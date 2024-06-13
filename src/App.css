@@ -1,0 +1,80 @@
+:root {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #192734;
+  color: azure;
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  margin: 0;
+  padding-left: 0;
+}
+
+.players-container {
+  display: flex;
+  position: relative;
+  min-height: 100vh;
+}
+
+.player-one, .player-two {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  list-style-type: none;
+}
+
+.player-one {
+  background-color: blue;
+}
+
+.player-two {
+  background-color: red;
+}
+
+.player-name {
+  font-size: 80px;
+}
+
+.player-score {
+  font-size: 192px;
+}
+
+.player-heart-rate {
+  font-size: 32px;
+}
+
+.player-serving {
+  font-size: 24px;
+  padding-top: 48px;
+}
+
+.match-progress, .recent-points {
+  display: flex;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  height: 50px;
+  background-color: rebeccapurple;
+  justify-content: center;
+  align-items: center;
+}
+
+.match-progress {
+  top: 5%;
+  width: fit-content;
+  padding: 5px 10px;
+  font-size: 48px;
+}
+
+.recent-points {
+  bottom: 5%;
+  width: 200px;
+}
