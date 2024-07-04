@@ -1,10 +1,30 @@
 import { useState } from 'react'
-import './App.css'
+import GeneralForm from './components/GeneralForm';
+import GameTracking from './components/GameTracking';
+import { v4 as uuidv4 } from "uuid"
 
-function App() {
+uuidv4();
+
+export default function App(){
+    const [sport, setSport] = useState(""); //
+    const [matchType, setMatchType] = useState("singles");
+    const [bestOf, setBestOf] = useState("1");
     const [playerOne, setPlayerOne] = useState({name: "John", score: 8, heartRate: 100, serving: true, games: 0});
     const [playerTwo, setPlayerTwo] = useState({name: "Gary", score: 6, heartRate: 100, serving: false, games: 1});
-    const [format, setFormat] = useState("1");
+    const [players, setPlayers] = useState([]);
+    const [score, setScore] = useState([]);
+
+    function addPlayer(name, age, colour){
+        setPlayers([
+            ...players,
+            {
+                id: uuidv4(),
+                name: name,
+                age: age,
+                colour: colour
+            }
+        ]);
+    }
     const [p1HeartRate, setP1HeartRate] = useState(0);
 
 
@@ -79,25 +99,19 @@ function App() {
 
     return (
         <>
-            <div className="players-container">
-                <ul className="player-one">
-                    <li className="player-name">{playerOne.name}</li>
-                    <li className="player-score">{playerOne.score}</li>
-                    <li className="player-heart-rate">{`${p1HeartRate} bpm`}</li>
-                    <li className="player-serving">{playerOne.serving ? "Serving" : ""}</li>
-                </ul>
-                <ul className="player-two">
-                    <li className="player-name">{playerTwo.name}</li>
-                    <li className="player-score">{playerTwo.score}</li>
-                    <li className="player-heart-rate">{`${playerTwo.heartRate} bpm`}</li>
-                    <li className="player-serving">{playerTwo.serving ? "Serving" : ""}</li>
-                </ul>
-            </div>
-            <div className="match-progress">{`${playerOne.games} - ${playerTwo.games}`}</div>
-            <button onClick={() => connect({ onChange: printHeartRate }).catch(console.error)}>Connect HR monitor</button>
-            <div className="recent-points">Last 10 points (wip)</div>
+            <GeneralForm 
+                sport={sport}
+                setSport={setSport}
+                matchType={matchType}
+                setMatchType={setMatchType}
+                bestOf={bestOf}
+                setBestOf={setBestOf}
+                addPlayer={addPlayer}
+            />
+            <GameTracking 
+                playerOne={playerOne}
+                playerTwo={playerTwo}
+            />
         </>
     )
 }
-
-export default App
