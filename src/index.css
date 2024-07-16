@@ -47,7 +47,9 @@
   }
   
   .player-heart-rate {
-    font-size: 32px;
+    font-size: 64px;
+    background-color: grey;
+    padding: 15px 30px;
   }
   
   .player-serving {

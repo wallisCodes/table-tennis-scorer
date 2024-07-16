@@ -1,18 +1,20 @@
 import { useState } from 'react'
 
-export default function PlayerForm({addPlayer}){
+export default function PlayerForm({players, addPlayer}){
     const [name, setName] = useState("");
     const [age, setAge] = useState("");
-    const [colour, setColour] = useState("");
+    const [colour, setColour] = useState("#000000");
     
     function handleSubmit(event){
         event.preventDefault();
         addPlayer(name, age, colour);
+        
 
         setName("");
         setAge("");
-        setColour("");
-        console.log("Added player");
+        setColour("#000000");
+        
+        console.log(`Players array: ${JSON.stringify(players)}`);
     }
 
     // TODO: Push form up a level so it's not nested inside GeneralForm

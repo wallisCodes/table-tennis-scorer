@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import GeneralForm from './components/GeneralForm';
+import PlayerForm from './components/PlayerForm';
 import GameTracking from './components/GameTracking';
 import { v4 as uuidv4 } from "uuid"
 
@@ -9,10 +10,28 @@ export default function App(){
     const [sport, setSport] = useState(""); //
     const [matchType, setMatchType] = useState("singles");
     const [bestOf, setBestOf] = useState("1");
-    const [playerOne, setPlayerOne] = useState({name: "John", score: 8, heartRate: 100, serving: true, games: 0});
-    const [playerTwo, setPlayerTwo] = useState({name: "Gary", score: 6, heartRate: 100, serving: false, games: 1});
+    const [playerOne, setPlayerOne] = useState(
+        {
+            name: "Player 1",
+            score: 0,
+            serving: true,
+            games: 0
+        }
+    );
+    const [playerTwo, setPlayerTwo] = useState(
+        {
+            name: "Player 2",
+            score: 0,
+            serving: false,
+            games: 0
+        }
+    );
     const [players, setPlayers] = useState([]);
-    const [score, setScore] = useState([]);
+    const [scoreHistory, setScoreHistory] = useState([]);
+    const [p1HeartRate, setP1HeartRate] = useState(0);
+    const [p2HeartRate, setP2HeartRate] = useState(0);
+    const [showScores, setShowScores] = useState(false);
+
 
     function addPlayer(name, age, colour){
         setPlayers([
@@ -24,94 +43,118 @@ export default function App(){
                 colour: colour
             }
         ]);
+        console.log(`players.length: ${players.length}`);
     }
-    const [p1HeartRate, setP1HeartRate] = useState(0);
+    
 
+    // function incrementP1Score(){
+        
+    // }
 
-
-    async function connect(props) {
-        const device = await navigator.bluetooth.requestDevice({
+    // Bluetooth code
+    async function connectOne(props) {
+        const deviceOne = await navigator.bluetooth.requestDevice({
             filters: [{ services: ['heart_rate'] }],
             acceptAllDevices: false,
         })
 
-        console.log(`%c\n<3`, 'font-size: 82px;', 'Starting HR...\n\n');
-        const server = await device.gatt?.connect();
+        console.log(`%c\n<3`, 'font-size: 82px;', 'Starting HR 1...\n\n');
+        const server = await deviceOne.gatt?.connect();
         const service = await server.getPrimaryService('heart_rate');
         const char = await service.getCharacteristic('heart_rate_measurement');
         char.oncharacteristicvaluechanged = props.onChange;
         char.startNotifications();
         return char;
     }
-  
-  
-  
-  
-  
-    function printHeartRate(event) {
-        // setHeartRate(event.target.value.getInt8(1));
-        const heartRate = event.target.value.getInt8(1);
-        setP1HeartRate(heartRate);
-        const prev = hrData[hrData.length - 1];
-        hrData[hrData.length] = heartRate;
-        hrData = hrData.slice(-200);
-        let arrow = '';
-        if (heartRate !== prev) arrow = heartRate > prev ? '⬆' : '⬇';
-        console.clear();
-        console.graph(hrData);
-        console.log(`%c\n💚 ${heartRate} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
+
+
+    async function connectTwo(props) {
+        const deviceTwo = await navigator.bluetooth.requestDevice({
+            filters: [{ services: ['heart_rate'] }],
+            acceptAllDevices: false,
+        })
+
+        console.log(`%c\n<3`, 'font-size: 82px;', 'Starting HR 2...\n\n');
+        const server = await deviceTwo.gatt?.connect();
+        const service = await server.getPrimaryService('heart_rate');
+        const char = await service.getCharacteristic('heart_rate_measurement');
+        char.oncharacteristicvaluechanged = props.onChange;
+        char.startNotifications();
+        return char;
     }
+
   
-  
-    // function setupConsoleGraphExample(height, width) {
-    //     const canvas = document.createElement('canvas');
-    //     const context = canvas.getContext('2d');
-    //     canvas.height = height;
-    //     canvas.width = width;
-    //     context.fillStyle = '#fff';
-    //     window.console.graph = data => {
-    //         const n = data.length;
-    //         const units = Math.floor(width / n);
-    //         width = units * n;
-    //         context.clearRect(0, 0, width, height);
-    //         for (let i = 0; i < n; ++i) {
-    //             context.fillRect(i * units, 0, units, 100 - (data[i] / 2));
-    //         }
-    //         console.log('%c ', `font-size: 0; padding-left: ${width}px; padding-bottom: ${height}px;
-    //         background: url("${canvas.toDataURL()}"), -webkit-linear-gradient(#eee, #888);`,)
-    //     }
-    // }
+    function printHeartRateOne(event) {
+        // setP1HeartRate(event.target.value.getInt8(1));
+        const heartRateOne = event.target.value.getInt8(1);
+        setP1HeartRate(heartRateOne);
+        const prev = hrDataOne[hrDataOne.length - 1];
+        hrDataOne[hrDataOne.length] = heartRateOne;
+        hrDataOne = hrDataOne.slice(-200);
+        let arrow = '';
+        if (heartRateOne !== prev) arrow = heartRateOne > prev ? '⬆' : '⬇';
+        console.clear();
+        // console.graph(hrData);
+        console.log(`%c\n💚 Player 1: ${heartRateOne} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
+    }
 
-    // console.log("Testing");
+    function printHeartRateTwo(event) {
+        // setP1HeartRate(event.target.value.getInt8(1));
+        const heartRateTwo = event.target.value.getInt8(1);
+        setP2HeartRate(heartRateTwo);
+        const prev = hrDataTwo[hrDataTwo.length - 1];
+        hrDataTwo[hrDataTwo.length] = heartRateTwo;
+        hrDataTwo = hrDataTwo.slice(-200);
+        let arrow = '';
+        if (heartRateTwo !== prev) arrow = heartRateTwo > prev ? '⬆' : '⬇';
+        console.clear();
+        // console.graph(hrData);
+        console.log(`%c\n💚 Player 2: ${heartRateTwo} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
+    }
 
-    // // Basic example that prints a live updating chart of the heart rate history.
-    // // Note: This should only be used as a quick/hacky test, it's not optimized.
-    // let hrData = new Array(200).fill(10);
-    
-    // console.clear();
-    // setupConsoleGraphExample(100, 400);
-    // connect({ onChange: printHeartRate }).catch(console.error);
+    let hrDataOne = new Array(200).fill(10);
+    let hrDataTwo = new Array(200).fill(10);
 
-
-
-
+    function backToInput(){
+        setShowScores(false);
+    }
 
 
     return (
         <>
-            <GeneralForm 
-                sport={sport}
-                setSport={setSport}
-                matchType={matchType}
-                setMatchType={setMatchType}
-                bestOf={bestOf}
-                setBestOf={setBestOf}
-                addPlayer={addPlayer}
-            />
-            <GameTracking 
-                playerOne={playerOne}
-                playerTwo={playerTwo}
-            />
+            {!showScores &&
+                <div>
+                    <GeneralForm 
+                        sport={sport}
+                        setSport={setSport}
+                        matchType={matchType}
+                        setMatchType={setMatchType}
+                        bestOf={bestOf}
+                        setBestOf={setBestOf}
+                        setShowScores={setShowScores}
+                    />
+                    <PlayerForm
+                        players={players}
+                        addPlayer={addPlayer}
+                    />
+                </div>
+            }
+            
+
+            {showScores &&
+            <div>
+                <button onClick={backToInput}>Go back</button>
+                <GameTracking 
+                    playerOne={playerOne}
+                    incrementP1Score={incrementP1Score}
+                    playerTwo={playerTwo}
+                    p1HeartRate={p1HeartRate}
+                    p2HeartRate={p2HeartRate}
+                />
+                <button onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect 1</button>
+                <button onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect 2</button>
+            </div>
+            }
         </>
     )
 }

@@ -1,9 +1,8 @@
-import { useState } from 'react'
-import PlayerForm from './PlayerForm';
-
-export default function GeneralForm({sport, setSport, matchType, setMatchType, bestOf, setBestOf, addPlayer}){
+export default function GeneralForm({sport, setSport, matchType, setMatchType, bestOf, setBestOf, setShowScores}){
     function handleSubmit(event){
         event.preventDefault();
+        console.log("Submitted general form");
+        setShowScores(true);
     }
 
     return (
@@ -22,6 +21,9 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                         >
                             <option value="">Choose Sport</option>
                             <option value="table-tennis">Table Tennis</option>
+                            <option value="squash">Squash</option>
+                            <option value="badminton">Badminton</option>
+                            <option value="tennis">Tennis</option>
                         </select>
                     </div>
 
@@ -71,15 +73,8 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                     />
                     <label htmlFor="bo3" className="">Best of 3</label>
                     <br />
-                </fieldset>
-                    
-
-                <PlayerForm 
-                    addPlayer={addPlayer}
-                />
-                
+                </fieldset>   
                 <button className="">Start Game</button>
-                
             </form>
         </>
     )
