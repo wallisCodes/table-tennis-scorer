@@ -1,4 +1,6 @@
-export default function GeneralForm({sport, setSport, matchType, setMatchType, bestOf, setBestOf, setShowScores}){
+import { useState } from 'react'
+
+export default function GeneralForm({matchDetails, setMatchDetails, setShowScores}){
     function handleSubmit(event){
         event.preventDefault();
         console.log("Submitted general form");
@@ -14,8 +16,11 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                         <label htmlFor="sport-choice" className="">Sport choice</label>
                         <select 
                             id="sport-choice"
-                            onChange={e => setSport(e.target.value)}
-                            value={sport}
+                            onChange={e => setMatchDetails({
+                                ...matchDetails,
+                                sport: e.target.value
+                            })}
+                            value={matchDetails.sport}
                             className=""
                             required
                         >
@@ -33,8 +38,11 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                         id="singles"
                         name="matchType"
                         value="singles"
-                        checked={matchType === "singles"}
-                        onChange={(e) => setMatchType(e.target.value)}
+                        checked={matchDetails.matchType === "singles"}
+                        onChange={(e) => setMatchDetails({
+                            ...matchDetails,
+                            matchType: e.target.value
+                        })}
                     />
                     <label htmlFor="singles" className="">Singles</label>
                     <br />
@@ -44,9 +52,11 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                         id="doubles"
                         name="matchType"
                         value="doubles"
-                        checked={matchType === "doubles"}
-                        onChange={(e) => setMatchType(e.target.value)}
-                        disabled
+                        checked={matchDetails.matchType === "doubles"}
+                        onChange={(e) => setMatchDetails({
+                            ...matchDetails,
+                            matchType: e.target.value
+                        })}
                     />
                     <label htmlFor="doubles" className="">Doubles</label>
                     <br />
@@ -57,8 +67,11 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                         id="bo1"
                         name="bestOf"
                         value="1"
-                        checked={bestOf === "1"}
-                        onChange={(e) => setBestOf(e.target.value)}
+                        checked={matchDetails.bestOf === "1"}
+                        onChange={(e) => setMatchDetails({
+                            ...matchDetails,
+                            bestOf: e.target.value
+                        })}
                     />
                     <label htmlFor="bo1" className="">Best of 1</label>
                     <br />
@@ -68,8 +81,11 @@ export default function GeneralForm({sport, setSport, matchType, setMatchType, b
                         id="bo3"
                         name="bestOf"
                         value="3"
-                        checked={bestOf === "3"}
-                        onChange={(e) => setBestOf(e.target.value)}
+                        checked={matchDetails.bestOf === "3"}
+                        onChange={(e) => setMatchDetails({
+                            ...matchDetails,
+                            bestOf: e.target.value
+                        })}
                     />
                     <label htmlFor="bo3" className="">Best of 3</label>
                     <br />

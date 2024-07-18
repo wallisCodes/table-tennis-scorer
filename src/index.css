@@ -31,25 +31,58 @@
   }
   
   .player-one {
-    background-color: blue;
+    /* background-color: blue; */
   }
   
   .player-two {
-    background-color: red;
+    /* background-color: red; */
+  }
+
+  .player-box {
+    display: flex;
+    gap: 1em;
   }
   
   .player-name {
     font-size: 80px;
+    width: 300px;
+    text-align: center;
+    background-color: black;
+  }
+
+  .player-team-one {
+    background-color: aqua;
+    height: inherit;
+    width: 50px;
+  }
+
+  .player-team-two {
+    background-color: magenta;
+    height: inherit;
+    width: 50px;
   }
   
-  .player-score {
+  .player-points {
     font-size: 192px;
   }
   
   .player-heart-rate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     font-size: 64px;
     background-color: grey;
     padding: 15px 30px;
+  }
+
+  .heart-rate-stats {
+    display: flex;
+    gap: 1em;
+  }
+
+  .heart-rate-icon {
+    fill: white;
+    /* height: 50px; */
   }
   
   .player-serving {

@@ -7,29 +7,18 @@ import { v4 as uuidv4 } from "uuid"
 uuidv4();
 
 export default function App(){
-    const [sport, setSport] = useState(""); //
-    const [matchType, setMatchType] = useState("singles");
-    const [bestOf, setBestOf] = useState("1");
-    const [playerOne, setPlayerOne] = useState(
+    const [matchDetails, setMatchDetails] = useState(
         {
-            name: "Player 1",
-            score: 0,
-            serving: true,
-            games: 0
+            sport: "table-tennis",
+            matchType: "singles",
+            bestOf: "3"
         }
     );
-    const [playerTwo, setPlayerTwo] = useState(
-        {
-            name: "Player 2",
-            score: 0,
-            serving: false,
-            games: 0
-        }
-    );
+
     const [players, setPlayers] = useState([]);
-    const [scoreHistory, setScoreHistory] = useState([]);
-    const [p1HeartRate, setP1HeartRate] = useState(0);
-    const [p2HeartRate, setP2HeartRate] = useState(0);
+    // const [scoreHistory, setScoreHistory] = useState([]);
+    const [p1HeartRate, setP1HeartRate] = useState(110);
+    const [p2HeartRate, setP2HeartRate] = useState(105);
     const [showScores, setShowScores] = useState(false);
 
 
@@ -40,16 +29,17 @@ export default function App(){
                 id: uuidv4(),
                 name: name,
                 age: age,
-                colour: colour
+                colour: colour,
+                serving: false,
+                points: 0,
+                games: 0
+                // heartRate: [85]
             }
         ]);
-        console.log(`players.length: ${players.length}`);
+        // console.log(`players.length: ${players.length}`);
     }
     
 
-    // function incrementP1Score(){
-        
-    // }
 
     // Bluetooth code
     async function connectOne(props) {
@@ -88,6 +78,12 @@ export default function App(){
         // setP1HeartRate(event.target.value.getInt8(1));
         const heartRateOne = event.target.value.getInt8(1);
         setP1HeartRate(heartRateOne);
+        // setPlayers(prev => {                                   TO CONTINUE...
+        //     return {
+        //         ...prev,
+        //         heartRate: heartRateOne
+        //     }
+        // })
         const prev = hrDataOne[hrDataOne.length - 1];
         hrDataOne[hrDataOne.length] = heartRateOne;
         hrDataOne = hrDataOne.slice(-200);
@@ -99,7 +95,6 @@ export default function App(){
     }
 
     function printHeartRateTwo(event) {
-        // setP1HeartRate(event.target.value.getInt8(1));
         const heartRateTwo = event.target.value.getInt8(1);
         setP2HeartRate(heartRateTwo);
         const prev = hrDataTwo[hrDataTwo.length - 1];
@@ -125,17 +120,14 @@ export default function App(){
             {!showScores &&
                 <div>
                     <GeneralForm 
-                        sport={sport}
-                        setSport={setSport}
-                        matchType={matchType}
-                        setMatchType={setMatchType}
-                        bestOf={bestOf}
-                        setBestOf={setBestOf}
+                        matchDetails={matchDetails}
+                        setMatchDetails={setMatchDetails}
                         setShowScores={setShowScores}
                     />
                     <PlayerForm
                         players={players}
                         addPlayer={addPlayer}
+                        matchDetails={matchDetails}
                     />
                 </div>
             }
@@ -145,11 +137,12 @@ export default function App(){
             <div>
                 <button onClick={backToInput}>Go back</button>
                 <GameTracking 
-                    playerOne={playerOne}
-                    incrementP1Score={incrementP1Score}
-                    playerTwo={playerTwo}
+                    // playerOne={playerOne}
+                    // incrementP1Score={incrementP1Score}
+                    // playerTwo={playerTwo}
                     p1HeartRate={p1HeartRate}
                     p2HeartRate={p2HeartRate}
+                    players={players}
                 />
                 <button onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect 1</button>
                 <button onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect 2</button>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function PlayerForm({players, addPlayer}){
+export default function PlayerForm({players, addPlayer, matchDetails}){
     const [name, setName] = useState("");
     const [age, setAge] = useState("");
     const [colour, setColour] = useState("#000000");
@@ -8,16 +8,15 @@ export default function PlayerForm({players, addPlayer}){
     function handleSubmit(event){
         event.preventDefault();
         addPlayer(name, age, colour);
-        
 
         setName("");
         setAge("");
         setColour("#000000");
-        
-        console.log(`Players array: ${JSON.stringify(players)}`);
+        // console.log(`players array: ${JSON.stringify(players)}`);
     }
 
-    // TODO: Push form up a level so it's not nested inside GeneralForm
+
+    
     return (
         <>
             <form onSubmit={handleSubmit} className=""> 
@@ -58,7 +57,7 @@ export default function PlayerForm({players, addPlayer}){
                             required
                         />
                     </div>
-                    <button className="">Add Player</button>
+                    <button className="" disabled={matchDetails.matchType === "singles" ? players.length >= 2 : players.length >= 4}>Add Player</button>
                 </fieldset>
             </form>
         </>
