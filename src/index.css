@@ -15,6 +15,16 @@
     padding-left: 0;
   }
   
+  .back-button {
+    position: absolute;
+    pointer-events: auto; /* allows absolutely positioned button to be clicked */
+    font-size: 32px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: rebeccapurple;
+    border: none;
+  }
+
   .players-container {
     display: flex;
     position: relative;
@@ -32,6 +42,7 @@
   
   .player-one {
     /* background-color: blue; */
+    border-right: 2px solid black;
   }
   
   .player-two {
@@ -51,13 +62,11 @@
   }
 
   .player-team-one {
-    background-color: aqua;
     height: inherit;
     width: 50px;
   }
 
   .player-team-two {
-    background-color: magenta;
     height: inherit;
     width: 50px;
   }
@@ -70,9 +79,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 64px;
-    background-color: grey;
-    padding: 15px 30px;
+    justify-content: center;
+    font-size: 120px;
+    width: 100%;
+    height: 400px;
+    padding: 30px 0;
   }
 
   .heart-rate-stats {
@@ -82,7 +93,17 @@
 
   .heart-rate-icon {
     fill: white;
-    /* height: 50px; */
+    height: 150px;
+    aspect-ratio: 1;
+    margin: 40px 0;
+    animation: beat 0.5s infinite alternate; /* vary beat with heart rate */
+    transform-origin: center;
+  }
+
+  @keyframes beat {
+    to { 
+      transform: scale(1.4); /* vary scale with heart rate */
+    }
   }
   
   .player-serving {

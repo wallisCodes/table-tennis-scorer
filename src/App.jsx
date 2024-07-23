@@ -15,10 +15,30 @@ export default function App(){
         }
     );
 
-    const [players, setPlayers] = useState([]);
+    // const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([ // for testing purposes
+        {
+            id: uuidv4(),
+            name: "Josh",
+            age: 28,
+            colour: "#00ff00",
+            serving: false,
+            points: 0,
+            games: 0
+        },
+        {
+            id: uuidv4(),
+            name: "Simon",
+            age: 56,
+            colour: "#ffff00",
+            serving: false,
+            points: 0,
+            games: 0
+        }
+    ]);
     // const [scoreHistory, setScoreHistory] = useState([]);
-    const [p1HeartRate, setP1HeartRate] = useState(110);
-    const [p2HeartRate, setP2HeartRate] = useState(105);
+    const [p1HeartRate, setP1HeartRate] = useState(130);
+    const [p2HeartRate, setP2HeartRate] = useState(150);
     const [showScores, setShowScores] = useState(false);
 
 
@@ -135,14 +155,12 @@ export default function App(){
 
             {showScores &&
             <div>
-                <button onClick={backToInput}>Go back</button>
                 <GameTracking 
-                    // playerOne={playerOne}
                     // incrementP1Score={incrementP1Score}
-                    // playerTwo={playerTwo}
                     p1HeartRate={p1HeartRate}
                     p2HeartRate={p2HeartRate}
                     players={players}
+                    backToInput={backToInput}
                 />
                 <button onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect 1</button>
                 <button onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect 2</button>
