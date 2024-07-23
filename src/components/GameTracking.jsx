@@ -1,4 +1,4 @@
-export default function GameTracking({p1HeartRate, p2HeartRate, players, backToInput}){
+export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, backToInput}){
     function maxHeartRate(age){
         return 220 - age;
     }
@@ -12,13 +12,6 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, backToI
         backgroundColor: players[1].colour
     }
 
-    const p1HRStyles = {
-        backgroundColor: "grey"
-    }
-
-    const p2HRStyles = {
-        // backgroundColor: "grey"
-    }
 
     function calcHRPercent(heartRate, age){
         return Math.round(heartRate * 100 / maxHeartRate(age));
@@ -50,16 +43,92 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, backToI
     // console.log(`HR percent = ${JSON.stringify(calcHRPercent(130, 60))}`);
     // console.log(`bgColor style = ${JSON.stringify(chooseBackgroundColor(95))}`);
 
+
+    // Scoring logic
+    const incrementP1Score = () => {
+        setPlayers(prevPlayers => {
+            // Create a shallow copy of the previous players array
+            const updatedPlayers = [...prevPlayers];
+            
+            // Check if the array is not empty and increase the points of the first player
+            if (updatedPlayers.length > 0) {
+                updatedPlayers[0] = { ...updatedPlayers[0], points: updatedPlayers[0].points + 1 };
+            }
+            
+            return updatedPlayers;
+        });
+    };
+
+    const decrementP1Score = () => {
+        setPlayers(prevPlayers => {
+            // Create a shallow copy of the previous players array
+            const updatedPlayers = [...prevPlayers];
+            
+            // Check if the array is not empty and decrease the points of the first player, ensuring they don't go below 0
+            if (updatedPlayers.length > 0) {
+                const newPoints = Math.max(0, updatedPlayers[0].points - 1);
+                updatedPlayers[0] = { ...updatedPlayers[0], points: newPoints };
+            }
+            
+            return updatedPlayers;
+        });
+    };
+
+    const incrementP2Score = () => {
+        setPlayers(prevPlayers => {
+            // Create a shallow copy of the previous players array
+            const updatedPlayers = [...prevPlayers];
+            
+            // Check if the array is not empty and increase the points of the second player
+            if (updatedPlayers.length > 0) {
+                updatedPlayers[1] = { ...updatedPlayers[1], points: updatedPlayers[1].points + 1 };
+            }
+            
+            return updatedPlayers;
+        });
+    };
+
+    const decrementP2Score = () => {
+        setPlayers(prevPlayers => {
+            // Create a copy of the previous players array
+            const updatedPlayers = [...prevPlayers];
+            
+            // Check if the array is not empty and decrease the points of the second player, ensuring they don't go below 0
+            if (updatedPlayers.length > 0) {
+                const newPoints = Math.max(0, updatedPlayers[1].points - 1);
+                updatedPlayers[1] = { ...updatedPlayers[1], points: newPoints };
+            }
+            
+            return updatedPlayers;
+        });
+    };
+
+
+
     return (
         <>
             <div className="players-container">
-                <button className="back-button" onClick={backToInput}>Go back</button>
+                {/* Back button */}
+                <svg onClick={backToInput} className="back-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="m10.978 14.999v3.251c0 .412-.335.75-.752.75-.188 0-.375-.071-.518-.206-1.775-1.685-4.945-4.692-6.396-6.069-.2-.189-.312-.452-.312-.725 0-.274.112-.536.312-.725 1.451-1.377 4.621-4.385 6.396-6.068.143-.136.33-.207.518-.207.417 0 .752.337.752.75v3.251h9.02c.531 0 1.002.47 1.002 1v3.998c0 .53-.471 1-1.002 1z" fillRule="nonzero"/>
+                </svg>
+
+                {/* First player/team display */}
                 <ul className="player-one">
-                    <li className="player-box">
-                        <div className="player-team-one" style={p1TeamStyles}></div>
-                        <span className="player-name">{players[0].name}</span>
-                    </li>
-                    <li className="player-points">{players[0].points}</li>
+                    {/* Player name, colour and score */}
+                    <div className="player-details">
+                        <li className="player-banner">
+                            <div className="player-team-one" style={p1TeamStyles}></div>
+                            <span className="player-name">{players[0].name}</span>
+                        </li>
+                        <li className="player-points">
+                            <span onClick={decrementP1Score} disabled={players[0].points === 0} className="score-control">-</span>
+                            <span>{players[0].points}</span>
+                            <span onClick={incrementP1Score} className="score-control">+</span>
+                        </li>
+                    </div>
+                    
+                    {/* Heart rate display */}
                     <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p1HeartRate, players[0].age))}>
                         <div className="heart-rate-stats">
                             <div>{`${calcHRPercent(p1HeartRate, players[0].age)}%`}</div>
@@ -73,12 +142,23 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, backToI
                     {/* <li className="player-max-heart-rate">{`Max: ${maxHeartRate(players[0].age)} bpm`}</li> 
                     <li className="player-serving">{players[0].serving ? "Serving" : "Not Serving"}</li> */}
                 </ul>
+
+                {/* Second player/team display */}
                 <ul className="player-two">
-                    <li className="player-box">
-                        <span className="player-name">{players[1].name}</span>
-                        <div className="player-team-two" style={p2TeamStyles}></div>
-                    </li>
-                    <li className="player-points">{players[1].points}</li>
+                    {/* Player name, colour and score */}
+                    <div className="player-details">
+                        <li className="player-banner">
+                            <span className="player-name">{players[1].name}</span>
+                            <div className="player-team-two" style={p2TeamStyles}></div>
+                        </li>
+                        <li className="player-points">
+                            <span onClick={decrementP2Score} className="score-control">-</span>
+                            <span>{players[1].points}</span>
+                            <span onClick={incrementP2Score} className="score-control">+</span>
+                        </li>
+                    </div>
+                    
+                    {/* Heart rate display */}
                     <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p2HeartRate, players[1].age))}>
                         <div className="heart-rate-stats">
                             <div>{`${calcHRPercent(p2HeartRate, players[1].age)}%`}</div>

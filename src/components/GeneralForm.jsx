@@ -1,10 +1,18 @@
 import { useState } from 'react'
 
-export default function GeneralForm({matchDetails, setMatchDetails, setShowScores}){
+export default function GeneralForm({matchDetails, setMatchDetails, setShowScores, players}){
+    // Simple form validation logic
+    const correctPlayers = players.length === 2;
+
     function handleSubmit(event){
         event.preventDefault();
-        console.log("Submitted general form");
-        setShowScores(true);
+
+        if (!correctPlayers){
+            alert("Make sure you have two players added below.");
+        } else {
+            console.log("Submitted general form");
+            setShowScores(true);
+        }
     }
 
     return (
@@ -57,6 +65,7 @@ export default function GeneralForm({matchDetails, setMatchDetails, setShowScore
                             ...matchDetails,
                             matchType: e.target.value
                         })}
+                        disabled
                     />
                     <label htmlFor="doubles" className="">Doubles</label>
                     <br />

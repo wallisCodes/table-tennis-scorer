@@ -11,34 +11,36 @@ export default function App(){
         {
             sport: "table-tennis",
             matchType: "singles",
-            bestOf: "3"
+            bestOf: "1"
         }
     );
 
-    // const [players, setPlayers] = useState([]);
-    const [players, setPlayers] = useState([ // for testing purposes
-        {
-            id: uuidv4(),
-            name: "Josh",
-            age: 28,
-            colour: "#00ff00",
-            serving: false,
-            points: 0,
-            games: 0
-        },
-        {
-            id: uuidv4(),
-            name: "Simon",
-            age: 56,
-            colour: "#ffff00",
-            serving: false,
-            points: 0,
-            games: 0
-        }
-    ]);
+    const [players, setPlayers] = useState([]);
+    // const [players, setPlayers] = useState([ // for testing purposes
+    //     {
+    //         id: uuidv4(),
+    //         name: "Josh",
+    //         age: 28,
+    //         colour: "#00ff00",
+    //         serving: false,
+    //         points: 0,
+    //         games: 0
+    //     },
+    //     {
+    //         id: uuidv4(),
+    //         name: "Simon",
+    //         age: 56,
+    //         colour: "#ffff00",
+    //         serving: false,
+    //         points: 0,
+    //         games: 0
+    //     }
+    // ]);
     // const [scoreHistory, setScoreHistory] = useState([]);
-    const [p1HeartRate, setP1HeartRate] = useState(130);
-    const [p2HeartRate, setP2HeartRate] = useState(150);
+    const [p1HeartRate, setP1HeartRate] = useState(0);
+    const [p2HeartRate, setP2HeartRate] = useState(0);
+    // const [p1HeartRate, setP1HeartRate] = useState(130);
+    // const [p2HeartRate, setP2HeartRate] = useState(150);
     const [showScores, setShowScores] = useState(false);
 
 
@@ -143,6 +145,7 @@ export default function App(){
                         matchDetails={matchDetails}
                         setMatchDetails={setMatchDetails}
                         setShowScores={setShowScores}
+                        players={players}
                     />
                     <PlayerForm
                         players={players}
@@ -160,6 +163,7 @@ export default function App(){
                     p1HeartRate={p1HeartRate}
                     p2HeartRate={p2HeartRate}
                     players={players}
+                    setPlayers={setPlayers}
                     backToInput={backToInput}
                 />
                 <button onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect 1</button>

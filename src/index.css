@@ -19,11 +19,14 @@
     position: absolute;
     pointer-events: auto; /* allows absolutely positioned button to be clicked */
     font-size: 32px;
-    padding: 8px 16px;
+    padding: 4px 8px;
     cursor: pointer;
     background-color: rebeccapurple;
     border: none;
+    fill: white;
   }
+
+  
 
   .players-container {
     display: flex;
@@ -42,14 +45,23 @@
   
   .player-one {
     /* background-color: blue; */
-    border-right: 2px solid black;
+    border-right: 6px solid black;
   }
   
   .player-two {
     /* background-color: red; */
   }
 
-  .player-box {
+  .player-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5em;
+    /* justify-content: center; */
+    align-items: center;
+    height: 60vh;
+  }
+
+  .player-banner {
     display: flex;
     gap: 1em;
   }
@@ -72,7 +84,15 @@
   }
   
   .player-points {
-    font-size: 192px;
+    font-size: 216px;
+    align-items: center;
+    display: flex;
+    gap: 20px;
+  }
+
+  .score-control {
+    font-size: 120px;
+    cursor: pointer;
   }
   
   .player-heart-rate {
@@ -80,9 +100,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 120px;
+    border-top: 6px solid black;
+    font-size: 100px;
     width: 100%;
-    height: 400px;
+    height: 40vh;
     padding: 30px 0;
   }
 
@@ -93,7 +114,7 @@
 
   .heart-rate-icon {
     fill: white;
-    height: 150px;
+    height: 120px;
     aspect-ratio: 1;
     margin: 40px 0;
     animation: beat 0.5s infinite alternate; /* vary beat with heart rate */
@@ -124,13 +145,13 @@
   }
   
   .match-progress {
-    top: 5%;
+    top: 0;
     width: fit-content;
     padding: 5px 10px;
     font-size: 48px;
   }
   
   .recent-points {
-    bottom: 5%;
+    bottom: 0;
     width: 200px;
   }
