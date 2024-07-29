@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import GeneralForm from './components/GeneralForm';
 import PlayerForm from './components/PlayerForm';
 import GameTracking from './components/GameTracking';
@@ -9,7 +9,7 @@ uuidv4();
 export default function App(){
     const [matchDetails, setMatchDetails] = useState(
         {
-            sport: "table-tennis",
+            sport: "squash",
             matchType: "singles",
             bestOf: "1"
         }
@@ -24,7 +24,6 @@ export default function App(){
     //         colour: "#00ff00",
     //         serving: false,
     //         points: 0,
-    //         games: 0
     //     },
     //     {
     //         id: uuidv4(),
@@ -33,14 +32,11 @@ export default function App(){
     //         colour: "#ffff00",
     //         serving: false,
     //         points: 0,
-    //         games: 0
     //     }
     // ]);
     // const [scoreHistory, setScoreHistory] = useState([]);
-    const [p1HeartRate, setP1HeartRate] = useState(0);
-    const [p2HeartRate, setP2HeartRate] = useState(0);
-    // const [p1HeartRate, setP1HeartRate] = useState(130);
-    // const [p2HeartRate, setP2HeartRate] = useState(150);
+    const [p1HeartRate, setP1HeartRate] = useState([70]); // 130
+    const [p2HeartRate, setP2HeartRate] = useState([70]); // 150
     const [showScores, setShowScores] = useState(false);
 
 
@@ -53,14 +49,40 @@ export default function App(){
                 age: age,
                 colour: colour,
                 serving: false,
-                points: 0,
-                games: 0
+                points: 0
+                // games: 0
                 // heartRate: [85]
             }
         ]);
-        // console.log(`players.length: ${players.length}`);
     }
     
+
+    // Used to generate mock HR data for testing purposes
+    // const [mockData, setMockData] = useState(false);
+
+    // if (mockData === true){
+    //     useEffect(() => {
+    //         function generateRandomHRValues(max, min){
+    //             //TODO: add timestamp to data
+    //             setP1HeartRate(prevData => {
+    //                 return [...prevData, Math.floor(Math.random() * (max - min + 1) + min)]
+    //             });
+
+    //             setP2HeartRate(prevData => {
+    //                 return [...prevData, Math.floor(Math.random() * (max - min + 1) + min)]
+    //             });
+    //         }
+    //         generateRandomHRValues(116, 160);
+        
+    //         const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
+    //             generateRandomHRValues(116, 160);
+    //         }, 5000);
+    
+    //         return () => clearInterval(int);
+    //     }, []);
+    // }
+
+
 
 
     // Bluetooth code
@@ -97,9 +119,16 @@ export default function App(){
 
   
     function printHeartRateOne(event) {
-        // setP1HeartRate(event.target.value.getInt8(1));
         const heartRateOne = event.target.value.getInt8(1);
-        setP1HeartRate(heartRateOne);
+        // setP1HeartRate(heartRateOne);
+        
+        // Ignore spurious HR data
+        if (20 <= heartRateOne && heartRateOne < 250){
+            setP1HeartRate(prevData => {
+                return [...prevData, heartRateOne]
+            });
+        }
+        
         // setPlayers(prev => {                                   TO CONTINUE...
         //     return {
         //         ...prev,
@@ -112,20 +141,26 @@ export default function App(){
         let arrow = '';
         if (heartRateOne !== prev) arrow = heartRateOne > prev ? '⬆' : '⬇';
         console.clear();
-        // console.graph(hrData);
         console.log(`%c\n💚 Player 1: ${heartRateOne} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
     }
 
     function printHeartRateTwo(event) {
         const heartRateTwo = event.target.value.getInt8(1);
-        setP2HeartRate(heartRateTwo);
+        // setP2HeartRate(heartRateTwo);
+
+        // Ignore spurious HR data
+        if (20 <= heartRateTwo && heartRateTwo < 250){
+            setP2HeartRate(prevData => {
+                return [...prevData, heartRateTwo]
+            });
+        }
+
         const prev = hrDataTwo[hrDataTwo.length - 1];
         hrDataTwo[hrDataTwo.length] = heartRateTwo;
         hrDataTwo = hrDataTwo.slice(-200);
         let arrow = '';
         if (heartRateTwo !== prev) arrow = heartRateTwo > prev ? '⬆' : '⬇';
         console.clear();
-        // console.graph(hrData);
         console.log(`%c\n💚 Player 2: ${heartRateTwo} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
     }
 
@@ -161,7 +196,9 @@ export default function App(){
                 <GameTracking 
                     // incrementP1Score={incrementP1Score}
                     p1HeartRate={p1HeartRate}
+                    setP1HeartRate={setP1HeartRate}
                     p2HeartRate={p2HeartRate}
+                    setP2HeartRate={setP2HeartRate}
                     players={players}
                     setPlayers={setPlayers}
                     backToInput={backToInput}

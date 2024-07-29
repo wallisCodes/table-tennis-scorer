@@ -95,6 +95,7 @@ export default function GeneralForm({matchDetails, setMatchDetails, setShowScore
                             ...matchDetails,
                             bestOf: e.target.value
                         })}
+                        disabled
                     />
                     <label htmlFor="bo3" className="">Best of 3</label>
                     <br />

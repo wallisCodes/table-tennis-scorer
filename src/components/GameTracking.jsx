@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+
+// export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
 export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, backToInput}){
     function maxHeartRate(age){
         return 220 - age;
@@ -40,70 +43,61 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
         return {backgroundColor: bgColor};
     }
 
-    // console.log(`HR percent = ${JSON.stringify(calcHRPercent(130, 60))}`);
-    // console.log(`bgColor style = ${JSON.stringify(chooseBackgroundColor(95))}`);
+
+    // SCORING LOGIC
+    const [winner, setWinner] = useState(null);
+    const [showWinner, setShowWinner] = useState(false);
+
+    // const scoreDifference = Math.abs(players[0].points - players[1].points);
+    // console.log(`Score differential: ${scoreDifference}`);
 
 
-    // Scoring logic
-    const incrementP1Score = () => {
+
+
+
+    const updatePlayerPoints = (playerIndex, increment = true) => {
         setPlayers(prevPlayers => {
-            // Create a shallow copy of the previous players array
             const updatedPlayers = [...prevPlayers];
-            
-            // Check if the array is not empty and increase the points of the first player
-            if (updatedPlayers.length > 0) {
-                updatedPlayers[0] = { ...updatedPlayers[0], points: updatedPlayers[0].points + 1 };
+
+            if (playerIndex >= 0 && playerIndex < updatedPlayers.length) {
+                const currentPoints = updatedPlayers[playerIndex].points;
+                const otherPlayerIndex = (playerIndex + 1) % 2;  // Assuming there are exactly 2 players
+                const otherPlayerPoints = updatedPlayers[otherPlayerIndex].points;
+
+                // Only update points if no one has won yet or if decrementing
+                if ((!winner) || !increment) {
+                    const newPoints = increment
+                        ? currentPoints + 1
+                        : Math.max(0, currentPoints - 1);
+
+                    updatedPlayers[playerIndex] = { ...updatedPlayers[playerIndex], points: newPoints };
+                }
             }
-            
+
             return updatedPlayers;
         });
     };
 
-    const decrementP1Score = () => {
-        setPlayers(prevPlayers => {
-            // Create a shallow copy of the previous players array
-            const updatedPlayers = [...prevPlayers];
-            
-            // Check if the array is not empty and decrease the points of the first player, ensuring they don't go below 0
-            if (updatedPlayers.length > 0) {
-                const newPoints = Math.max(0, updatedPlayers[0].points - 1);
-                updatedPlayers[0] = { ...updatedPlayers[0], points: newPoints };
+    useEffect(() => {
+        if (players.length >= 2) {
+            const [player1, player2] = players;
+
+            if (player1.points >= 21 && player1.points - player2.points >= 2) {
+                setWinner(player1.name);
+                setShowWinner(true);
+            } else if (player2.points >= 21 && player2.points - player1.points >= 2) {
+                setWinner(player2.name);
+                setShowWinner(true);
             }
-            
-            return updatedPlayers;
-        });
+        }
+    }, [players]); // Run this effect whenever 'players' state changes
+
+    const handleGoBack = () => {
+        setShowWinner(false);
+        setWinner(null); // Reset the winner state in order to make changes to score again
     };
-
-    const incrementP2Score = () => {
-        setPlayers(prevPlayers => {
-            // Create a shallow copy of the previous players array
-            const updatedPlayers = [...prevPlayers];
-            
-            // Check if the array is not empty and increase the points of the second player
-            if (updatedPlayers.length > 0) {
-                updatedPlayers[1] = { ...updatedPlayers[1], points: updatedPlayers[1].points + 1 };
-            }
-            
-            return updatedPlayers;
-        });
-    };
-
-    const decrementP2Score = () => {
-        setPlayers(prevPlayers => {
-            // Create a copy of the previous players array
-            const updatedPlayers = [...prevPlayers];
-            
-            // Check if the array is not empty and decrease the points of the second player, ensuring they don't go below 0
-            if (updatedPlayers.length > 0) {
-                const newPoints = Math.max(0, updatedPlayers[1].points - 1);
-                updatedPlayers[1] = { ...updatedPlayers[1], points: newPoints };
-            }
-            
-            return updatedPlayers;
-        });
-    };
-
-
+    
+    
 
     return (
         <>
@@ -117,63 +111,108 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                 <ul className="player-one">
                     {/* Player name, colour and score */}
                     <div className="player-details">
-                        <li className="player-banner">
+                        <li className="player-one-banner">
                             <div className="player-team-one" style={p1TeamStyles}></div>
-                            <span className="player-name">{players[0].name}</span>
+                            <span className="player-one-name">{players[0].name}</span>
                         </li>
-                        <li className="player-points">
-                            <span onClick={decrementP1Score} disabled={players[0].points === 0} className="score-control">-</span>
-                            <span>{players[0].points}</span>
-                            <span onClick={incrementP1Score} className="score-control">+</span>
-                        </li>
+
+                        {showWinner === true ? (
+                            <div className="winner-box">
+                                <h1 className="winner-name">{winner} wins!</h1>
+                                <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
+                            </div>
+                            ) : (
+                            <li className="player-points">
+                                <span onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0} className="score-control">-</span>
+                                <span>{players[0].points}</span>
+                                <span onClick={() => updatePlayerPoints(0, true)} className="score-control">+</span>
+                            </li>
+                        )}
+                        
+
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p1HeartRate, players[0].age))}>
+                    <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age))}>
                         <div className="heart-rate-stats">
-                            <div>{`${calcHRPercent(p1HeartRate, players[0].age)}%`}</div>
-                            <div>{p1HeartRate}</div>
+                            <div>{`${calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age)}%`}</div>
+                            <div className="hr-absolute">
+                                <div>{p1HeartRate[p1HeartRate.length - 1]}</div>
+                                <div className="hr-extremities">
+                                    <div className="player-max-heart-rate">
+                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
+                                        </svg>
+                                        <span>{Math.max(...p1HeartRate)}</span>
+                                    </div>
+                                    <div className="player-min-heart-rate">
+                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
+                                        </svg>
+                                        <span>{Math.min(...p1HeartRate)}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
                             <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
                         </svg>
                     </li>
-                    {/* Implement a more accurate way to calculate heart rate? */}
-                    {/* <li className="player-max-heart-rate">{`Max: ${maxHeartRate(players[0].age)} bpm`}</li> 
-                    <li className="player-serving">{players[0].serving ? "Serving" : "Not Serving"}</li> */}
                 </ul>
 
                 {/* Second player/team display */}
                 <ul className="player-two">
                     {/* Player name, colour and score */}
                     <div className="player-details">
-                        <li className="player-banner">
-                            <span className="player-name">{players[1].name}</span>
+                        <li className="player-two-banner">
+                            <span className="player-two-name">{players[1].name}</span>
                             <div className="player-team-two" style={p2TeamStyles}></div>
                         </li>
-                        <li className="player-points">
-                            <span onClick={decrementP2Score} className="score-control">-</span>
-                            <span>{players[1].points}</span>
-                            <span onClick={incrementP2Score} className="score-control">+</span>
-                        </li>
+
+                        {showWinner === true ? (
+                            <div className="winner-box">
+                                <h1 className="winner-name">{winner} wins!</h1>
+                                <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
+                            </div>
+                            ) : (
+                            <li className="player-points">
+                                <span onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0} className="score-control">-</span>
+                                <span>{players[1].points}</span>
+                                <span onClick={() => updatePlayerPoints(1, true)} className="score-control">+</span>
+                            </li>
+                        )}
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p2HeartRate, players[1].age))}>
+                    <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age))}>
                         <div className="heart-rate-stats">
-                            <div>{`${calcHRPercent(p2HeartRate, players[1].age)}%`}</div>
-                            <div>{p2HeartRate}</div>
+                            <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age)}%`}</div>
+                            <div className="hr-absolute">
+                                <div>{p2HeartRate[p2HeartRate.length - 1]}</div>
+                                <div className="hr-extremities">
+                                    <div className="player-max-heart-rate">
+                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
+                                        </svg>
+                                        <span>{Math.max(...p2HeartRate)}</span>
+                                    </div>
+                                    <div className="player-min-heart-rate">
+                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
+                                        </svg>
+                                        <span>{Math.min(...p2HeartRate)}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
                             <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
                         </svg>
                     </li>
-                    {/* <li className="player-max-heart-rate">{`Max: ${220 - players[1].age} bpm`}</li> */}
-                    {/* <li className="player-serving">{players[1].serving ? "Serving" : "Not Serving"}</li> */}
                 </ul>
             </div>
-            <div className="match-progress">{`${players[0].games} - ${players[1].games}`}</div>
-            <div className="recent-points">Last 5 points (wip)</div>
+            {/* <div className="match-progress">{`${players[0].games} - ${players[1].games}`}</div> */}
+            {/* <div className="recent-points">Last 5 points (wip)</div> */}
         </>
     )
 }

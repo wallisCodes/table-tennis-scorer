@@ -21,8 +21,8 @@
     font-size: 32px;
     padding: 4px 8px;
     cursor: pointer;
-    background-color: rebeccapurple;
-    border: none;
+    /* background-color: rebeccapurple; */
+    border: 1px solid white;
     fill: white;
   }
 
@@ -54,33 +54,61 @@
 
   .player-details {
     display: flex;
-    flex-direction: column;
-    gap: 5em;
-    /* justify-content: center; */
     align-items: center;
-    height: 60vh;
+    height: 55vh;
   }
 
-  .player-banner {
+  .player-one-banner, .player-two-banner {
     display: flex;
-    gap: 1em;
+    position: absolute;
+    top: 0;
+  }
+
+  .player-one-banner {
+    right: 50%;
+  }
+
+  .player-two-banner {
+    left: 50%;
   }
   
-  .player-name {
+  .player-one-name, .player-two-name {
     font-size: 80px;
     width: 300px;
     text-align: center;
     background-color: black;
   }
 
-  .player-team-one {
-    height: inherit;
-    width: 50px;
+  .player-one-name {
+    border-right: 3px solid white;
   }
 
-  .player-team-two {
+  .player-two-name {
+    border-left: 3px solid white;
+  }
+
+  .player-team-one, .player-team-two {
     height: inherit;
     width: 50px;
+    border: 2px solid black;
+  }
+
+  .winner-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .winner-name {
+    font-size: 48px;
+  }
+
+  .view-score-btn {
+    border: none;
+    font-size: 24px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border: 1px solid white;
   }
   
   .player-points {
@@ -88,6 +116,7 @@
     align-items: center;
     display: flex;
     gap: 20px;
+    padding-top: 80px;
   }
 
   .score-control {
@@ -103,7 +132,7 @@
     border-top: 6px solid black;
     font-size: 100px;
     width: 100%;
-    height: 40vh;
+    height: 45vh;
     padding: 30px 0;
   }
 
@@ -112,9 +141,32 @@
     gap: 1em;
   }
 
+  .hr-absolute {
+    display: flex;
+    /* flex-direction: column; */
+  }
+
+  .hr-extremities {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .player-max-heart-rate, .player-min-heart-rate {
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    font-size: 28px;
+  }
+
+  .hr-max-icon, .hr-min-icon {
+    fill: white;
+    /* height: 40px; */
+  }
+
   .heart-rate-icon {
     fill: white;
-    height: 120px;
+    height: 100px;
     aspect-ratio: 1;
     margin: 40px 0;
     animation: beat 0.5s infinite alternate; /* vary beat with heart rate */
