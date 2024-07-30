@@ -1,225 +1,229 @@
 :root {
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #192734;
+  color: azure;
+}
 
-  * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    background-color: #192734;
-    color: azure;
-    margin: 0;
-    padding: 0;
-  }
-  
-  ul {
-    margin: 0;
-    padding-left: 0;
-  }
-  
-  .back-button {
-    position: absolute;
-    z-index: 10; /* ensures button appears over the top of long names (todo: limit max width of banner) */
-    pointer-events: auto; /* allows absolutely positioned button to be clicked */
-    font-size: 32px;
-    padding: 4px 8px;
-    cursor: pointer;
-    border: 1px solid white;
-    fill: white;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .players-container {
-    display: flex;
-    position: relative;
-    min-height: 100vh;
-  }
-  
-  .player-one, .player-two {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 50%;
-    list-style-type: none;
-  }
-  
-  .player-one {
-    border-right: 6px solid black;
-  }
+/* =============== INPUT SCREEN =============== */
 
-  .player-details {
-    display: flex;
-    align-items: center;
-    height: 55vh;
-  }
 
-  .player-one-banner, .player-two-banner {
-    display: flex;
-    position: absolute;
-    top: 0;
-    border: 2px solid white;
-  }
 
-  .player-one-banner {
-    right: 50%;
-  }
+/* =============== GAME TRACKING =============== */
+.back-button {
+  position: absolute;
+  z-index: 10; /* ensures button appears over the top of long names (todo: limit max width of banner) */
+  pointer-events: auto; /* allows absolutely positioned button to be clicked */
+  font-size: 32px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border: 1px solid white;
+  fill: white;
+}
 
-  .player-two-banner {
-    left: 50%;
-  }
-  
-  .player-one-name, .player-two-name {
-    font-size: 60px;
-    min-width: 250px;
-    padding: 5px 30px;
-    text-align: center;
-    background-color: black;
-  }
+.players-container {
+  display: flex;
+  position: relative;
+  min-height: 100vh;
+}
 
-  .player-one-name {
-    border-right: 1px solid white;
-  }
+.player-one, .player-two {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  list-style-type: none;
+}
 
-  .player-two-name {
-    border-left: 1px solid white;
-  }
+.player-one {
+  border-right: 6px solid black;
+}
 
-  .player-team-one, .player-team-two {
-    height: inherit;
-    width: 50px;
-  }
+.player-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 55vh;
+  width: 100%;
+}
 
-  .winner-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.player-one-banner, .player-two-banner {
+  display: flex;
+  position: absolute;
+  top: 0;
+  border: 2px solid white;
+}
 
-  .winner-name {
-    font-size: 48px;
-  }
+.player-one-banner {
+  right: -3px;
+}
 
-  .view-score-btn {
-    border: none;
-    font-size: 24px;
-    padding: 6px 12px;
-    cursor: pointer;
-    border: 1px solid black;
-    background-color: white;
-  }
-  
-  .player-points {
-    font-size: 216px;
-    align-items: center;
-    display: flex;
-    gap: 20px;
-    padding-top: 80px;
-  }
+.player-two-banner {
+  left: -3px;
+}
 
-  .score-control {
-    font-size: 120px;
-    cursor: pointer;
-  }
+.player-one-name, .player-two-name {
+  font-size: 60px;
+  min-width: 250px;
+  padding: 5px 30px;
+  text-align: center;
+  background-color: black;
+}
 
-  .heart-rate-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 45vh;
-    width: 100%;
-    border-top: 6px solid black;
-  }
-  
-  .player-heart-rate {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 100px;
-    width: 100%;
-    padding: 30px 0;
-  }
+.player-one-name {
+  border-right: 1px solid white;
+}
 
-  .heart-rate-stats {
-    display: flex;
-    gap: 1em;
-  }
+.player-two-name {
+  border-left: 1px solid white;
+}
 
-  .hr-absolute {
-    display: flex;
-  }
+.player-team-one, .player-team-two {
+  height: inherit;
+  width: 50px;
+}
 
-  .hr-extremities {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+.winner-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2em;
+  padding-top: 3em;
+}
 
-  .player-max-heart-rate, .player-min-heart-rate {
-    display: flex;
-    justify-content: center;
-    /* align-items: center; */
-    font-size: 28px;
-  }
+.winner-name {
+  font-size: 48px;
+}
 
-  .hr-max-icon, .hr-min-icon {
-    fill: white;
-  }
+.view-score-btn {
+  border: none;
+  font-size: 24px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: 1px solid black;
+  background-color: white;
+}
 
-  .heart-rate-icon {
-    fill: white;
-    height: 100px;
-    aspect-ratio: 1;
-    margin: 40px 0 0;
-    animation: beat 0.5s infinite alternate; /* vary beat with heart rate */
-    transform-origin: center;
-  }
+.player-points {
+  font-size: 216px;
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  padding-top: 80px;
+}
 
-  @keyframes beat {
-    to { 
-      transform: scale(1.4); /* vary scale with heart rate */
-    }
-  }
+.score-minus, .score-plus {
+  font-size: 120px;
+  cursor: pointer;
+}
 
-  .bluetooth-connect-btn {
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
-    border: none;
-    font-size: 48px;
-    padding: 16px 32px;
-    cursor: pointer;
-    border: 1px solid white;
-    background-color: #192734;
-    color: white;
+.score-minus {
+  padding: 0 17px;
+}
+
+.recent-points {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: 16px 24px;
+  width: fit-content;
+}
+
+.point-circle {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background-color: grey;
+  border: 1px solid white;
+}
+
+.point-won {
+  background-color: green;
+}
+
+.point-lost {
+  background-color: red;
+}
+
+.heart-rate-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45vh;
+  width: 100%;
+  border-top: 6px solid black;
+}
+
+.player-heart-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 100px;
+  width: 100%;
+  padding: 30px 0;
+}
+
+.heart-rate-stats {
+  display: flex;
+  gap: 1em;
+}
+
+.hr-absolute {
+  display: flex;
+}
+
+.hr-extremities {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.player-max-heart-rate, .player-min-heart-rate {
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+  font-size: 28px;
+}
+
+.hr-max-icon, .hr-min-icon {
+  fill: white;
+}
+
+.heart-rate-icon {
+  fill: white;
+  height: 100px;
+  aspect-ratio: 1;
+  margin: 40px 0 0;
+  animation: beat 0.5s infinite alternate; /* vary beat with heart rate */
+  transform-origin: center;
+}
+
+@keyframes beat {
+  to { 
+    transform: scale(1.4); /* vary scale with heart rate */
   }
-  
-  .player-serving {
-    font-size: 24px;
-    padding-top: 48px;
-  }
-  
-  .match-progress, .recent-points {
-    display: flex;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    height: 50px;
-    background-color: rebeccapurple;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .match-progress {
-    top: 0;
-    width: fit-content;
-    padding: 5px 10px;
-    font-size: 48px;
-  }
-  
-  .recent-points {
-    bottom: 0;
-    width: 200px;
-  }
+}
+
+.bluetooth-connect-btn {
+  border: none;
+  font-size: 48px;
+  padding: 16px 32px;
+  cursor: pointer;
+  border: 1px solid white;
+  background-color: #192734;
+  color: white;
+}

@@ -48,25 +48,18 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
     }
 
 
-    // SCORING LOGIC
+    // SCORING STATE & LOGIC
     const [winner, setWinner] = useState(null);
     const [showWinner, setShowWinner] = useState(false);
-
-    // const scoreDifference = Math.abs(players[0].points - players[1].points);
-    // console.log(`Score differential: ${scoreDifference}`);
+    const [scoreHistory, setScoreHistory] = useState([]);
 
 
-
-
-
-    const updatePlayerPoints = (playerIndex, increment = true) => {
+    function updatePlayerPoints(playerIndex, increment = true){
         setPlayers(prevPlayers => {
-            const updatedPlayers = [...prevPlayers];
+            const updatedPlayers = [...prevPlayers]; // Creating shallow copy of players array
 
             if (playerIndex >= 0 && playerIndex < updatedPlayers.length) {
                 const currentPoints = updatedPlayers[playerIndex].points;
-                const otherPlayerIndex = (playerIndex + 1) % 2;  // Assuming there are exactly 2 players
-                const otherPlayerPoints = updatedPlayers[otherPlayerIndex].points;
 
                 // Only update points if no one has won yet or if decrementing
                 if ((!winner) || !increment) {
@@ -77,10 +70,16 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     updatedPlayers[playerIndex] = { ...updatedPlayers[playerIndex], points: newPoints };
                 }
             }
-
             return updatedPlayers;
         });
+
+        if (increment) {
+            setScoreHistory(prevScoreHistory => [...prevScoreHistory, `P${playerIndex + 1}`]);
+        } else if (!increment && players[playerIndex].points > 0) {
+            setScoreHistory(prevScoreHistory => prevScoreHistory.slice(0, -1));
+        }
     };
+
 
     useEffect(() => {
         if (players.length >= 2) {
@@ -96,12 +95,16 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
         }
     }, [players]); // Run this effect whenever 'players' state changes
 
-    const handleGoBack = () => {
+    function handleGoBack(){
         setShowWinner(false);
         setWinner(null); // Reset the winner state in order to make changes to score again
     };
     
     
+    // Generating dots for last 5 points
+    const lastFivePoints = scoreHistory.slice(-5);
+    const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
+    const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
 
     return (
         <>
@@ -126,18 +129,19 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                                 <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
                             </div>
                             ) : (
-                            <li className="player-points">
-                                <span onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0} className="score-control">-</span>
-                                <span>{players[0].points}</span>
-                                <span onClick={() => updatePlayerPoints(0, true)} className="score-control">+</span>
-                            </li>
+                            <div>
+                                <li className="player-points">
+                                    <span onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0} className="score-minus">-</span>
+                                    <span>{players[0].points}</span>
+                                    <span onClick={() => updatePlayerPoints(0, true)} className="score-plus">+</span>
+                                </li>
+                                <div className="recent-points">{recentPointsP1}</div>
+                            </div>
                         )}
-                        
-
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age))}>
+                    <li className="heart-rate-box" style={bluetoothOne ? (chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothOne ? (
                             <div className="player-heart-rate">
                                 <div className="heart-rate-stats">
@@ -185,16 +189,19 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                                 <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
                             </div>
                             ) : (
-                            <li className="player-points">
-                                <span onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0} className="score-control">-</span>
-                                <span>{players[1].points}</span>
-                                <span onClick={() => updatePlayerPoints(1, true)} className="score-control">+</span>
-                            </li>
+                            <div>
+                                <li className="player-points">
+                                    <span onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0} className="score-minus">-</span>
+                                    <span>{players[1].points}</span>
+                                    <span onClick={() => updatePlayerPoints(1, true)} className="score-plus">+</span>
+                                </li>
+                                <div className="recent-points">{recentPointsP2}</div>
+                            </div>
                         )}
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age))}>
+                    <li className="heart-rate-box" style={bluetoothTwo ? (chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothTwo ? (
                             <div className="player-heart-rate">
                                 <div className="heart-rate-stats">
@@ -227,8 +234,6 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     </li>
                 </ul>
             </div>
-            {/* <div className="match-progress">{`${players[0].games} - ${players[1].games}`}</div> */}
-            {/* <div className="recent-points">Last 5 points (wip)</div> */}
         </>
     )
 }

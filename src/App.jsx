@@ -15,26 +15,25 @@ export default function App(){
         }
     );
 
-    // const [players, setPlayers] = useState([]);
-    const [players, setPlayers] = useState([ // for testing purposes
-        {
-            id: uuidv4(),
-            name: "Cunningham",
-            age: 28,
-            colour: "#ffffff",
-            serving: false,
-            points: 18,
-        },
-        {
-            id: uuidv4(),
-            name: "Griffiths",
-            age: 56,
-            colour: "#000000",
-            serving: false,
-            points: 18,
-        }
-    ]);
-    // const [scoreHistory, setScoreHistory] = useState([]);
+    const [players, setPlayers] = useState([]);
+    // const [players, setPlayers] = useState([ // for testing purposes
+    //     {
+    //         id: uuidv4(),
+    //         name: "Cunningham",
+    //         age: 28,
+    //         colour: "#ffffff",
+    //         serving: false,
+    //         points: 0,
+    //     },
+    //     {
+    //         id: uuidv4(),
+    //         name: "Griffiths",
+    //         age: 56,
+    //         colour: "#000000",
+    //         serving: false,
+    //         points: 0,
+    //     }
+    // ]);
     const [p1HeartRate, setP1HeartRate] = useState([70]); // 130
     const [p2HeartRate, setP2HeartRate] = useState([70]); // 150
     const [showScores, setShowScores] = useState(false);
@@ -50,8 +49,6 @@ export default function App(){
                 colour: colour,
                 serving: false,
                 points: 0
-                // games: 0
-                // heartRate: [85]
             }
         ]);
     }
@@ -86,7 +83,7 @@ export default function App(){
     
 
     // Bluetooth code
-    const [bluetoothOne, setBluetoothOne] = useState(true);
+    const [bluetoothOne, setBluetoothOne] = useState(false);
     const [bluetoothTwo, setBluetoothTwo] = useState(false);
 
     async function connectOne(props) {
