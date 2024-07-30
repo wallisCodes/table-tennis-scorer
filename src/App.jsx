@@ -15,25 +15,25 @@ export default function App(){
         }
     );
 
-    const [players, setPlayers] = useState([]);
-    // const [players, setPlayers] = useState([ // for testing purposes
-    //     {
-    //         id: uuidv4(),
-    //         name: "Josh",
-    //         age: 28,
-    //         colour: "#00ff00",
-    //         serving: false,
-    //         points: 0,
-    //     },
-    //     {
-    //         id: uuidv4(),
-    //         name: "Simon",
-    //         age: 56,
-    //         colour: "#ffff00",
-    //         serving: false,
-    //         points: 0,
-    //     }
-    // ]);
+    // const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([ // for testing purposes
+        {
+            id: uuidv4(),
+            name: "Cunningham",
+            age: 28,
+            colour: "#ffffff",
+            serving: false,
+            points: 18,
+        },
+        {
+            id: uuidv4(),
+            name: "Griffiths",
+            age: 56,
+            colour: "#000000",
+            serving: false,
+            points: 18,
+        }
+    ]);
     // const [scoreHistory, setScoreHistory] = useState([]);
     const [p1HeartRate, setP1HeartRate] = useState([70]); // 130
     const [p2HeartRate, setP2HeartRate] = useState([70]); // 150
@@ -83,9 +83,12 @@ export default function App(){
     // }
 
 
-
+    
 
     // Bluetooth code
+    const [bluetoothOne, setBluetoothOne] = useState(true);
+    const [bluetoothTwo, setBluetoothTwo] = useState(false);
+
     async function connectOne(props) {
         const deviceOne = await navigator.bluetooth.requestDevice({
             filters: [{ services: ['heart_rate'] }],
@@ -96,6 +99,7 @@ export default function App(){
         const server = await deviceOne.gatt?.connect();
         const service = await server.getPrimaryService('heart_rate');
         const char = await service.getCharacteristic('heart_rate_measurement');
+        setBluetoothOne(true);
         char.oncharacteristicvaluechanged = props.onChange;
         char.startNotifications();
         return char;
@@ -112,6 +116,7 @@ export default function App(){
         const server = await deviceTwo.gatt?.connect();
         const service = await server.getPrimaryService('heart_rate');
         const char = await service.getCharacteristic('heart_rate_measurement');
+        setBluetoothTwo(true);
         char.oncharacteristicvaluechanged = props.onChange;
         char.startNotifications();
         return char;
@@ -202,9 +207,13 @@ export default function App(){
                     players={players}
                     setPlayers={setPlayers}
                     backToInput={backToInput}
+                    bluetoothOne={bluetoothOne}
+                    connectOne={connectOne}
+                    printHeartRateOne={printHeartRateOne}
+                    bluetoothTwo={bluetoothTwo}
+                    connectTwo={connectTwo}
+                    printHeartRateTwo={printHeartRateTwo}
                 />
-                <button onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect 1</button>
-                <button onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect 2</button>
             </div>
             }
         </>

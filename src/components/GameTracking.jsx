@@ -1,18 +1,22 @@
 import { useState, useEffect } from "react";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
-export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, backToInput}){
+export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, backToInput, bluetoothOne,
+                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo
+}){
     function maxHeartRate(age){
         return 220 - age;
     }
 
     // Dynamically assign player colours to tracking screen based on previous user input
     const p1TeamStyles = {
-        backgroundColor: players[0].colour
+        backgroundColor: players[0].colour,
+        borderRight: "2px solid white"
     }
 
     const p2TeamStyles = {
-        backgroundColor: players[1].colour
+        backgroundColor: players[1].colour,
+        borderLeft: "2px solid white"
     }
 
 
@@ -116,7 +120,7 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                             <span className="player-one-name">{players[0].name}</span>
                         </li>
 
-                        {showWinner === true ? (
+                        {showWinner ? (
                             <div className="winner-box">
                                 <h1 className="winner-name">{winner} wins!</h1>
                                 <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
@@ -133,30 +137,36 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age))}>
-                        <div className="heart-rate-stats">
-                            <div>{`${calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age)}%`}</div>
-                            <div className="hr-absolute">
-                                <div>{p1HeartRate[p1HeartRate.length - 1]}</div>
-                                <div className="hr-extremities">
-                                    <div className="player-max-heart-rate">
-                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
-                                        </svg>
-                                        <span>{Math.max(...p1HeartRate)}</span>
-                                    </div>
-                                    <div className="player-min-heart-rate">
-                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
-                                        </svg>
-                                        <span>{Math.min(...p1HeartRate)}</span>
+                    <li className="heart-rate-box" style={chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age))}>
+                        {bluetoothOne ? (
+                            <div className="player-heart-rate">
+                                <div className="heart-rate-stats">
+                                    <div>{`${calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age)}%`}</div>
+                                    <div className="hr-absolute">
+                                        <div>{p1HeartRate[p1HeartRate.length - 1]}</div>
+                                        <div className="hr-extremities">
+                                            <div className="player-max-heart-rate">
+                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
+                                                </svg>
+                                                <span>{Math.max(...p1HeartRate)}</span>
+                                            </div>
+                                            <div className="player-min-heart-rate">
+                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
+                                                </svg>
+                                                <span>{Math.min(...p1HeartRate)}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
+                                    <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
+                                </svg>
                             </div>
-                        </div>
-                        <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
-                            <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
-                        </svg>
+                            ) : (
+                            <button className="bluetooth-connect-btn" onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect HR Monitor</button>   
+                        )}
                     </li>
                 </ul>
 
@@ -169,7 +179,7 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                             <div className="player-team-two" style={p2TeamStyles}></div>
                         </li>
 
-                        {showWinner === true ? (
+                        {showWinner ? (
                             <div className="winner-box">
                                 <h1 className="winner-name">{winner} wins!</h1>
                                 <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
@@ -184,30 +194,36 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="player-heart-rate" style={chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age))}>
-                        <div className="heart-rate-stats">
-                            <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age)}%`}</div>
-                            <div className="hr-absolute">
-                                <div>{p2HeartRate[p2HeartRate.length - 1]}</div>
-                                <div className="hr-extremities">
-                                    <div className="player-max-heart-rate">
-                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
-                                        </svg>
-                                        <span>{Math.max(...p2HeartRate)}</span>
-                                    </div>
-                                    <div className="player-min-heart-rate">
-                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
-                                        </svg>
-                                        <span>{Math.min(...p2HeartRate)}</span>
+                    <li className="heart-rate-box" style={chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age))}>
+                        {bluetoothTwo ? (
+                            <div className="player-heart-rate">
+                                <div className="heart-rate-stats">
+                                    <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age)}%`}</div>
+                                    <div className="hr-absolute">
+                                        <div>{p2HeartRate[p2HeartRate.length - 1]}</div>
+                                        <div className="hr-extremities">
+                                            <div className="player-max-heart-rate">
+                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
+                                                </svg>
+                                                <span>{Math.max(...p2HeartRate)}</span>
+                                            </div>
+                                            <div className="player-min-heart-rate">
+                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
+                                                </svg>
+                                                <span>{Math.min(...p2HeartRate)}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
+                                    <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
+                                </svg>
                             </div>
-                        </div>
-                        <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
-                            <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
-                        </svg>
+                            ) : (
+                            <button className="bluetooth-connect-btn" onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect HR Monitor</button>
+                        )}
                     </li>
                 </ul>
             </div>
