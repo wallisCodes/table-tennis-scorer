@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import GeneralForm from './components/GeneralForm';
 import PlayerForm from './components/PlayerForm';
 import GameTracking from './components/GameTracking';
+import Results from './components/Results';
 import { v4 as uuidv4 } from "uuid"
 
 uuidv4();
@@ -15,28 +16,28 @@ export default function App(){
         }
     );
 
-    const [players, setPlayers] = useState([]);
-    // const [players, setPlayers] = useState([ // for testing purposes
-    //     {
-    //         id: uuidv4(),
-    //         name: "Cunningham",
-    //         age: 28,
-    //         colour: "#ffffff",
-    //         serving: false,
-    //         points: 0,
-    //     },
-    //     {
-    //         id: uuidv4(),
-    //         name: "Griffiths",
-    //         age: 56,
-    //         colour: "#000000",
-    //         serving: false,
-    //         points: 0,
-    //     }
-    // ]);
-    const [p1HeartRate, setP1HeartRate] = useState([70]); // 130
-    const [p2HeartRate, setP2HeartRate] = useState([70]); // 150
-    const [showScores, setShowScores] = useState(false);
+    // const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([ // for testing purposes
+        {
+            id: uuidv4(),
+            name: "Wallis",
+            age: 28,
+            colour: "#ffffff",
+            serving: false,
+            points: 15,
+        },
+        {
+            id: uuidv4(),
+            name: "Lau",
+            age: 56,
+            colour: "#000000",
+            serving: false,
+            points: 15,
+        }
+    ]);
+    const [p1HeartRate, setP1HeartRate] = useState([]); // 130
+    const [p2HeartRate, setP2HeartRate] = useState([]); // 150
+    const [display, setDisplay] = useState("input");
 
 
     function addPlayer(name, age, colour){
@@ -52,39 +53,62 @@ export default function App(){
             }
         ]);
     }
+
+
+    function getCurrentTime(){
+        const currentTime = new Date();
+        const hours = currentTime.getHours();
+        const minutes = currentTime.getMinutes();
+        const seconds = currentTime.getSeconds();
+        const milliseconds = currentTime.getMilliseconds();
+        
+        const timeFormatted = `${hours}:${minutes}:${seconds}:${milliseconds}`;
+        return timeFormatted;
+    }
     
 
     // Used to generate mock HR data for testing purposes
-    // const [mockData, setMockData] = useState(false);
+    const [mockData, setMockData] = useState(true);
 
-    // if (mockData === true){
-    //     useEffect(() => {
-    //         function generateRandomHRValues(max, min){
-    //             //TODO: add timestamp to data
-    //             setP1HeartRate(prevData => {
-    //                 return [...prevData, Math.floor(Math.random() * (max - min + 1) + min)]
-    //             });
+    if (mockData === true){
+        useEffect(() => {
 
-    //             setP2HeartRate(prevData => {
-    //                 return [...prevData, Math.floor(Math.random() * (max - min + 1) + min)]
-    //             });
-    //         }
-    //         generateRandomHRValues(116, 160);
+            function generateRandomHRValues(max, min) {
+                const currentTime = getCurrentTime();
+                console.log(`Current time inside mockData useEffect: ${currentTime}`);
+                
+                setP1HeartRate(prevData => [
+                    ...prevData, 
+                    {
+                        value: Math.floor(Math.random() * (max - min + 1) + min),
+                        time: currentTime
+                    }
+                ]);
+
+                setP2HeartRate(prevData => [
+                    ...prevData, 
+                    {
+                        value: Math.floor(Math.random() * (max - min + 1) + min),
+                        time: currentTime
+                    }
+                ]);
+            }
+            generateRandomHRValues(116, 160);
         
-    //         const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
-    //             generateRandomHRValues(116, 160);
-    //         }, 5000);
+            const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
+                generateRandomHRValues(116, 160);
+            }, 20000);
     
-    //         return () => clearInterval(int);
-    //     }, []);
-    // }
+            return () => clearInterval(int);
+        }, []);
+    }
 
 
     
 
     // Bluetooth code
-    const [bluetoothOne, setBluetoothOne] = useState(false);
-    const [bluetoothTwo, setBluetoothTwo] = useState(false);
+    const [bluetoothOne, setBluetoothOne] = useState(true);
+    const [bluetoothTwo, setBluetoothTwo] = useState(true);
 
     async function connectOne(props) {
         const deviceOne = await navigator.bluetooth.requestDevice({
@@ -122,21 +146,25 @@ export default function App(){
   
     function printHeartRateOne(event) {
         const heartRateOne = event.target.value.getInt8(1);
-        // setP1HeartRate(heartRateOne);
+        const currentTime = getCurrentTime();
+        console.log(`Current time inside print fn 1: ${currentTime}`);
         
         // Ignore spurious HR data
         if (20 <= heartRateOne && heartRateOne < 250){
-            setP1HeartRate(prevData => {
-                return [...prevData, heartRateOne]
-            });
+            // setP1HeartRate(prevData => {
+            //     return [...prevData, heartRateOne]
+            // });
+
+            setP1HeartRate(prevData => [
+                ...prevData, 
+                {
+                    value: heartRateOne,
+                    time: currentTime
+                }
+            ]);
         }
         
-        // setPlayers(prev => {                                   TO CONTINUE...
-        //     return {
-        //         ...prev,
-        //         heartRate: heartRateOne
-        //     }
-        // })
+        // Is this code needed?
         const prev = hrDataOne[hrDataOne.length - 1];
         hrDataOne[hrDataOne.length] = heartRateOne;
         hrDataOne = hrDataOne.slice(-200);
@@ -148,15 +176,25 @@ export default function App(){
 
     function printHeartRateTwo(event) {
         const heartRateTwo = event.target.value.getInt8(1);
-        // setP2HeartRate(heartRateTwo);
+        const currentTime = getCurrentTime();
+        console.log(`Current time inside print fn 2: ${currentTime}`);
 
         // Ignore spurious HR data
         if (20 <= heartRateTwo && heartRateTwo < 250){
-            setP2HeartRate(prevData => {
-                return [...prevData, heartRateTwo]
-            });
+            // setP2HeartRate(prevData => {
+            //     return [...prevData, heartRateTwo]
+            // });
+
+            setP2HeartRate(prevData => [
+                ...prevData, 
+                {
+                    value: heartRateTwo,
+                    time: currentTime
+                }
+            ]);
         }
 
+        // Is this code needed?
         const prev = hrDataTwo[hrDataTwo.length - 1];
         hrDataTwo[hrDataTwo.length] = heartRateTwo;
         hrDataTwo = hrDataTwo.slice(-200);
@@ -166,22 +204,31 @@ export default function App(){
         console.log(`%c\n💚 Player 2: ${heartRateTwo} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
     }
 
+    // Is this code needed?
     let hrDataOne = new Array(200).fill(10);
     let hrDataTwo = new Array(200).fill(10);
 
-    function backToInput(){
-        setShowScores(false);
+    function toInput(){
+        setDisplay("input");
+    }
+
+    function toScores(){
+        setDisplay("scores");
+    }
+
+    function toResults(){
+        setDisplay("results");
     }
 
 
     return (
         <>
-            {!showScores &&
-                <div>
+            {display === "input" &&
+                <>
                     <GeneralForm 
                         matchDetails={matchDetails}
                         setMatchDetails={setMatchDetails}
-                        setShowScores={setShowScores}
+                        toScores={toScores}
                         players={players}
                     />
                     <PlayerForm
@@ -189,21 +236,21 @@ export default function App(){
                         addPlayer={addPlayer}
                         matchDetails={matchDetails}
                     />
-                </div>
+                </>
             }
             
 
-            {showScores &&
-            <div>
+            {display === "scores" &&
                 <GameTracking 
-                    // incrementP1Score={incrementP1Score}
                     p1HeartRate={p1HeartRate}
                     setP1HeartRate={setP1HeartRate}
                     p2HeartRate={p2HeartRate}
                     setP2HeartRate={setP2HeartRate}
                     players={players}
                     setPlayers={setPlayers}
-                    backToInput={backToInput}
+                    toInput={toInput}
+                    toScores={toScores}
+                    toResults={toResults}
                     bluetoothOne={bluetoothOne}
                     connectOne={connectOne}
                     printHeartRateOne={printHeartRateOne}
@@ -211,7 +258,12 @@ export default function App(){
                     connectTwo={connectTwo}
                     printHeartRateTwo={printHeartRateTwo}
                 />
-            </div>
+            }
+
+            {display === "results" &&
+                <Results 
+                    toScores={toScores}
+                />
             }
         </>
     )

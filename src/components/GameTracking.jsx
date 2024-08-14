@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
-export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, backToInput, bluetoothOne,
+export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, toInput, toResults, bluetoothOne,
                                     connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo
 }){
     function maxHeartRate(age){
@@ -110,7 +110,7 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
         <>
             <div className="players-container">
                 {/* Back button */}
-                <svg onClick={backToInput} className="back-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg onClick={toInput} className="back-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="m10.978 14.999v3.251c0 .412-.335.75-.752.75-.188 0-.375-.071-.518-.206-1.775-1.685-4.945-4.692-6.396-6.069-.2-.189-.312-.452-.312-.725 0-.274.112-.536.312-.725 1.451-1.377 4.621-4.385 6.396-6.068.143-.136.33-.207.518-.207.417 0 .752.337.752.75v3.251h9.02c.531 0 1.002.47 1.002 1v3.998c0 .53-.471 1-1.002 1z" fillRule="nonzero"/>
                 </svg>
 
@@ -141,25 +141,25 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={bluetoothOne ? (chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <li className="heart-rate-box" style={bluetoothOne ? (chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothOne ? (
                             <div className="player-heart-rate">
                                 <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(p1HeartRate[p1HeartRate.length - 1], players[0].age)}%`}</div>
+                                    <div>{`${calcHRPercent(p1HeartRate[p1HeartRate.length - 1].value, players[0].age)}%`}</div>
                                     <div className="hr-absolute">
-                                        <div>{p1HeartRate[p1HeartRate.length - 1]}</div>
+                                        <div>{p1HeartRate[p1HeartRate.length - 1].value}</div>
                                         <div className="hr-extremities">
                                             <div className="player-max-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
                                                 </svg>
-                                                <span>{Math.max(...p1HeartRate)}</span>
+                                                {/* <span>{Math.max(...p1HeartRate)}</span> */}
                                             </div>
                                             <div className="player-min-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
                                                 </svg>
-                                                <span>{Math.min(...p1HeartRate)}</span>
+                                                {/* <span>{Math.min(...p1HeartRate)}</span> */}
                                             </div>
                                         </div>
                                     </div>
@@ -201,25 +201,25 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={bluetoothTwo ? (chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <li className="heart-rate-box" style={bluetoothTwo ? (chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothTwo ? (
                             <div className="player-heart-rate">
                                 <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1], players[1].age)}%`}</div>
+                                    <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age)}%`}</div>
                                     <div className="hr-absolute">
-                                        <div>{p2HeartRate[p2HeartRate.length - 1]}</div>
+                                        <div>{p2HeartRate[p2HeartRate.length - 1].value}</div>
                                         <div className="hr-extremities">
                                             <div className="player-max-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
                                                 </svg>
-                                                <span>{Math.max(...p2HeartRate)}</span>
+                                                {/* <span>{Math.max(...p2HeartRate)}</span> */}
                                             </div>
                                             <div className="player-min-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
                                                 </svg>
-                                                <span>{Math.min(...p2HeartRate)}</span>
+                                                {/* <span>{Math.min(...p2HeartRate)}</span> */}
                                             </div>
                                         </div>
                                     </div>
@@ -233,6 +233,11 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                         )}
                     </li>
                 </ul>
+
+                {/* Results button */}
+                <svg onClick={toResults} className="next-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1z" fillRule="nonzero"/>
+                </svg>
             </div>
         </>
     )

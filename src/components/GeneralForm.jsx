@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function GeneralForm({matchDetails, setMatchDetails, setShowScores, players}){
+export default function GeneralForm({matchDetails, setMatchDetails, toScores, players}){
     // Simple form validation logic
     const correctPlayers = players.length === 2;
 
@@ -11,7 +11,7 @@ export default function GeneralForm({matchDetails, setMatchDetails, setShowScore
             alert("Make sure you have two players added below.");
         } else {
             console.log("Submitted general form");
-            setShowScores(true);
+            toScores();
         }
     }
 
