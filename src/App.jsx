@@ -35,8 +35,18 @@ export default function App(){
             points: 15,
         }
     ]);
-    const [p1HeartRate, setP1HeartRate] = useState([]); // 130
-    const [p2HeartRate, setP2HeartRate] = useState([]); // 150
+    const [p1HeartRate, setP1HeartRate] = useState([
+        {
+            value: 130,
+            time: ""
+        }
+    ]); // 130
+    const [p2HeartRate, setP2HeartRate] = useState([
+        {
+            value: 150,
+            time: ""
+        }
+    ]); // 150
     const [display, setDisplay] = useState("input");
 
 
@@ -68,7 +78,7 @@ export default function App(){
     
 
     // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(true);
+    const [mockData, setMockData] = useState(false);
 
     if (mockData === true){
         useEffect(() => {
@@ -103,8 +113,6 @@ export default function App(){
         }, []);
     }
 
-
-    
 
     // Bluetooth code
     const [bluetoothOne, setBluetoothOne] = useState(true);
@@ -173,6 +181,7 @@ export default function App(){
         console.clear();
         console.log(`%c\n💚 Player 1: ${heartRateOne} ${arrow}`, 'font-size: 24px;', '\n\n(To disconnect, refresh or close tab)\n\n');
     }
+
 
     function printHeartRateTwo(event) {
         const heartRateTwo = event.target.value.getInt8(1);
@@ -248,6 +257,7 @@ export default function App(){
                     setP2HeartRate={setP2HeartRate}
                     players={players}
                     setPlayers={setPlayers}
+                    getCurrentTime={getCurrentTime}
                     toInput={toInput}
                     toScores={toScores}
                     toResults={toResults}

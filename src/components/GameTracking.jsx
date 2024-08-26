@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
 export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, toInput, toResults, bluetoothOne,
-                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo
+                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -39,13 +39,19 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
             case (80 <= heartRatePercent && heartRatePercent < 90):
                 bgColor = "#ffcb2d"; //yellow
                 break
-            case (90 <= heartRatePercent && heartRatePercent <= 100):
+            case (90 <= heartRatePercent && heartRatePercent < 100):
                 bgColor = "#de105b"; //red
+                break
+            case (100 <= heartRatePercent && heartRatePercent <= 150):
+                bgColor = "#b100cd"; //purple
                 break
             default: bgColor = "#c2cbca"; //grey
         }
         return {backgroundColor: bgColor};
     }
+
+    const p1HeartRateOnly = p1HeartRate.map(data => data.value);
+    const p2HeartRateOnly = p2HeartRate.map(data => data.value);
 
 
     // SCORING STATE & LOGIC
@@ -74,7 +80,15 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
         });
 
         if (increment) {
-            setScoreHistory(prevScoreHistory => [...prevScoreHistory, `P${playerIndex + 1}`]);
+            const currentTime = getCurrentTime();
+            setScoreHistory(prevScoreHistory => [
+                ...prevScoreHistory,
+                {
+                    player: `P${playerIndex + 1}`,
+                    time: currentTime
+                }
+            ]);
+
         } else if (!increment && players[playerIndex].points > 0) {
             setScoreHistory(prevScoreHistory => prevScoreHistory.slice(0, -1));
         }
@@ -103,8 +117,8 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
     
     // Generating dots for last 5 points
     const lastFivePoints = scoreHistory.slice(-5);
-    const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
-    const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
+    const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.player === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
+    const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.player === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
 
     return (
         <>
@@ -154,12 +168,13 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                                                     <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
                                                 </svg>
                                                 {/* <span>{Math.max(...p1HeartRate)}</span> */}
+                                                <span>{Math.max(...p1HeartRateOnly)}</span>
                                             </div>
                                             <div className="player-min-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
                                                 </svg>
-                                                {/* <span>{Math.min(...p1HeartRate)}</span> */}
+                                                <span>{Math.min(...p1HeartRateOnly)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -213,13 +228,13 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
                                                 </svg>
-                                                {/* <span>{Math.max(...p2HeartRate)}</span> */}
+                                                <span>{Math.max(...p2HeartRateOnly)}</span>
                                             </div>
                                             <div className="player-min-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
                                                 </svg>
-                                                {/* <span>{Math.min(...p2HeartRate)}</span> */}
+                                                <span>{Math.min(...p2HeartRateOnly)}</span>
                                             </div>
                                         </div>
                                     </div>
