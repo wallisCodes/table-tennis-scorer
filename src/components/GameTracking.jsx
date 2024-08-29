@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
 export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, toInput, toResults, bluetoothOne,
-                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime
+                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime, onButtonClick
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -219,6 +219,7 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     <li className="heart-rate-box" style={bluetoothTwo ? (chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothTwo ? (
                             <div className="player-heart-rate">
+                                <button className="bluetooth-disconnect-btn">Disconnect</button>
                                 <div className="heart-rate-stats">
                                     <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age)}%`}</div>
                                     <div className="hr-absolute">
