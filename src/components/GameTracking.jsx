@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
 export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, toInput, toResults, bluetoothOne,
-                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime, onButtonClick
+                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime, scanDeviceTwo, onDisconnectButtonClick, onReconnectButtonClick
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -219,7 +219,10 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     <li className="heart-rate-box" style={bluetoothTwo ? (chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothTwo ? (
                             <div className="player-heart-rate">
-                                <button className="bluetooth-disconnect-btn">Disconnect</button>
+                                <div className="bluetooth-buttons">
+                                    <button onClick={onDisconnectButtonClick} className="bluetooth-disconnect-btn">Disconnect</button>
+                                    <button onClick={onReconnectButtonClick} className="bluetooth-reconnect-btn">Reconnect</button>
+                                </div>
                                 <div className="heart-rate-stats">
                                     <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age)}%`}</div>
                                     <div className="hr-absolute">
@@ -245,7 +248,8 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                                 </svg>
                             </div>
                             ) : (
-                            <button className="bluetooth-connect-btn" onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect HR Monitor</button>
+                            // <button className="bluetooth-connect-btn" onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect HR Monitor</button>
+                            <button className="bluetooth-connect-btn" onClick={scanDeviceTwo}>Connect HR Monitor</button>
                         )}
                     </li>
                 </ul>
