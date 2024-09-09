@@ -24,7 +24,7 @@ export default function App(){
             age: 28,
             colour: "#ffffff",
             serving: false,
-            points: 0,
+            points: 12,
         },
         {
             id: uuidv4(),
@@ -32,7 +32,7 @@ export default function App(){
             age: 56,
             colour: "#000000",
             serving: false,
-            points: 0,
+            points: 12,
         }
     ]);
     const [p1HeartRate, setP1HeartRate] = useState([
@@ -78,7 +78,7 @@ export default function App(){
     
 
     // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(true);
+    const [mockData, setMockData] = useState(false);
 
     if (mockData === true){
         useEffect(() => {
@@ -193,27 +193,27 @@ export default function App(){
     }
 
     async function connect() {
-        console.log(`deviceTwo before: ${JSON.stringify(deviceTwo)}`);
+        console.log(`deviceTwo before: ${JSON.parse(JSON.stringify(deviceTwo))}`);
         console.log('Connecting to Bluetooth Device...');
         const server = await deviceTwo.gatt.connect();
         console.log('> Bluetooth Device connected');
-        console.log(`deviceTwo after: ${deviceTwo}`);   
+        console.log(`deviceTwo after: ${JSON.parse(JSON.stringify(deviceTwo))}`);   
         
         console.log(`Server: ${server}`);
-        console.log(`Server (JSON): ${JSON.stringify(server)}`);
+        // console.log(`Server (JSON): ${JSON.stringify(server)}`);
         
         
         setBluetoothTwo(true); // TODO: think of a better way to track connection
 
         console.log('Getting Heart Rate...');
         const service = await server.getPrimaryService('heart_rate');
-        console.log(`Service: ${service}`);
-        console.log(`Service (JSON): ${JSON.stringify(service)}`);
+        // console.log(`Service: ${service}`);
+        // console.log(`Service (JSON): ${JSON.stringify(service)}`);
 
         console.log('Getting Heart Rate Measurement Characteristic...');
         const char = await service.getCharacteristic('heart_rate_measurement');
-        console.log(`Char: ${char}`);
-        console.log(`Char (JSON): ${JSON.stringify(char)}`);
+        // console.log(`Char: ${char}`);
+        // console.log(`Char (JSON): ${JSON.stringify(char)}`);
 
         // char.oncharacteristicvaluechanged = props.onChange;
         // char.startNotifications();
@@ -430,6 +430,9 @@ export default function App(){
                     scanDeviceTwo={scanDeviceTwo}
                     onDisconnectButtonClick={onDisconnectButtonClick}
                     onReconnectButtonClick={onReconnectButtonClick}
+                    // connect={connect}
+                    // onDisconnected={onDisconnected}
+                    deviceTwo={deviceTwo}
                 />
             }
 

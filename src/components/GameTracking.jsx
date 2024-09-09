@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import Modal from "./Modal";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
 export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, toInput, toResults, bluetoothOne,
-                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime, scanDeviceTwo, onDisconnectButtonClick, onReconnectButtonClick
+                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime, scanDeviceTwo, onDisconnectButtonClick, onReconnectButtonClick, deviceTwo
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -58,6 +59,8 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
     const [winner, setWinner] = useState(null);
     const [showWinner, setShowWinner] = useState(false);
     const [scoreHistory, setScoreHistory] = useState([]);
+    const [modal, setModal] = useState(false); // Modal for receiver to choose extra points played if tied 14-14
+    const [receiversChoice, setReceiversChoice] = useState(0); 
 
 
     function updatePlayerPoints(playerIndex, increment = true){
@@ -95,19 +98,43 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
     };
 
 
+    function promptReceiver(){
+        setTimeout(() => {
+            setModal(true);
+          }, "200");       
+    }
+
     useEffect(() => {
-        if (players.length >= 2) {
+        // First to 15, except if it's 14-14 a modal pops up asking the receiver if they want to play 1 or 3 more points
+
+        if (players.length === 2) {
             const [player1, player2] = players;
 
-            if (player1.points >= 21 && player1.points - player2.points >= 2) {
+            if (player1.points === 14 && player2.points === 14) {
+                promptReceiver();
+            }
+            else if (player1.points === 15 + receiversChoice) {
                 setWinner(player1.name);
                 setShowWinner(true);
-            } else if (player2.points >= 21 && player2.points - player1.points >= 2) {
+            } 
+            else if (player2.points === 15 + receiversChoice) {
                 setWinner(player2.name);
                 setShowWinner(true);
             }
         }
     }, [players]); // Run this effect whenever 'players' state changes
+
+    function chooseOneExtraPoint(){
+        setReceiversChoice(0);
+        console.log("Receiver chose 1 extra point!");
+        setModal(false);
+    }
+
+    function chooseThreeExtraPoints(){
+        setReceiversChoice(2);
+        console.log("Receiver chose 3 extra points!");
+        setModal(false);
+    }
 
     function handleGoBack(){
         setShowWinner(false);
@@ -127,6 +154,23 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                 <svg onClick={toInput} className="back-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="m10.978 14.999v3.251c0 .412-.335.75-.752.75-.188 0-.375-.071-.518-.206-1.775-1.685-4.945-4.692-6.396-6.069-.2-.189-.312-.452-.312-.725 0-.274.112-.536.312-.725 1.451-1.377 4.621-4.385 6.396-6.068.143-.136.33-.207.518-.207.417 0 .752.337.752.75v3.251h9.02c.531 0 1.002.47 1.002 1v3.998c0 .53-.471 1-1.002 1z" fillRule="nonzero"/>
                 </svg>
+
+
+                {/* <button onClick={() => setModal(true)}>Open modal</button> */}
+                {modal && <Modal
+                    openModal={modal}
+                    closeModal={() => setModal(false)}
+                    className=""
+                >
+                    <h1 className="modal-header">Extra points (receiver's choice)</h1>
+                    <div className="modal-buttons">
+                        <button onClick={chooseOneExtraPoint} className="modal-button">1</button>
+                        <button onClick={chooseThreeExtraPoints} className="modal-button">3</button>
+                    </div>                
+                </Modal>}
+                
+
+
 
                 {/* First player/team display */}
                 <ul className="player-one">
@@ -220,8 +264,8 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                         {bluetoothTwo ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">
-                                    <button onClick={onDisconnectButtonClick} className="bluetooth-disconnect-btn">Disconnect</button>
-                                    <button onClick={onReconnectButtonClick} className="bluetooth-reconnect-btn">Reconnect</button>
+                                    <button onClick={() => onDisconnectButtonClick()} className="bluetooth-disconnect-btn">Disconnect</button>
+                                    <button onClick={() => onReconnectButtonClick()} className="bluetooth-reconnect-btn">Reconnect</button>
                                 </div>
                                 <div className="heart-rate-stats">
                                     <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age)}%`}</div>

@@ -36,6 +36,39 @@
     min-height: 100vh;
 }
 
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    /* gap: 32px; */
+    align-items: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    
+    margin: auto;
+    height: 300px;
+    width: 500px;
+}
+
+.modal-header {
+    text-align: center;
+    font-size: 50px;
+    /* margin-bottom: 32px; */
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 32px;
+}
+
+.modal-button {
+    font-size: 32px;
+    padding: 8px 64px;
+    cursor: pointer;
+    border: 1px solid white;
+}
+
 .player-one, .player-two {
     display: flex;
     flex-direction: column;
