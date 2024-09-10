@@ -14,7 +14,6 @@ export default function Modal({openModal, closeModal, children}){
     return (
         <dialog ref={ref} onCancel={closeModal} className="modal-container">
             {children}
-            {/* <button onClick={closeModal}>Close</button> */}
         </dialog>
     );
 }

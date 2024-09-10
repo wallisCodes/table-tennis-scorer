@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
-export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlayers, toInput, toResults, bluetoothOne,
-                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime, scanDeviceTwo, onDisconnectButtonClick, onReconnectButtonClick, deviceTwo
+export default function GameTracking({p1HeartRate, p1HeartRateOnly, p2HeartRate, p2HeartRateOnly, players, setPlayers, toInput, toResults, bluetoothOne,
+                                    connectOne, printHeartRateOne, bluetoothTwo, connectTwo, printHeartRateTwo, getCurrentTime
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -51,8 +51,7 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
         return {backgroundColor: bgColor};
     }
 
-    const p1HeartRateOnly = p1HeartRate.map(data => data.value);
-    const p2HeartRateOnly = p2HeartRate.map(data => data.value);
+    
 
 
     // SCORING STATE & LOGIC
@@ -126,13 +125,13 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
 
     function chooseOneExtraPoint(){
         setReceiversChoice(0);
-        console.log("Receiver chose 1 extra point!");
+        // console.log("Receiver chose 1 extra point!");
         setModal(false);
     }
 
     function chooseThreeExtraPoints(){
         setReceiversChoice(2);
-        console.log("Receiver chose 3 extra points!");
+        // console.log("Receiver chose 3 extra points!");
         setModal(false);
     }
 
@@ -155,9 +154,9 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     <path d="m10.978 14.999v3.251c0 .412-.335.75-.752.75-.188 0-.375-.071-.518-.206-1.775-1.685-4.945-4.692-6.396-6.069-.2-.189-.312-.452-.312-.725 0-.274.112-.536.312-.725 1.451-1.377 4.621-4.385 6.396-6.068.143-.136.33-.207.518-.207.417 0 .752.337.752.75v3.251h9.02c.531 0 1.002.47 1.002 1v3.998c0 .53-.471 1-1.002 1z" fillRule="nonzero"/>
                 </svg>
 
-
-                {/* <button onClick={() => setModal(true)}>Open modal</button> */}
-                {modal && <Modal
+                {/* Modal that pops up when score is tied at 14-14 asking receiver how many more points should be played */}
+                {modal && 
+                <Modal
                     openModal={modal}
                     closeModal={() => setModal(false)}
                     className=""
@@ -169,8 +168,6 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     </div>                
                 </Modal>}
                 
-
-
 
                 {/* First player/team display */}
                 <ul className="player-one">
@@ -263,10 +260,10 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                     <li className="heart-rate-box" style={bluetoothTwo ? (chooseBackgroundColor(calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {bluetoothTwo ? (
                             <div className="player-heart-rate">
-                                <div className="bluetooth-buttons">
+                                {/* <div className="bluetooth-buttons">
                                     <button onClick={() => onDisconnectButtonClick()} className="bluetooth-disconnect-btn">Disconnect</button>
                                     <button onClick={() => onReconnectButtonClick()} className="bluetooth-reconnect-btn">Reconnect</button>
-                                </div>
+                                </div> */}
                                 <div className="heart-rate-stats">
                                     <div>{`${calcHRPercent(p2HeartRate[p2HeartRate.length - 1].value, players[1].age)}%`}</div>
                                     <div className="hr-absolute">
@@ -292,8 +289,7 @@ export default function GameTracking({p1HeartRate, p2HeartRate, players, setPlay
                                 </svg>
                             </div>
                             ) : (
-                            // <button className="bluetooth-connect-btn" onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect HR Monitor</button>
-                            <button className="bluetooth-connect-btn" onClick={scanDeviceTwo}>Connect HR Monitor</button>
+                            <button className="bluetooth-connect-btn" onClick={() => connectTwo({ onChange: printHeartRateTwo }).catch(console.error)}>Connect HR Monitor</button>
                         )}
                     </li>
                 </ul>
