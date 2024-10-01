@@ -20,7 +20,7 @@ ChartJS.register(
     Legend
 );
 
-export default function LineGraph({p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, p2HeartRate, p2HeartRateOnly, p2HRTimeOnly, players}){
+export default function LineGraph({p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, heartRate, heartRateOnly, heartRateTimeOnly, players}){
     // console.log(`p1HeartRate: ${JSON.stringify(p1HeartRate)}`);
     const minsAndSecs = new Date().toJSON().substring(14, 19);
     
@@ -28,8 +28,8 @@ export default function LineGraph({p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, p
     
     const p1HROnlyFormatted = p1HeartRateOnly.slice(1);
     const p1HRTimeOnlyFormatted = p1HRTimeOnly.slice(1);
-    const p2HROnlyFormatted = p2HeartRateOnly.slice(1);
-    const p2HRTimeOnlyFormatted = p2HRTimeOnly.slice(1);
+    const p2HROnlyFormatted = heartRateOnly.slice(1);
+    const p2HRTimeOnlyFormatted = heartRateTimeOnly.slice(1);
 
     const longestTimeDataset = p1HRTimeOnlyFormatted.length - p2HRTimeOnlyFormatted.length >= 0 ? p1HRTimeOnlyFormatted : p2HRTimeOnlyFormatted; 
 

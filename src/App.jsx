@@ -199,6 +199,7 @@ export default function App(){
         }
     ]);
     const heartRateOnly = heartRate.map(data => data.value);
+    const heartRateTimeOnly = heartRate.map(data => data.time);
     const [deviceConnected, setDeviceConnected] = useState(false);
     const [paused, setPaused] = useState(false);
     const [reconnecting, setReconnecting] = useState(false);
@@ -277,6 +278,10 @@ export default function App(){
     // Function to handle device disconnection
     function handleDisconnection(){
         console.log("Function called: handleDisconnection()");
+        console.log(`disconnectedManually STATUS: ${disconnectedManually}`);
+
+        // setTimeout(console.log(`Wait 2s, disconnectedManually STATUS: ${disconnectedManually}`), 10000);
+        
         if (!disconnectedManually) {
             setDeviceConnected(false);
             setReconnecting(true);
@@ -340,10 +345,10 @@ export default function App(){
     // Function to handle manual disconnection
     async function handleManualDisconnect(){
         if (deviceRef.current && deviceRef.current.gatt.connected) {
-            console.log("Device disconnected manually.");
+            console.log("Function called: handleManualDisconnect()");
             setDisconnectedManually(true);
             setDeviceConnected(false);
-            // console.log("Set manual disconnection state to FALSE");
+            console.log(`disconnectedManually STATUS before disconnect: ${disconnectedManually}`);
             await deviceRef.current.gatt.disconnect();
         }
     };
@@ -425,9 +430,9 @@ export default function App(){
                     p1HeartRate={p1HeartRate}
                     p1HeartRateOnly={p1HeartRateOnly}
                     p1HRTimeOnly={p1HRTimeOnly}
-                    p2HeartRate={p2HeartRate}
-                    p2HeartRateOnly={p2HeartRateOnly}
-                    p2HRTimeOnly={p2HRTimeOnly}
+                    heartRate={heartRate}
+                    heartRateOnly={heartRateOnly}
+                    heartRateTimeOnly={heartRateTimeOnly}
                     players={players}
                 />
             }

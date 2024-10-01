@@ -1,6 +1,6 @@
 import LineGraph from "./Line";
 
-export default function Results({toScores, p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, p2HeartRate, p2HeartRateOnly, p2HRTimeOnly, players}){
+export default function Results({toScores, p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, heartRate, heartRateOnly, heartRateTimeOnly, players}){
     return (
         <>
             {/* Back button */}
@@ -13,9 +13,9 @@ export default function Results({toScores, p1HeartRate, p1HeartRateOnly, p1HRTim
                     p1HeartRate={p1HeartRate}
                     p1HeartRateOnly={p1HeartRateOnly}
                     p1HRTimeOnly={p1HRTimeOnly}
-                    p2HeartRate={p2HeartRate}
-                    p2HeartRateOnly={p2HeartRateOnly}
-                    p2HRTimeOnly={p2HRTimeOnly}
+                    heartRate={heartRate}
+                    heartRateOnly={heartRateOnly}
+                    heartRateTimeOnly={heartRateTimeOnly}
                     players={players}
                 />
             </div>
