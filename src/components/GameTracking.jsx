@@ -4,7 +4,7 @@ import Modal from "./Modal";
 // export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
 export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, setPlayers, toInput, toResults, bluetoothOne,
                                     connectOne, printHeartRateOne, getCurrentTime, handleManualDisconnect, handleManualReconnect,
-                                    heartRate, heartRateOnly, deviceConnected, paused, connectToHeartRateSensor, handlePause, handleResume, disconnectedManually, reconnecting 
+                                    heartRate, heartRateOnly, deviceInitialised, deviceConnected, paused, connectToHeartRateSensor, handlePause, handleResume, disconnectedManuallyRef, reconnecting 
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -321,7 +321,7 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                     
                     {/* Heart rate display */}
                     <li className="heart-rate-box" style={deviceConnected && heartRate ? (chooseBackgroundColor(calcHRPercent(heartRate[heartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
-                        {deviceConnected ? (
+                        {deviceInitialised ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">
                                     {/* <button onClick={() => onDisconnectButtonClick()} className="bluetooth-disconnect-btn">Disconnect</button>
@@ -335,7 +335,7 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                                     )}
 
                                     {/* Display disconnect/reconnect buttons depending on connection status */}
-                                    {disconnectedManually ? (
+                                    {disconnectedManuallyRef.current ? (
                                         <button onClick={handleManualReconnect} className="bluetooth-reconnect-btn">Reconnect</button>
                                     ) : (
                                         <button onClick={handleManualDisconnect} className="bluetooth-disconnect-btn">Disconnect</button>

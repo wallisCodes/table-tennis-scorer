@@ -200,10 +200,12 @@ export default function App(){
     ]);
     const heartRateOnly = heartRate.map(data => data.value);
     const heartRateTimeOnly = heartRate.map(data => data.time);
+    const [deviceInitialised, setDeviceInitialised] = useState(false);
     const [deviceConnected, setDeviceConnected] = useState(false);
     const [paused, setPaused] = useState(false);
     const [reconnecting, setReconnecting] = useState(false);
-    const [disconnectedManually, setDisconnectedManually] = useState(false);
+
+    const disconnectedManuallyRef = useRef(false);
     const deviceRef = useRef(null);  // Store Bluetooth device
     const characteristicRef = useRef(null); // Store characteristic to resume later
 
@@ -219,8 +221,9 @@ export default function App(){
 
             deviceRef.current = device;
             device.addEventListener('gattserverdisconnected', handleDisconnection);
+            setDeviceInitialised(true);
             setDeviceConnected(true);
-            setDisconnectedManually(false);
+            disconnectedManuallyRef.current = false;
 
             console.log('Connecting to GATT Server...');
             const server = await device.gatt.connect();
@@ -278,19 +281,18 @@ export default function App(){
     // Function to handle device disconnection
     function handleDisconnection(){
         console.log("Function called: handleDisconnection()");
-        console.log(`disconnectedManually STATUS: ${disconnectedManually}`);
-
+        // console.log(`disconnectedManually STATUS: ${disconnectedManually}`);
         // setTimeout(console.log(`Wait 2s, disconnectedManually STATUS: ${disconnectedManually}`), 10000);
         
-        if (!disconnectedManually) {
+        if (!disconnectedManuallyRef.current) {
             setDeviceConnected(false);
             setReconnecting(true);
-            console.log("Device disconnected. Attempting to reconnect in 5 seconds...");
+            console.log("Device disconnected. Attempting to reconnect in 3 seconds...");
             setTimeout(() => {
                 if (deviceRef.current) {
                     reconnectToDevice(deviceRef.current);
                 }
-            }, 5000);
+            }, 3000);
         } else {
             console.log("Device was disconnected manually.");
         }
@@ -314,7 +316,7 @@ export default function App(){
             await startHeartRateNotifications(characteristic);
             setDeviceConnected(true);
             setReconnecting(false);
-            setDisconnectedManually(false);
+            disconnectedManuallyRef.current = false;
         } 
         catch (error) {
             console.error("Reconnection failed:", error);
@@ -326,7 +328,6 @@ export default function App(){
     // Pause button handler
     function handlePause(){
         console.log("Function called: handlePause()");
-
         if (characteristicRef.current && !paused) {
             stopHeartRateNotifications(characteristicRef.current);
         }
@@ -336,7 +337,6 @@ export default function App(){
     // Resume button handler
     function handleResume(){
         console.log("Function called: handleResume()");
-
         if (characteristicRef.current && paused) {
             startHeartRateNotifications(characteristicRef.current);
         }
@@ -346,9 +346,9 @@ export default function App(){
     async function handleManualDisconnect(){
         if (deviceRef.current && deviceRef.current.gatt.connected) {
             console.log("Function called: handleManualDisconnect()");
-            setDisconnectedManually(true);
+            disconnectedManuallyRef.current = true;
             setDeviceConnected(false);
-            console.log(`disconnectedManually STATUS before disconnect: ${disconnectedManually}`);
+            // console.log(`disconnectedManually STATUS before disconnect: ${disconnectedManuallyRef.current}`);
             await deviceRef.current.gatt.disconnect();
         }
     };
@@ -400,21 +400,12 @@ export default function App(){
                     bluetoothOne={bluetoothOne}
                     connectOne={connectOne}
                     printHeartRateOne={printHeartRateOne}
-                    // bluetoothTwo={bluetoothTwo}
-                    // connectTwo={connectTwo}
-                    // printHeartRateTwo={printHeartRateTwo}
-                    // scanDeviceTwo={scanDeviceTwo}
-                    // onDisconnectButtonClick={onDisconnectButtonClick}
-                    // onReconnectButtonClick={onReconnectButtonClick}
-                    // connect={connect}
-                    // onDisconnected={onDisconnected}
-                    // deviceTwo={deviceTwo}
                     heartRate={heartRate}
                     heartRateOnly={heartRateOnly}
+                    deviceInitialised={deviceInitialised}
                     deviceConnected={deviceConnected}
                     paused={paused}
-                    // setPaused={setPaused}
-                    disconnectedManually={disconnectedManually}
+                    disconnectedManuallyRef={disconnectedManuallyRef}
                     handleManualDisconnect={handleManualDisconnect}
                     reconnecting={reconnecting}
                     handleManualReconnect={handleManualReconnect}
