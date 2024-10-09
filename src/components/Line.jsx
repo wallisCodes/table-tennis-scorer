@@ -20,16 +20,16 @@ ChartJS.register(
     Legend
 );
 
-export default function LineGraph({p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, heartRate, heartRateOnly, heartRateTimeOnly, players}){
+export default function LineGraph({players, heartRateOneOnly, heartRateOneTimeOnly, heartRateTwoOnly, heartRateTwoTimeOnly}){
     // console.log(`p1HeartRate: ${JSON.stringify(p1HeartRate)}`);
     const minsAndSecs = new Date().toJSON().substring(14, 19);
     
     // console.log(`minutes and seconds only: ${minsAndSecs}`);
     
-    const p1HROnlyFormatted = p1HeartRateOnly.slice(1);
-    const p1HRTimeOnlyFormatted = p1HRTimeOnly.slice(1);
-    const p2HROnlyFormatted = heartRateOnly.slice(1);
-    const p2HRTimeOnlyFormatted = heartRateTimeOnly.slice(1);
+    const p1HROnlyFormatted = heartRateOneOnly.slice(1);
+    const p1HRTimeOnlyFormatted = heartRateOneTimeOnly.slice(1);
+    const p2HROnlyFormatted = heartRateTwoOnly.slice(1);
+    const p2HRTimeOnlyFormatted = heartRateTwoTimeOnly.slice(1);
 
     const longestTimeDataset = p1HRTimeOnlyFormatted.length - p2HRTimeOnlyFormatted.length >= 0 ? p1HRTimeOnlyFormatted : p2HRTimeOnlyFormatted; 
 
@@ -81,29 +81,6 @@ export default function LineGraph({p1HeartRate, p1HeartRateOnly, p1HRTimeOnly, h
         ]
     };
 
-    // const data = {
-    //     labels: [
-    //         "Monday",
-    //         "Tuesday",
-    //         "Wednesday",
-    //         "Thursday",
-    //         "Friday",
-    //         "Saturday",
-    //         "Sunday"
-    //     ],
-    //     datasets: [
-    //         {
-    //             label: "Josh",
-    //             data: [40, 10, 70, 30, 90, 20, 50],
-    //             borderColor: players[0].colour
-    //         },
-    //         {
-    //             label: "Simon",
-    //             data: [60, 80, 10, 30, 60, 100, 0],
-    //             borderColor: players[1].colour
-    //         }
-    //     ]
-    // };
 
     return (
         <>

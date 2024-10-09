@@ -10,7 +10,7 @@ uuidv4();
 export default function App(){
     const [matchDetails, setMatchDetails] = useState(
         {
-            sport: "squash",
+            sport: "table-tennis",
             matchType: "singles",
             bestOf: "1"
         }
@@ -35,18 +35,18 @@ export default function App(){
             points: 12,
         }
     ]);
-    const [p1HeartRate, setP1HeartRate] = useState([
-        {
-            value: 80,
-            time: ""
-        }
-    ]);
-    const [p2HeartRate, setP2HeartRate] = useState([
-        {
-            value: 80,
-            time: ""
-        }
-    ]);
+    // const [p1HeartRate, setP1HeartRate] = useState([
+    //     {
+    //         value: 80,
+    //         time: ""
+    //     }
+    // ]);
+    // const [p2HeartRate, setP2HeartRate] = useState([
+    //     {
+    //         value: 80,
+    //         time: ""
+    //     }
+    // ]);
     const [display, setDisplay] = useState("input");
 
 
@@ -76,105 +76,40 @@ export default function App(){
     }
     
 
-    // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(false);
+    // // Used to generate mock HR data for testing purposes
+    // const [mockData, setMockData] = useState(false);
 
-    if (mockData === true){
-        useEffect(() => {
+    // if (mockData === true){
+    //     useEffect(() => {
 
-            function generateRandomHRValues(max, min) {
-                const currentTime = getCurrentTime();
+    //         function generateRandomHRValues(max, min) {
+    //             const currentTime = getCurrentTime();
                 
-                setP1HeartRate(prevData => [
-                    ...prevData, 
-                    {
-                        value: Math.floor(Math.random() * (max - min + 1) + min),
-                        time: currentTime
-                    }
-                ]);
+    //             setP1HeartRate(prevData => [
+    //                 ...prevData, 
+    //                 {
+    //                     value: Math.floor(Math.random() * (max - min + 1) + min),
+    //                     time: currentTime
+    //                 }
+    //             ]);
 
-                setP2HeartRate(prevData => [
-                    ...prevData, 
-                    {
-                        value: Math.floor(Math.random() * (max - min + 1) + min),
-                        time: currentTime
-                    }
-                ]);
-            }
-            generateRandomHRValues(116, 180);
+    //             setP2HeartRate(prevData => [
+    //                 ...prevData, 
+    //                 {
+    //                     value: Math.floor(Math.random() * (max - min + 1) + min),
+    //                     time: currentTime
+    //                 }
+    //             ]);
+    //         }
+    //         generateRandomHRValues(116, 180);
         
-            const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
-                generateRandomHRValues(116, 180);
-            }, 1000);
+    //         const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
+    //             generateRandomHRValues(116, 180);
+    //         }, 1000);
     
-            return () => clearInterval(int);
-        }, []);
-    }
-
-    const p1HeartRateOnly = p1HeartRate.map(data => data.value);
-    const p2HeartRateOnly = p2HeartRate.map(data => data.value);
-    const p1HRTimeOnly = p1HeartRate.map(data => data.time);
-    const p2HRTimeOnly = p2HeartRate.map(data => data.time);
-
-    // Bluetooth code
-    const [bluetoothOne, setBluetoothOne] = useState(false);
-
-    async function connectOne(props) {
-        const deviceOne = await navigator.bluetooth.requestDevice({
-            filters: [{ services: ['heart_rate'] }]
-            // acceptAllDevices: false,
-        })
-
-        console.log('Connecting to GATT Server...');
-        const server = await deviceOne.gatt?.connect();
-
-        console.log('Getting Heart Rate...');
-        const service = await server.getPrimaryService('heart_rate');
-
-        console.log('Getting Heart Rate Measurement Characteristic...');
-        const char = await service.getCharacteristic('heart_rate_measurement');
-
-        setBluetoothOne(true);
-        char.oncharacteristicvaluechanged = props.onChange;
-        char.startNotifications();
-        return char;
-    }
-
-
-
-
-  
-    function printHeartRateOne(event) {
-        const heartRateOne = event.target.value.getInt8(1);
-        const currentTime = getCurrentTime();
-        
-        // Ignore spurious HR data
-        if (0 <= heartRateOne && heartRateOne < 250){
-            setP1HeartRate(prevData => [
-                ...prevData, 
-                {
-                    value: heartRateOne,
-                    time: currentTime
-                }
-            ]);
-        }
-        
-        // Is this code needed? Yes, for debugging in chrome/edge
-        const prev = hrDataOne[hrDataOne.length - 1];
-        hrDataOne[hrDataOne.length] = heartRateOne;
-        hrDataOne = hrDataOne.slice(-200);
-        let arrow = '';
-        if (heartRateOne !== prev) arrow = heartRateOne > prev ? '⬆' : '⬇';
-        // console.clear();
-        console.log(`%c\n💚 Player 1: ${heartRateOne} ${arrow}`, 'font-size: 24px;');
-        console.log(`Current time: ${currentTime}`);
-    }
-
-
-
-    // Is this code needed?
-    let hrDataOne = new Array(200).fill(10);
-
+    //         return () => clearInterval(int);
+    //     }, []);
+    // }
 
     function toInput(){
         setDisplay("input");
@@ -189,88 +124,104 @@ export default function App(){
     }
 
 
-    // -------------------- BLUETOOTH TESTING --------------------
+    // -------------------- BLUETOOTH CODE --------------------
     // const [heartRate, setHeartRate] = useState(null);
-    const [heartRate, setHeartRate] = useState([
+    const [heartRateOne, setHeartRateOne] = useState([
         {
             value: 80,
             time: ""
         }
     ]);
-    const heartRateOnly = heartRate.map(data => data.value);
-    const heartRateTimeOnly = heartRate.map(data => data.time);
-    const [deviceInitialised, setDeviceInitialised] = useState(false);
-    const [deviceStatus, setDeviceStatus] = useState("disconnected");
-    const [paused, setPaused] = useState(false);
-    const [reconnectOverride, setReconnectOverride] = useState(false);
+    const heartRateOneOnly = heartRateOne.map(data => data.value);
+    const heartRateOneTimeOnly = heartRateOne.map(data => data.time);
+    const [deviceInitialisedOne, setDeviceInitialisedOne] = useState(false);
+    const [deviceStatusOne, setDeviceStatusOne] = useState("disconnected");
+    const [pausedOne, setPausedOne] = useState(false);
+    const [reconnectOverrideOne, setReconnectOverrideOne] = useState(false);
 
-    const disconnectedManuallyRef = useRef(false);
-    const deviceRef = useRef(null);  // Store Bluetooth device
-    const characteristicRef = useRef(null); // Store characteristic to resume later
+    const disconnectedManuallyRefOne = useRef(false);
+    const deviceRefOne = useRef(null);  // Store Bluetooth device
+    const characteristicRefOne = useRef(null); // Store characteristic to resume later
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    const [heartRateTwo, setHeartRateTwo] = useState([
+        {
+            value: 80,
+            time: ""
+        }
+    ]);
+    const heartRateTwoOnly = heartRateTwo.map(data => data.value);
+    const heartRateTwoTimeOnly = heartRateTwo.map(data => data.time);
+    const [deviceInitialisedTwo, setDeviceInitialisedTwo] = useState(false);
+    const [deviceStatusTwo, setDeviceStatusTwo] = useState("disconnected");
+    const [pausedTwo, setPausedTwo] = useState(false);
+    const [reconnectOverrideTwo, setReconnectOverrideTwo] = useState(false);
+
+    const disconnectedManuallyRefTwo = useRef(false);
+    const deviceRefTwo = useRef(null);  // Store Bluetooth device
+    const characteristicRefTwo = useRef(null); // Store characteristic to resume later
 
 
-    // Function to connect to a Bluetooth heart rate sensor
-    async function connectToHeartRateSensor() {
-        console.log("Function called: connectToHeartRateSensor()");
+    // Function to connect to Bluetooth heart rate sensor one
+    async function connectToHeartRateSensorOne() {
+        console.log("Function called: connectToHeartRateSensorOne()");
         try {
-            const device = await navigator.bluetooth.requestDevice({
+            const deviceOne = await navigator.bluetooth.requestDevice({
                 filters: [{ services: ["heart_rate"] }]
             });
-            setDeviceStatus("connecting");
-            deviceRef.current = device;
-            device.addEventListener('gattserverdisconnected', handleDisconnection);
-            setDeviceInitialised(true);
-            disconnectedManuallyRef.current = false;
+            setDeviceStatusOne("connecting");
+            deviceRefOne.current = deviceOne;
+            deviceOne.addEventListener('gattserverdisconnected', handleDisconnectionOne);
+            setDeviceInitialisedOne(true);
+            disconnectedManuallyRefOne.current = false;
 
             console.log('Connecting to GATT Server...');
-            const server = await device.gatt.connect();
-            // setDeviceConnected(true);
-            setDeviceStatus("connected");
+            const server = await deviceOne.gatt.connect();
+            setDeviceStatusOne("connected");
             console.log('Getting Heart Rate...');
             const service = await server.getPrimaryService("heart_rate");
             console.log('Getting Heart Rate Measurement Characteristic...');
-            const characteristic = await service.getCharacteristic("heart_rate_measurement");
+            const characteristicOne = await service.getCharacteristic("heart_rate_measurement");
                     
-            characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurement);
-            characteristicRef.current = characteristic; // Store characteristic
-            await startHeartRateNotifications(characteristic); // Subscribe to heart rate changes
+            characteristicOne.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
+            characteristicRefOne.current = characteristicOne; // Store characteristic
+            await startHeartRateNotificationsOne(characteristicOne); // Subscribe to heart rate changes
         } 
         catch (error) {
-            console.error("Failed to connect to heart rate sensor:", error);
+            console.error("Failed to connect to heart rate sensor one:", error);
         }
     };
 
 
     // Function to start heart rate notifications
-    async function startHeartRateNotifications(characteristic){
-        console.log("Function called: startHeartRateNotifications()");
+    async function startHeartRateNotificationsOne(characteristic){
+        console.log("Function called: startHeartRateNotificationsOne()");
         await characteristic.startNotifications();
-        setPaused(false);
-        setDeviceStatus("connected");
-        // deviceStatusRef.current = "connected";
+        setPausedOne(false);
+        setDeviceStatusOne("connected");
     };
 
 
     // Function to stop heart rate notifications (pause)
-    async function stopHeartRateNotifications(characteristic){
-        console.log("Function called: stopHeartRateNotifications()");
+    async function stopHeartRateNotificationsOne(characteristic){
+        console.log("Function called: stopHeartRateNotificationsOne()");
         await characteristic.stopNotifications();
-        characteristic.removeEventListener("characteristicvaluechanged", handleHeartRateMeasurement);
-        setPaused(true);
-        setDeviceStatus("paused");
-        // deviceStatusRef.current = "paused";
+        characteristic.removeEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
+        setPausedOne(true);
+        setDeviceStatusOne("paused");
     };
 
 
     // Function to handle heart rate measurement updates
-    function handleHeartRateMeasurement(event){
+    function handleHeartRateMeasurementOne(event){
         const value = event.target.value;
         const heartRateValue = value.getUint8(1); // Extract heart rate value
         const currentTime = getCurrentTime();
         
         // Ignore spurious HR data
         if (0 <= heartRateValue && heartRateValue < 220){
-            setHeartRate(prevData => [
+            setHeartRateOne(prevData => [
                 ...prevData, 
                 {
                     value: heartRateValue,
@@ -282,34 +233,33 @@ export default function App(){
 
 
     // Function to handle device disconnection
-    function handleDisconnection(){
-        console.log("Function called: handleDisconnection()");        
-        if (!disconnectedManuallyRef.current) {
-            setDeviceStatus("disconnected");
-            reconnectToDevice(deviceRef.current);
+    function handleDisconnectionOne(){
+        console.log("Function called: handleDisconnectionOne()");        
+        if (!disconnectedManuallyRefOne.current) {
+            setDeviceStatusOne("disconnected");
+            reconnectToDeviceOne(deviceRefOne.current);
         } else {
-            // setDeviceConnected(false);
-            setDeviceStatus("disconnected");
+            setDeviceStatusOne("disconnected");
             console.log("Device was disconnected manually.");
         }
     };
 
 
     // Function to reconnect to the device (max 3 times)
-    async function reconnectToDevice(device){
-        console.log("Function called: reconnectToDevice()");
+    async function reconnectToDeviceOne(device){
+        console.log("Function called: reconnectToDeviceOne()");
 
         let reconnectionAttempt = 0;
         const maxAttempts = 3;
 
-        console.log(`START: reconnectionAttempt #${reconnectionAttempt}`);
-        console.log(`START: reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
+        console.log(`ReconnectionAttempt #${reconnectionAttempt}`);
+        console.log(`Reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
         
         
         // Attempt to reconnect until max attempts has been reached
         do {
             try {
-                setDeviceStatus("reconnecting");
+                setDeviceStatusOne("reconnecting");
                 console.log('Connecting to GATT Server...');
                 await device.gatt.connect();
                 console.log('Getting Heart Rate...');
@@ -318,14 +268,14 @@ export default function App(){
                 const characteristic = await service.getCharacteristic("heart_rate_measurement");
     
                 //Need to re-add event listener because it gets removed when disconnecting manually
-                characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurement);
-                characteristicRef.current = characteristic;
-                await startHeartRateNotifications(characteristic);
-                disconnectedManuallyRef.current = false;
+                characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
+                characteristicRefOne.current = characteristic;
+                await startHeartRateNotificationsOne(characteristic);
+                disconnectedManuallyRefOne.current = false;
 
                 // break out of do-while loop if reconnected succesfully
                 reconnectionAttempt = 5;
-                setDeviceStatus("connected");
+                setDeviceStatusOne("connected");
                 break;
             } 
             catch (error) {
@@ -334,8 +284,8 @@ export default function App(){
                 console.log(`Reconnection attempt #${reconnectionAttempt}`);
                 console.log(`Reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
                 if (maxAttempts - reconnectionAttempt <= 0){
-                    setDeviceStatus("disconnected");
-                    setReconnectOverride(true);
+                    setDeviceStatusOne("disconnected");
+                    setReconnectOverrideOne(true);
                     console.log("Maximum reconnection attempts met. Device failed to reconnect automatically.");
                 }
             }
@@ -344,39 +294,208 @@ export default function App(){
 
 
     // Pause button handler
-    function handlePause(){
-        console.log("Function called: handlePause()");
-        if (characteristicRef.current && !paused) {
-            stopHeartRateNotifications(characteristicRef.current);
+    function handlePauseOne(){
+        console.log("Function called: handlePauseOne()");
+        if (characteristicRefOne.current && !pausedOne) {
+            stopHeartRateNotificationsOne(characteristicRefOne.current);
         }
     };
 
 
     // Resume button handler
-    function handleResume(){
-        console.log("Function called: handleResume()");
-        if (characteristicRef.current && paused) {
-            startHeartRateNotifications(characteristicRef.current);
-        }
+    function handleResumeOne(){
+        console.log("Function called: handleResumeOne()");
+        if (characteristicRefOne.current && pausedOne) {
+            startHeartRateNotificationsOne(characteristicRefOne.current);
+        }One
     };
 
 
     // Function to handle manual disconnection
-    async function handleManualDisconnect(){
-        if (deviceRef.current && deviceRef.current.gatt.connected) {
-            console.log("Function called: handleManualDisconnect()");
-            disconnectedManuallyRef.current = true;
-            // setDeviceConnected(false);
-            setDeviceStatus("disconnected");
-            await deviceRef.current.gatt.disconnect();
+    async function handleManualDisconnectOne(){
+        if (deviceRefOne.current && deviceRefOne.current.gatt.connected) {
+            console.log("Function called: handleManualDisconnectOne()");
+            disconnectedManuallyRefOne.current = true;
+            setDeviceStatusOne("disconnected");
+            await deviceRefOne.current.gatt.disconnect();
         }
     };
 
 
     // Function to handle manual reconnection
-    async function handleManualReconnect(){
-        if (deviceRef.current) {
-            reconnectToDevice(deviceRef.current);
+    async function handleManualReconnectOne(){
+        if (deviceRefOne.current) {
+            reconnectToDeviceOne(deviceRefOne.current);
+        }
+    };
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+
+    // Function to connect to Bluetooth heart rate sensor Two
+    async function connectToHeartRateSensorTwo() {
+        console.log("Function called: connectToHeartRateSensorTwo()");
+        try {
+            const deviceTwo = await navigator.bluetooth.requestDevice({
+                filters: [{ services: ["heart_rate"] }]
+            });
+            setDeviceStatusTwo("connecting");
+            deviceRefTwo.current = deviceTwo;
+            deviceTwo.addEventListener('gattserverdisconnected', handleDisconnectionTwo);
+            setDeviceInitialisedTwo(true);
+            disconnectedManuallyRefTwo.current = false;
+
+            console.log('Connecting to GATT Server...');
+            const server = await deviceTwo.gatt.connect();
+            setDeviceStatusTwo("connected");
+            console.log('Getting Heart Rate...');
+            const service = await server.getPrimaryService("heart_rate");
+            console.log('Getting Heart Rate Measurement Characteristic...');
+            const characteristicTwo = await service.getCharacteristic("heart_rate_measurement");
+                    
+            characteristicTwo.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
+            characteristicRefTwo.current = characteristicTwo; // Store characteristic
+            await startHeartRateNotificationsTwo(characteristicTwo); // Subscribe to heart rate changes
+        } 
+        catch (error) {
+            console.error("Failed to connect to heart rate sensor Two:", error);
+        }
+    };
+
+
+    // Function to start heart rate notifications
+    async function startHeartRateNotificationsTwo(characteristic){
+        console.log("Function called: startHeartRateNotificationsTwo()");
+        await characteristic.startNotifications();
+        setPausedTwo(false);
+        setDeviceStatusTwo("connected");
+    };
+
+
+    // Function to stop heart rate notifications (pause)
+    async function stopHeartRateNotificationsTwo(characteristic){
+        console.log("Function called: stopHeartRateNotificationsTwo()");
+        await characteristic.stopNotifications();
+        characteristic.removeEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
+        setPausedTwo(true);
+        setDeviceStatusTwo("paused");
+    };
+
+
+    // Function to handle heart rate measurement updates
+    function handleHeartRateMeasurementTwo(event){
+        const value = event.target.value;
+        const heartRateValue = value.getUint8(1); // Extract heart rate value
+        const currentTime = getCurrentTime();
+        
+        // Ignore spurious HR data
+        if (0 <= heartRateValue && heartRateValue < 220){
+            setHeartRateTwo(prevData => [
+                ...prevData, 
+                {
+                    value: heartRateValue,
+                    time: currentTime
+                }
+            ]);
+        }
+    };
+
+
+    // Function to handle device disconnection
+    function handleDisconnectionTwo(){
+        console.log("Function called: handleDisconnectionTwo()");        
+        if (!disconnectedManuallyRefTwo.current) {
+            setDeviceStatusTwo("disconnected");
+            reconnectToDeviceTwo(deviceRefTwo.current);
+        } else {
+            setDeviceStatusTwo("disconnected");
+            console.log("Device was disconnected manually.");
+        }
+    };
+
+
+    // Function to reconnect to the device (max 3 times)
+    async function reconnectToDeviceTwo(device){
+        console.log("Function called: reconnectToDeviceTwo()");
+
+        let reconnectionAttempt = 0;
+        const maxAttempts = 3;
+
+        console.log(`ReconnectionAttempt #${reconnectionAttempt}`);
+        console.log(`Reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
+        
+        
+        // Attempt to reconnect until max attempts has been reached
+        do {
+            try {
+                setDeviceStatusTwo("reconnecting");
+                console.log('Connecting to GATT Server...');
+                await device.gatt.connect();
+                console.log('Getting Heart Rate...');
+                const service = await device.gatt.getPrimaryService("heart_rate");
+                console.log('Getting Heart Rate Measurement Characteristic...');
+                const characteristic = await service.getCharacteristic("heart_rate_measurement");
+    
+                //Need to re-add event listener because it gets removed when disconnecting manually
+                characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
+                characteristicRefTwo.current = characteristic;
+                await startHeartRateNotificationsTwo(characteristic);
+                disconnectedManuallyRefTwo.current = false;
+
+                // break out of do-while loop if reconnected succesfully
+                reconnectionAttempt = 5;
+                setDeviceStatusTwo("connected");
+                break;
+            } 
+            catch (error) {
+                console.error("Reconnection failed:", error);
+                reconnectionAttempt++;
+                console.log(`Reconnection attempt #${reconnectionAttempt}`);
+                console.log(`Reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
+                if (maxAttempts - reconnectionAttempt <= 0){
+                    setDeviceStatusTwo("disconnected");
+                    setReconnectOverrideTwo(true);
+                    console.log("Maximum reconnection attempts met. Device failed to reconnect automatically.");
+                }
+            }
+        } while (reconnectionAttempt < maxAttempts);  
+    };
+
+
+    // Pause button handler
+    function handlePauseTwo(){
+        console.log("Function called: handlePauseTwo()");
+        if (characteristicRefTwo.current && !pausedTwo) {
+            stopHeartRateNotificationsTwo(characteristicRefTwo.current);
+        }
+    };
+
+
+    // Resume button handler
+    function handleResumeTwo(){
+        console.log("Function called: handleResumeTwo()");
+        if (characteristicRefTwo.current && pausedTwo) {
+            startHeartRateNotificationsTwo(characteristicRefTwo.current);
+        }
+    };
+
+
+    // Function to handle manual disconnection
+    async function handleManualDisconnectTwo(){
+        if (deviceRefTwo.current && deviceRefTwo.current.gatt.connected) {
+            console.log("Function called: handleManualDisconnectTwo()");
+            disconnectedManuallyRefTwo.current = true;
+            setDeviceStatusTwo("disconnected");
+            await deviceRefTwo.current.gatt.disconnect();
+        }
+    };
+
+
+    // Function to handle manual reconnection
+    async function handleManualReconnectTwo(){
+        if (deviceRefTwo.current) {
+            reconnectToDeviceTwo(deviceRefTwo.current);
         }
     };
 
@@ -399,52 +518,48 @@ export default function App(){
                 </>
             }
             
-
             {display === "scores" &&
                 <GameTracking 
-                    p1HeartRate={p1HeartRate}
-                    setP1HeartRate={setP1HeartRate}
-                    p1HeartRateOnly={p1HeartRateOnly}
-                    p1HRTimeOnly={p1HRTimeOnly}
-                    p2HeartRate={p2HeartRate}
-                    setP2HeartRate={setP2HeartRate}
-                    p2HeartRateOnly={p2HeartRateOnly}
-                    p2HRTimeOnly={p2HRTimeOnly}
                     players={players}
                     setPlayers={setPlayers}
                     getCurrentTime={getCurrentTime}
                     toInput={toInput}
-                    toScores={toScores}
                     toResults={toResults}
-                    bluetoothOne={bluetoothOne}
-                    connectOne={connectOne}
-                    printHeartRateOne={printHeartRateOne}
-                    heartRate={heartRate}
-                    heartRateOnly={heartRateOnly}
-                    deviceInitialised={deviceInitialised}
-                    // deviceConnected={deviceConnected}
-                    paused={paused}
-                    disconnectedManuallyRef={disconnectedManuallyRef}
-                    deviceStatus={deviceStatus}
-                    handleManualDisconnect={handleManualDisconnect}
-                    reconnectOverride={reconnectOverride}
-                    handleManualReconnect={handleManualReconnect}
-                    connectToHeartRateSensor={connectToHeartRateSensor}
-                    handlePause={handlePause}
-                    handleResume={handleResume}
+                    heartRateOne={heartRateOne}
+                    heartRateOneOnly={heartRateOneOnly}
+                    deviceInitialisedOne={deviceInitialisedOne}
+                    deviceStatusOne={deviceStatusOne}
+                    pausedOne={pausedOne}
+                    reconnectOverrideOne={reconnectOverrideOne}
+                    disconnectedManuallyRefOne={disconnectedManuallyRefOne}
+                    handleManualDisconnectOne={handleManualDisconnectOne}
+                    handleManualReconnectOne={handleManualReconnectOne}
+                    connectToHeartRateSensorOne={connectToHeartRateSensorOne}
+                    handlePauseOne={handlePauseOne}
+                    handleResumeOne={handleResumeOne}
+                    heartRateTwo={heartRateTwo}
+                    heartRateTwoOnly={heartRateTwoOnly}
+                    deviceInitialisedTwo={deviceInitialisedTwo}
+                    deviceStatusTwo={deviceStatusTwo}
+                    pausedTwo={pausedTwo}
+                    reconnectOverrideTwo={reconnectOverrideTwo}
+                    disconnectedManuallyRefTwo={disconnectedManuallyRefTwo}
+                    handleManualDisconnectTwo={handleManualDisconnectTwo}
+                    handleManualReconnectTwo={handleManualReconnectTwo}
+                    connectToHeartRateSensorTwo={connectToHeartRateSensorTwo}
+                    handlePauseTwo={handlePauseTwo}
+                    handleResumeTwo={handleResumeTwo}
                 />
             }
 
             {display === "results" &&
                 <Results 
                     toScores={toScores}
-                    p1HeartRate={p1HeartRate}
-                    p1HeartRateOnly={p1HeartRateOnly}
-                    p1HRTimeOnly={p1HRTimeOnly}
-                    heartRate={heartRate}
-                    heartRateOnly={heartRateOnly}
-                    heartRateTimeOnly={heartRateTimeOnly}
                     players={players}
+                    heartRateOneOnly={heartRateOneOnly}
+                    heartRateOneTimeOnly={heartRateOneTimeOnly}
+                    heartRateTwoOnly={heartRateTwoOnly}
+                    heartRateTwoTimeOnly={heartRateTwoTimeOnly}
                 />
             }
         </>

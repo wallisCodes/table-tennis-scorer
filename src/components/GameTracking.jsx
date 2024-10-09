@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
 
-// export default function GameTracking({p1HeartRate, setP1HeartRate, p2HeartRate, setP2HeartRate, players, setPlayers, backToInput}){
-export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, setPlayers, toInput, toResults, bluetoothOne,
-                                    connectOne, printHeartRateOne, getCurrentTime, handleManualDisconnect, handleManualReconnect, reconnectOverride,
-                                    heartRate, heartRateOnly, deviceInitialised, paused, connectToHeartRateSensor, handlePause, handleResume, disconnectedManuallyRef, deviceStatus 
+export default function GameTracking({players, setPlayers, getCurrentTime, toInput, toResults, heartRateOne, heartRateOneOnly,
+    deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
+    handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, heartRateTwo, heartRateTwoOnly,
+    deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo 
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -192,8 +193,8 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                     {/* Player name, colour and score */}
                     <div className="player-details">
                         <li className="player-one-banner">
-                            <div className="player-team-one" style={p1TeamStyles}></div>
                             <span className="player-one-name">{players[0].name}</span>
+                            <div className="player-team-one" style={p1TeamStyles}></div>
                         </li>
 
                         {showWinner ? (
@@ -214,26 +215,40 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={bluetoothOne ? (chooseBackgroundColor(calcHRPercent(p1HeartRate[p1HeartRate.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
-                        {bluetoothOne ? (
+                    <li className="heart-rate-box" style={deviceStatusOne === "connected" && heartRateOne ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                        {deviceInitialisedOne ? (
                             <div className="player-heart-rate">
+                                <div className="bluetooth-buttons">                                  
+                                    {/* Display pause/resume buttons depending on HR characteristic measurements */}
+                                    {pausedOne ? (
+                                        <button onClick={handleResumeOne} className="bluetooth-disconnect-btn">Resume</button>
+                                    ) : (
+                                        <button onClick={handlePauseOne} className="bluetooth-disconnect-btn">Pause</button>
+                                    )}
+
+                                    {/* Display disconnect/reconnect buttons depending on connection status */}
+                                    {disconnectedManuallyRefOne.current || reconnectOverrideOne ? (
+                                        <button onClick={handleManualReconnectOne} className="bluetooth-reconnect-btn">Reconnect</button>
+                                    ) : (
+                                        <button onClick={handleManualDisconnectOne} className="bluetooth-disconnect-btn">Disconnect</button>
+                                    )}
+                                </div>
                                 <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(p1HeartRate[p1HeartRate.length - 1].value, players[0].age)}%`}</div>
+                                    <div>{`${calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[1].age)}%`}</div>
                                     <div className="hr-absolute">
-                                        <div>{p1HeartRate[p1HeartRate.length - 1].value}</div>
+                                        <div>{heartRateOne[heartRateOne.length - 1].value}</div>
                                         <div className="hr-extremities">
                                             <div className="player-max-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
                                                 </svg>
-                                                {/* <span>{Math.max(...p1HeartRate)}</span> */}
-                                                <span>{Math.max(...p1HeartRateOnly)}</span>
+                                                <span>{Math.max(...heartRateOneOnly)}</span>
                                             </div>
                                             <div className="player-min-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
                                                 </svg>
-                                                <span>{Math.min(...p1HeartRateOnly)}</span>
+                                                <span>{Math.min(...heartRateOneOnly)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -241,9 +256,13 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                                 <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
                                     <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
                                 </svg>
+                                <div className="device-status">
+                                    <div style={chooseStatusColor(deviceStatusOne)} className="device-status-circle"></div>
+                                    <div className="device-status-text">{deviceStatusOne}</div>
+                                </div>
                             </div>
                             ) : (
-                            <button className="bluetooth-connect-btn" onClick={() => connectOne({ onChange: printHeartRateOne }).catch(console.error)}>Connect HR Monitor</button>   
+                            <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensorOne}>Connect HR Monitor</button>
                         )}
                     </li>
                 </ul>
@@ -279,40 +298,40 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={deviceStatus === "connected" && heartRate ? (chooseBackgroundColor(calcHRPercent(heartRate[heartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
-                        {deviceInitialised ? (
+                    <li className="heart-rate-box" style={deviceStatusTwo === "connected" && heartRateTwo ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                        {deviceInitialisedTwo ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
                                     {/* Display pause/resume buttons depending on HR characteristic measurements */}
-                                    {paused ? (
-                                        <button onClick={handleResume} className="bluetooth-disconnect-btn">Resume</button>
+                                    {pausedTwo ? (
+                                        <button onClick={handleResumeTwo} className="bluetooth-disconnect-btn">Resume</button>
                                     ) : (
-                                        <button onClick={handlePause} className="bluetooth-disconnect-btn">Pause</button>
+                                        <button onClick={handlePauseTwo} className="bluetooth-disconnect-btn">Pause</button>
                                     )}
 
                                     {/* Display disconnect/reconnect buttons depending on connection status */}
-                                    {disconnectedManuallyRef.current || reconnectOverride ? (
-                                        <button onClick={handleManualReconnect} className="bluetooth-reconnect-btn">Reconnect</button>
+                                    {disconnectedManuallyRefTwo.current || reconnectOverrideTwo ? (
+                                        <button onClick={handleManualReconnectTwo} className="bluetooth-reconnect-btn">Reconnect</button>
                                     ) : (
-                                        <button onClick={handleManualDisconnect} className="bluetooth-disconnect-btn">Disconnect</button>
+                                        <button onClick={handleManualDisconnectTwo} className="bluetooth-disconnect-btn">Disconnect</button>
                                     )}
                                 </div>
                                 <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(heartRate[heartRate.length - 1].value, players[1].age)}%`}</div>
+                                    <div>{`${calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age)}%`}</div>
                                     <div className="hr-absolute">
-                                        <div>{heartRate[heartRate.length - 1].value}</div>
+                                        <div>{heartRateTwo[heartRateTwo.length - 1].value}</div>
                                         <div className="hr-extremities">
                                             <div className="player-max-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
                                                 </svg>
-                                                <span>{Math.max(...heartRateOnly)}</span>
+                                                <span>{Math.max(...heartRateTwoOnly)}</span>
                                             </div>
                                             <div className="player-min-heart-rate">
                                                 <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
                                                 </svg>
-                                                <span>{Math.min(...heartRateOnly)}</span>
+                                                <span>{Math.min(...heartRateTwoOnly)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -321,12 +340,12 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                                     <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
                                 </svg>
                                 <div className="device-status">
-                                    <div style={chooseStatusColor(deviceStatus)} className="device-status-circle"></div>
-                                    <div className="device-status-text">{deviceStatus}</div>
+                                    <div style={chooseStatusColor(deviceStatusTwo)} className="device-status-circle"></div>
+                                    <div className="device-status-text">{deviceStatusTwo}</div>
                                 </div>
                             </div>
                             ) : (
-                            <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensor}>Connect HR Monitor</button>
+                            <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensorTwo}>Connect HR Monitor</button>
                         )}
                     </li>
                 </ul>
