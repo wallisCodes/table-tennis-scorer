@@ -266,7 +266,7 @@ export default function App(){
         const currentTime = getCurrentTime();
         
         // Ignore spurious HR data
-        if (0 <= heartRateValue && heartRateValue < 250){
+        if (0 <= heartRateValue && heartRateValue < 220){
             setHeartRate(prevData => [
                 ...prevData, 
                 {
@@ -280,48 +280,61 @@ export default function App(){
 
     // Function to handle device disconnection
     function handleDisconnection(){
-        console.log("Function called: handleDisconnection()");
-        // console.log(`disconnectedManually STATUS: ${disconnectedManually}`);
-        // setTimeout(console.log(`Wait 2s, disconnectedManually STATUS: ${disconnectedManually}`), 10000);
-        
+        console.log("Function called: handleDisconnection()");        
         if (!disconnectedManuallyRef.current) {
             setDeviceConnected(false);
-            setReconnecting(true);
-            console.log("Device disconnected. Attempting to reconnect in 3 seconds...");
-            setTimeout(() => {
-                if (deviceRef.current) {
-                    reconnectToDevice(deviceRef.current);
-                }
-            }, 3000);
+            reconnectToDevice(deviceRef.current);
         } else {
+            setDeviceConnected(false);
             console.log("Device was disconnected manually.");
         }
     };
 
 
-    // Function to reconnect to the device
+    // Function to reconnect to the device (max 3 times)
     async function reconnectToDevice(device){
+        setReconnecting(true);
         console.log("Function called: reconnectToDevice()");
-        try {
-            console.log('Connecting to GATT Server...');
-            await device.gatt.connect();
-            console.log('Getting Heart Rate...');
-            const service = await device.gatt.getPrimaryService("heart_rate");
-            console.log('Getting Heart Rate Measurement Characteristic...');
-            const characteristic = await service.getCharacteristic("heart_rate_measurement");
 
-            //Need to re-add event listener because it gets removed when disconnecting manually
-            characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurement);
-            characteristicRef.current = characteristic;
-            await startHeartRateNotifications(characteristic);
-            setDeviceConnected(true);
-            setReconnecting(false);
-            disconnectedManuallyRef.current = false;
-        } 
-        catch (error) {
-            console.error("Reconnection failed:", error);
-            setTimeout(() => reconnectToDevice(device), 5000); // Retry after 5 seconds
-        }
+        let reconnectionAttempt = 0;
+        const maxAttempts = 3;
+
+        console.log(`START: reconnectionAttempt #${reconnectionAttempt}`);
+        console.log(`START: reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
+        
+        
+        // Attempt to reconnect until max attempts has been reached
+        do {
+            try {
+                console.log('Connecting to GATT Server...');
+                await device.gatt.connect();
+                console.log('Getting Heart Rate...');
+                const service = await device.gatt.getPrimaryService("heart_rate");
+                console.log('Getting Heart Rate Measurement Characteristic...');
+                const characteristic = await service.getCharacteristic("heart_rate_measurement");
+    
+                //Need to re-add event listener because it gets removed when disconnecting manually
+                characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurement);
+                characteristicRef.current = characteristic;
+                await startHeartRateNotifications(characteristic);
+                setDeviceConnected(true);
+                setReconnecting(false);
+                disconnectedManuallyRef.current = false;
+
+                // break out of do-while loop if reconnected succesfully
+                reconnectionAttempt = 5;
+                break;
+            } 
+            catch (error) {
+                console.error("Reconnection failed:", error);
+                reconnectionAttempt++;
+                console.log(`Reconnection attempt #${reconnectionAttempt}`);
+                console.log(`Reconnection attempts remaining: ${maxAttempts - reconnectionAttempt}`);
+                if (maxAttempts - reconnectionAttempt <= 0){
+                    console.log("Maximum reconnection attempts met. Device failed to reconnect automatically.");
+                }
+            }
+        } while (reconnectionAttempt < maxAttempts);  
     };
 
 

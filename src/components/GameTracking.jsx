@@ -323,10 +323,7 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                     <li className="heart-rate-box" style={deviceConnected && heartRate ? (chooseBackgroundColor(calcHRPercent(heartRate[heartRate.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {deviceInitialised ? (
                             <div className="player-heart-rate">
-                                <div className="bluetooth-buttons">
-                                    {/* <button onClick={() => onDisconnectButtonClick()} className="bluetooth-disconnect-btn">Disconnect</button>
-                                    <button onClick={() => onReconnectButtonClick()} className="bluetooth-reconnect-btn">Reconnect</button> */}
-                                    
+                                <div className="bluetooth-buttons">                                  
                                     {/* Display pause/resume buttons depending on HR characteristic measurements */}
                                     {paused ? (
                                         <button onClick={handleResume} className="bluetooth-disconnect-btn">Resume</button>
@@ -370,8 +367,6 @@ export default function GameTracking({p1HeartRate, p1HeartRateOnly, players, set
                         )}
                     </li>
                 </ul>
-
-
 
                 {/* Results button */}
                 <svg onClick={toResults} className="next-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
