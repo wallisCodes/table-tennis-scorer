@@ -36,7 +36,7 @@ export default function GeneralForm({matchDetails, setMatchDetails, toScores, pl
                             <option value="table-tennis">Table Tennis</option>
                             <option value="squash">Squash</option>
                             <option value="badminton">Badminton</option>
-                            <option value="tennis">Tennis</option>
+                            {/* <option value="tennis">Tennis</option> */}
                         </select>
                     </div>
 

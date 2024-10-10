@@ -16,25 +16,25 @@ export default function App(){
         }
     );
 
-    // const [players, setPlayers] = useState([]);
-    const [players, setPlayers] = useState([ // for testing purposes
-        {
-            id: uuidv4(),
-            name: "Wallis",
-            age: 28,
-            colour: "#ffffff",
-            serving: false,
-            points: 12,
-        },
-        {
-            id: uuidv4(),
-            name: "Lau",
-            age: 56,
-            colour: "#000000",
-            serving: false,
-            points: 12,
-        }
-    ]);
+    const [players, setPlayers] = useState([]);
+    // const [players, setPlayers] = useState([ // for testing purposes
+    //     {
+    //         id: uuidv4(),
+    //         name: "Wallis",
+    //         age: 28,
+    //         colour: "#ffffff",
+    //         serving: false,
+    //         points: 12,
+    //     },
+    //     {
+    //         id: uuidv4(),
+    //         name: "Lau",
+    //         age: 56,
+    //         colour: "#000000",
+    //         serving: false,
+    //         points: 12,
+    //     }
+    // ]);
     // const [p1HeartRate, setP1HeartRate] = useState([
     //     {
     //         value: 80,
@@ -549,6 +549,7 @@ export default function App(){
                     connectToHeartRateSensorTwo={connectToHeartRateSensorTwo}
                     handlePauseTwo={handlePauseTwo}
                     handleResumeTwo={handleResumeTwo}
+                    matchDetails={matchDetails}
                 />
             }
 

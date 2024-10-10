@@ -5,7 +5,7 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
     deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
-    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo 
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, matchDetails 
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -123,24 +123,46 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
           }, "200");       
     }
 
-    useEffect(() => {
-        // First to 15, except if it's 14-14 a modal pops up asking the receiver if they want to play 1 or 3 more points
-        if (players.length === 2) {
-            const [player1, player2] = players;
 
-            if (player1.points === 14 && player2.points === 14) {
-                promptReceiver();
-            }
-            else if (player1.points === 15 + receiversChoice) {
-                setWinner(player1.name);
-                setShowWinner(true);
+    // Decide which scoring algorithm to execute depending on user sport choice
+    useEffect(() => {
+        if (matchDetails.sport === "table-tennis" || matchDetails.sport === "badminton"){
+            // Table tennis & badminton scoring: first to 21 points wins, must be by two clear points (e.g. 22-20, 25-23)
+            if (players.length === 2) {
+                const [player1, player2] = players;
+    
+                if (player1.points >= 21 && player1.points - player2.points >= 2) {
+                    setWinner(player1.name);
+                    setShowWinner(true);
+                } else if (player2.points >= 21 && player2.points - player1.points >= 2) {
+                    setWinner(player2.name);
+                    setShowWinner(true);
+                }
             } 
-            else if (player2.points === 15 + receiversChoice) {
-                setWinner(player2.name);
-                setShowWinner(true);
+        }
+        else if (matchDetails.sport === "squash"){
+            // Squash scoring: first to 15, except if it's 14-14 a modal pops up asking the receiver if they want to play 1 or 3 more points
+            if (players.length === 2) {
+                const [player1, player2] = players;
+    
+                if (player1.points === 14 && player2.points === 14) {
+                    promptReceiver();
+                }
+                else if (player1.points === 15 + receiversChoice) {
+                    setWinner(player1.name);
+                    setShowWinner(true);
+                } 
+                else if (player2.points === 15 + receiversChoice) {
+                    setWinner(player2.name);
+                    setShowWinner(true);
+                }
             }
         }
+        else {
+            console.log("Couldn't find matching scoring algorithm. Please check sport choice.");
+        }
     }, [players]); // Run this effect whenever 'players' state changes
+
 
     function chooseOneExtraPoint(){
         setReceiversChoice(0);
