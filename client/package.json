@@ -1,5 +1,5 @@
 {
-  "name": "table-tennis-scorer",
+  "name": "client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,8 +9,8 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "clean": "rm -rf dist"
+    "deploy": "gh-pages -d client/dist",
+    "clean": "rm -rf client/dist"
   },
   "dependencies": {
     "chart.js": "^4.4.4",

@@ -215,8 +215,8 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                     {/* Player name, colour and score */}
                     <div className="player-details">
                         <li className="player-one-banner">
-                            <span className="player-one-name">{players[0].name}</span>
                             <div className="player-team-one" style={p1TeamStyles}></div>
+                            <span className="player-one-name">{players[0].name}</span>
                         </li>
 
                         {showWinner ? (
