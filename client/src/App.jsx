@@ -15,38 +15,25 @@ export default function App(){
             bestOf: "1"
         }
     );
-
-    const [players, setPlayers] = useState([]);
-    // const [players, setPlayers] = useState([ // for testing purposes
-    //     {
-    //         id: uuidv4(),
-    //         name: "Wallis",
-    //         age: 28,
-    //         colour: "#ffffff",
-    //         serving: false,
-    //         points: 12,
-    //     },
-    //     {
-    //         id: uuidv4(),
-    //         name: "Lau",
-    //         age: 56,
-    //         colour: "#000000",
-    //         serving: false,
-    //         points: 12,
-    //     }
-    // ]);
-    // const [p1HeartRate, setP1HeartRate] = useState([
-    //     {
-    //         value: 80,
-    //         time: ""
-    //     }
-    // ]);
-    // const [p2HeartRate, setP2HeartRate] = useState([
-    //     {
-    //         value: 80,
-    //         time: ""
-    //     }
-    // ]);
+    // const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([ // for testing purposes
+        {
+            id: uuidv4(),
+            name: "Wallis",
+            age: 28,
+            colour: "#ffffff",
+            serving: false,
+            points: 12,
+        },
+        {
+            id: uuidv4(),
+            name: "Lau",
+            age: 56,
+            colour: "#000000",
+            serving: false,
+            points: 12,
+        }
+    ]);
     const [display, setDisplay] = useState("input");
 
 
@@ -77,39 +64,42 @@ export default function App(){
     
 
     // // Used to generate mock HR data for testing purposes
-    // const [mockData, setMockData] = useState(false);
+    const [mockData, setMockData] = useState(false);
 
-    // if (mockData === true){
-    //     useEffect(() => {
+    if (mockData === true){
+        useEffect(() => {
+            setDeviceStatusOne("mock data");
+            setDeviceStatusTwo("mock data");
 
-    //         function generateRandomHRValues(max, min) {
-    //             const currentTime = getCurrentTime();
+            function generateRandomHRValues(max, min) {
+                const currentTime = getCurrentTime();
                 
-    //             setP1HeartRate(prevData => [
-    //                 ...prevData, 
-    //                 {
-    //                     value: Math.floor(Math.random() * (max - min + 1) + min),
-    //                     time: currentTime
-    //                 }
-    //             ]);
+                setHeartRateOne(prevData => [
+                    ...prevData, 
+                    {
+                        value: Math.floor(Math.random() * (max - min + 1) + min),
+                        time: currentTime
+                    }
+                ]);
 
-    //             setP2HeartRate(prevData => [
-    //                 ...prevData, 
-    //                 {
-    //                     value: Math.floor(Math.random() * (max - min + 1) + min),
-    //                     time: currentTime
-    //                 }
-    //             ]);
-    //         }
-    //         generateRandomHRValues(116, 180);
+                setHeartRateTwo(prevData => [
+                    ...prevData, 
+                    {
+                        value: Math.floor(Math.random() * (max - min + 1) + min),
+                        time: currentTime
+                    }
+                ]);
+            }
+            generateRandomHRValues(116, 180);
         
-    //         const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
-    //             generateRandomHRValues(116, 180);
-    //         }, 1000);
+            const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
+                generateRandomHRValues(116, 180);
+            }, 1000);
     
-    //         return () => clearInterval(int);
-    //     }, []);
-    // }
+            return () => clearInterval(int);
+        }, []);
+    }
+
 
     function toInput(){
         setDisplay("input");
@@ -550,6 +540,7 @@ export default function App(){
                     handlePauseTwo={handlePauseTwo}
                     handleResumeTwo={handleResumeTwo}
                     matchDetails={matchDetails}
+                    mockData={mockData}
                 />
             }
 

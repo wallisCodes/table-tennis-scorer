@@ -5,7 +5,7 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
     deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
-    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, matchDetails 
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, matchDetails, mockData
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -67,6 +67,9 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                 break
             case (deviceStatus === "reconnecting" || deviceStatus === "connecting"):
                 bgColor = "orange";
+                break
+            case (deviceStatus === "mock data"):
+                bgColor = "lightseagreen";
                 break
             default: bgColor = "red";
         }
@@ -237,8 +240,8 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={deviceStatusOne === "connected" && heartRateOne ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
-                        {deviceInitialisedOne ? (
+                    <li className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                        {deviceInitialisedOne || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
                                     {/* Display pause/resume buttons depending on HR characteristic measurements */}
@@ -320,8 +323,8 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={deviceStatusTwo === "connected" && heartRateTwo ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
-                        {deviceInitialisedTwo ? (
+                    <li className="heart-rate-box" style={(deviceStatusTwo === "connected" || mockData) && heartRateTwo ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                        {deviceInitialisedTwo || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
                                     {/* Display pause/resume buttons depending on HR characteristic measurements */}

@@ -1,47 +1,22 @@
-// Mock data to test API
-let players = {
-    1: {
-        id: "1",
-        name: "Robin Wieruch",
-    },
-    2: {
-        id: "2",
-        name: "Wolfgang Pauli",
-    },
-    3: {
-        id: "3",
-        name: "Dave Davids",
-    },
-    4: {
-        id: "4",
-        name: "Paul Oakenfold",
-    }
-};
-  
-let messages = {
-    1: {
-        id: "1",
-        text: "Padel rules!",
-        playerId: "4",
-    },
-    2: {
-        id: "2",
-        text: "Tennis is better!",
-        playerId: "3",
-    },
-    3: {
-        id: "3",
-        text: "Badminton is faster!",
-        playerId: "2",
-    },
-    4: {
-        id: "4",
-        text: "Pickleball is easier!",
-        playerId: "1",
-    }
-};
+import sequelize from '../config/database.js';
+import Player from './Player.js';
+import Match from './Match.js';
+import ScoreHistory from './ScoreHistory.js';
+import HeartRate from './HeartRate.js';
+import MatchPlayer from './MatchPlayer.js';
 
-export default {
-    players,
-    messages
-};
+// Defining associations
+Match.belongsTo(Player, { as: 'winner', foreignKey: 'winnerId' });
+
+Player.hasMany(Match, { foreignKey: 'winnerId' });
+
+ScoreHistory.belongsTo(Match, { foreignKey: 'matchId' });
+ScoreHistory.belongsTo(Player, { foreignKey: 'playerId' });
+
+HeartRate.belongsTo(Match, { foreignKey: 'matchId' });
+HeartRate.belongsTo(Player, { foreignKey: 'playerId' });
+
+MatchPlayer.belongsTo(Match, { foreignKey: 'matchId' });
+MatchPlayer.belongsTo(Player, { foreignKey: 'playerId' });
+
+export { sequelize, Player, Match, ScoreHistory, HeartRate, MatchPlayer };

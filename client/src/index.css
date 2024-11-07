@@ -278,7 +278,14 @@
     font-size: 16px;
 }
 
-.bluetooth-connect-btn {
+.bluetooth-initial-buttons {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    /* align-items: center; */
+}
+
+.bluetooth-connect-btn, .use-mock-data-btn {
     border: none;
     font-size: 48px;
     padding: 16px 32px;
