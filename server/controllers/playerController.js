@@ -9,6 +9,15 @@ export const createPlayer = async (req, res) => {
     }
 };
 
+export const getAllPlayers = async (req, res) => {
+    try {
+        const players = await Player.findAll();
+        res.status(200).json(players);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching players' });
+    }
+};
+
 export const getPlayerById = async (req, res) => {
     try {
         const player = await Player.findByPk(req.params.playerId);
@@ -47,5 +56,14 @@ export const deletePlayer = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Error deleting player' });
+    }
+};
+
+export const deleteAllPlayers = async (req, res) => {
+    try {
+        await Player.destroy({ where: {} }); // Deletes all entries in the table
+        res.status(200).json({ message: 'All players deleted' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting all players' });
     }
 };

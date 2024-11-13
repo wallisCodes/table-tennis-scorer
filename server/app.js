@@ -21,18 +21,11 @@ app.use('/api/score-history', scoreHistoryRoutes);
 app.use('/api/heart-rate', heartRateRoutes);
 
 
-// Testing connection
-// try {
-//     await sequelize.authenticate();
-//     console.log('Connection has been established successfully.');
-// } catch (error) {
-//     console.error('Unable to connect to the database:', error);
-// }
-
-
 // Sync database and start server
 const PORT = process.env.PORT || 3000;
 // change sync options for production { alter: true }
+// sequelize.sync().then(() => {
+// sequelize.sync({ force: true }).then(() => {
 sequelize.sync({ alter: true }).then(() => {
     console.log("Database synchronized");
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import GeneralForm from './components/GeneralForm';
 import PlayerForm from './components/PlayerForm';
 import GameTracking from './components/GameTracking';
+import Dashboard from './components/Dashboard';
 import Results from './components/Results';
 import { v4 as uuidv4 } from "uuid"
 
@@ -113,6 +114,9 @@ export default function App(){
         setDisplay("results");
     }
 
+    function toDashboard(){
+        setDisplay("dashboard");
+    }
 
     // -------------------- BLUETOOTH CODE --------------------
     // const [heartRate, setHeartRate] = useState(null);
@@ -544,14 +548,23 @@ export default function App(){
                 />
             }
 
+
             {display === "results" &&
                 <Results 
                     toScores={toScores}
+                    toDashboard={toDashboard}
                     players={players}
                     heartRateOneOnly={heartRateOneOnly}
                     heartRateOneTimeOnly={heartRateOneTimeOnly}
                     heartRateTwoOnly={heartRateTwoOnly}
                     heartRateTwoTimeOnly={heartRateTwoTimeOnly}
+                />
+            }
+
+            {display === "dashboard" &&
+                <Dashboard
+                    toResults={toResults} 
+                    heartRateOne={heartRateOne}
                 />
             }
         </>
