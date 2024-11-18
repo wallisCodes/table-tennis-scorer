@@ -275,8 +275,24 @@
     background-color:white;
 }
 
-.device-status-text {
+.device-status-text, .device-battery-label, .device-battery-value {
     font-size: 16px;
+}
+
+.device-battery {
+    position: absolute;
+    bottom: 0;
+    right: 2%;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    background-color: #192734;
+    padding: 4px 8px;
+}
+
+.battery-icon {
+    fill: white;
 }
 
 .bluetooth-initial-buttons {

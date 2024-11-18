@@ -118,7 +118,8 @@ export default function App(){
         setDisplay("dashboard");
     }
 
-    // -------------------- BLUETOOTH CODE --------------------
+
+    //////////////////////////////   BLUETOOTH CODE   //////////////////////////////
     // const [heartRate, setHeartRate] = useState(null);
     const [heartRateOne, setHeartRateOne] = useState([
         {
@@ -132,29 +133,12 @@ export default function App(){
     const [deviceStatusOne, setDeviceStatusOne] = useState("disconnected");
     const [pausedOne, setPausedOne] = useState(false);
     const [reconnectOverrideOne, setReconnectOverrideOne] = useState(false);
+    const [batteryLevelOne, setBatteryLevelOne] = useState(null);
 
     const disconnectedManuallyRefOne = useRef(false);
     const deviceRefOne = useRef(null);  // Store Bluetooth device
-    const characteristicRefOne = useRef(null); // Store characteristic to resume later
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-    const [heartRateTwo, setHeartRateTwo] = useState([
-        {
-            value: 80,
-            time: ""
-        }
-    ]);
-    const heartRateTwoOnly = heartRateTwo.map(data => data.value);
-    const heartRateTwoTimeOnly = heartRateTwo.map(data => data.time);
-    const [deviceInitialisedTwo, setDeviceInitialisedTwo] = useState(false);
-    const [deviceStatusTwo, setDeviceStatusTwo] = useState("disconnected");
-    const [pausedTwo, setPausedTwo] = useState(false);
-    const [reconnectOverrideTwo, setReconnectOverrideTwo] = useState(false);
-
-    const disconnectedManuallyRefTwo = useRef(false);
-    const deviceRefTwo = useRef(null);  // Store Bluetooth device
-    const characteristicRefTwo = useRef(null); // Store characteristic to resume later
+    const characteristicRefOne = useRef(null); // Store heart rate characteristic to resume later
+    const batteryCharacteristicRefOne = useRef(null); // Store battery level characteristic
 
 
     // Function to connect to Bluetooth heart rate sensor one
@@ -162,7 +146,8 @@ export default function App(){
         console.log("Function called: connectToHeartRateSensorOne()");
         try {
             const deviceOne = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ["heart_rate"] }]
+                filters: [{ services: ["heart_rate"] }],
+                optionalServices: ["battery_service"],
             });
             setDeviceStatusOne("connecting");
             deviceRefOne.current = deviceOne;
@@ -177,10 +162,22 @@ export default function App(){
             const service = await server.getPrimaryService("heart_rate");
             console.log('Getting Heart Rate Measurement Characteristic...');
             const characteristicOne = await service.getCharacteristic("heart_rate_measurement");
-                    
+            
+            // Listen for heart rate changes by re-adding event listener
             characteristicOne.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
-            characteristicRefOne.current = characteristicOne; // Store characteristic
+            characteristicRefOne.current = characteristicOne; // Store heart rate characteristic
             await startHeartRateNotificationsOne(characteristicOne); // Subscribe to heart rate changes
+
+            // Access battery service and read battery level
+            const batteryServiceOne = await server.getPrimaryService("battery_service");
+            const batteryLevelCharacteristicOne = await batteryServiceOne.getCharacteristic("battery_level");
+            const batteryLevelValueOne = await batteryLevelCharacteristicOne.readValue();
+            setBatteryLevelOne(batteryLevelValueOne.getUint8(0)); // Read and store initial battery level
+
+            // Listen for battery level changes by re-adding event listener
+            batteryLevelCharacteristicOne.addEventListener("characteristicvaluechanged", handleBatteryLevelOne);
+            batteryCharacteristicRefOne.current = batteryLevelCharacteristicOne; // Store battery level characteristic
+            await batteryLevelCharacteristicOne.startNotifications(); // Start notifications for battery level changes
         } 
         catch (error) {
             console.error("Failed to connect to heart rate sensor one:", error);
@@ -226,9 +223,30 @@ export default function App(){
     };
 
 
+    // Function to handle battery level updates
+    function handleBatteryLevelOne(event){
+        console.log("Battery level one measured.");
+        const value = event.target.value;
+        const batteryValue = value.getUint8(0);
+        setBatteryLevelOne(batteryValue);
+    }
+
+
+    // Stop battery level readings by removing event listener
+    async function stopBatteryLevelOne(){
+        console.log("Battery level one measurements stopped.");
+        // await batteryCharacteristicRefOne.current.stopNotifications();
+        batteryCharacteristicRefOne.current.removeEventListener("characteristicvaluechanged", handleBatteryLevelOne);
+        batteryCharacteristicRefOne.current = null;
+    }
+
+
     // Function to handle device disconnection
     function handleDisconnectionOne(){
-        console.log("Function called: handleDisconnectionOne()");        
+        console.log("Function called: handleDisconnectionOne()");
+        stopBatteryLevelOne();
+    
+        // Reconnect if connection dropped (automatic disconnect), don't reconnect otherwise (manual disconnect)
         if (!disconnectedManuallyRefOne.current) {
             setDeviceStatusOne("disconnected");
             reconnectToDeviceOne(deviceRefOne.current);
@@ -261,11 +279,21 @@ export default function App(){
                 console.log('Getting Heart Rate Measurement Characteristic...');
                 const characteristic = await service.getCharacteristic("heart_rate_measurement");
     
-                //Need to re-add event listener because it gets removed when disconnecting manually
                 characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
                 characteristicRefOne.current = characteristic;
                 await startHeartRateNotificationsOne(characteristic);
                 disconnectedManuallyRefOne.current = false;
+
+                // Access battery service and read battery level
+                const batteryServiceOne = await device.gatt.getPrimaryService("battery_service");
+                const batteryLevelCharacteristicOne = await batteryServiceOne.getCharacteristic("battery_level");
+                const batteryLevelValueOne = await batteryLevelCharacteristicOne.readValue();
+                setBatteryLevelOne(batteryLevelValueOne.getUint8(0)); // Read and store initial battery level
+
+                // Listen for battery level changes
+                batteryLevelCharacteristicOne.addEventListener("characteristicvaluechanged", handleBatteryLevelOne);
+                batteryCharacteristicRefOne.current = batteryLevelCharacteristicOne; // Store battery level characteristic
+                await batteryLevelCharacteristicOne.startNotifications(); // Start notifications for battery level changes
 
                 // break out of do-while loop if reconnected succesfully
                 reconnectionAttempt = 5;
@@ -301,7 +329,7 @@ export default function App(){
         console.log("Function called: handleResumeOne()");
         if (characteristicRefOne.current && pausedOne) {
             startHeartRateNotificationsOne(characteristicRefOne.current);
-        }One
+        }
     };
 
 
@@ -324,15 +352,35 @@ export default function App(){
     };
 
 
-
+    
     /////////////////////////////////////////////////////////////////////////////////
+    const [heartRateTwo, setHeartRateTwo] = useState([
+        {
+            value: 80,
+            time: ""
+        }
+    ]);
+    const heartRateTwoOnly = heartRateTwo.map(data => data.value);
+    const heartRateTwoTimeOnly = heartRateTwo.map(data => data.time);
+    const [deviceInitialisedTwo, setDeviceInitialisedTwo] = useState(false);
+    const [deviceStatusTwo, setDeviceStatusTwo] = useState("disconnected");
+    const [pausedTwo, setPausedTwo] = useState(false);
+    const [reconnectOverrideTwo, setReconnectOverrideTwo] = useState(false);
+    const [batteryLevelTwo, setBatteryLevelTwo] = useState(null);
+
+    const disconnectedManuallyRefTwo = useRef(false);
+    const deviceRefTwo = useRef(null);  // Store Bluetooth device
+    const characteristicRefTwo = useRef(null); // Store heart rate characteristic to resume later
+    const batteryCharacteristicRefTwo = useRef(null); // Store battery level characteristic
+
 
     // Function to connect to Bluetooth heart rate sensor Two
     async function connectToHeartRateSensorTwo() {
         console.log("Function called: connectToHeartRateSensorTwo()");
         try {
             const deviceTwo = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ["heart_rate"] }]
+                filters: [{ services: ["heart_rate"] }],
+                optionalServices: ["battery_service"],
             });
             setDeviceStatusTwo("connecting");
             deviceRefTwo.current = deviceTwo;
@@ -347,10 +395,22 @@ export default function App(){
             const service = await server.getPrimaryService("heart_rate");
             console.log('Getting Heart Rate Measurement Characteristic...');
             const characteristicTwo = await service.getCharacteristic("heart_rate_measurement");
-                    
+            
+            // Listen for heart rate changes by re-adding event listener
             characteristicTwo.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
-            characteristicRefTwo.current = characteristicTwo; // Store characteristic
+            characteristicRefTwo.current = characteristicTwo; // Store heart rate characteristic
             await startHeartRateNotificationsTwo(characteristicTwo); // Subscribe to heart rate changes
+
+            // Access battery service and read battery level
+            const batteryServiceTwo = await server.getPrimaryService("battery_service");
+            const batteryLevelCharacteristicTwo = await batteryServiceTwo.getCharacteristic("battery_level");
+            const batteryLevelValueTwo = await batteryLevelCharacteristicTwo.readValue();
+            setBatteryLevelTwo(batteryLevelValueTwo.getUint8(0)); // Read and store initial battery level
+
+            // Listen for battery level changes by re-adding event listener
+            batteryLevelCharacteristicTwo.addEventListener("characteristicvaluechanged", handleBatteryLevelTwo);
+            batteryCharacteristicRefTwo.current = batteryLevelCharacteristicTwo; // Store battery level characteristic
+            await batteryLevelCharacteristicTwo.startNotifications(); // Start notifications for battery level changes
         } 
         catch (error) {
             console.error("Failed to connect to heart rate sensor Two:", error);
@@ -396,9 +456,29 @@ export default function App(){
     };
 
 
+    // Function to handle battery level updates
+    function handleBatteryLevelTwo(event){
+        console.log("Battery level two measured.");
+        const value = event.target.value;
+        const batteryValue = value.getUint8(0);
+        setBatteryLevelTwo(batteryValue);
+    }
+
+
+    // Stop battery level readings by removing event listener
+    async function stopBatteryLevelTwo(){
+        console.log("Battery level two measurements stopped.");
+        batteryCharacteristicRefTwo.current.removeEventListener("characteristicvaluechanged", handleBatteryLevelTwo);
+        batteryCharacteristicRefTwo.current = null;
+    }
+
+
     // Function to handle device disconnection
     function handleDisconnectionTwo(){
-        console.log("Function called: handleDisconnectionTwo()");        
+        console.log("Function called: handleDisconnectionTwo()");
+        stopBatteryLevelTwo();
+    
+        // Reconnect if connection dropped (automatic disconnect), don't reconnect otherwise (manual disconnect)        
         if (!disconnectedManuallyRefTwo.current) {
             setDeviceStatusTwo("disconnected");
             reconnectToDeviceTwo(deviceRefTwo.current);
@@ -431,11 +511,21 @@ export default function App(){
                 console.log('Getting Heart Rate Measurement Characteristic...');
                 const characteristic = await service.getCharacteristic("heart_rate_measurement");
     
-                //Need to re-add event listener because it gets removed when disconnecting manually
                 characteristic.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
                 characteristicRefTwo.current = characteristic;
                 await startHeartRateNotificationsTwo(characteristic);
                 disconnectedManuallyRefTwo.current = false;
+
+                // Access battery service and read battery level
+                const batteryServiceTwo = await device.gatt.getPrimaryService("battery_service");
+                const batteryLevelCharacteristicTwo = await batteryServiceTwo.getCharacteristic("battery_level");
+                const batteryLevelValueTwo = await batteryLevelCharacteristicTwo.readValue();
+                setBatteryLevelTwo(batteryLevelValueTwo.getUint8(0)); // Read and store initial battery level
+
+                // Listen for battery level changes
+                batteryLevelCharacteristicTwo.addEventListener("characteristicvaluechanged", handleBatteryLevelTwo);
+                batteryCharacteristicRefTwo.current = batteryLevelCharacteristicTwo; // Store battery level characteristic
+                await batteryLevelCharacteristicTwo.startNotifications(); // Start notifications for battery level changes
 
                 // break out of do-while loop if reconnected succesfully
                 reconnectionAttempt = 5;
@@ -531,6 +621,7 @@ export default function App(){
                     connectToHeartRateSensorOne={connectToHeartRateSensorOne}
                     handlePauseOne={handlePauseOne}
                     handleResumeOne={handleResumeOne}
+                    batteryLevelOne={batteryLevelOne}
                     heartRateTwo={heartRateTwo}
                     heartRateTwoOnly={heartRateTwoOnly}
                     deviceInitialisedTwo={deviceInitialisedTwo}
@@ -543,6 +634,7 @@ export default function App(){
                     connectToHeartRateSensorTwo={connectToHeartRateSensorTwo}
                     handlePauseTwo={handlePauseTwo}
                     handleResumeTwo={handleResumeTwo}
+                    batteryLevelTwo={batteryLevelTwo}
                     matchDetails={matchDetails}
                     mockData={mockData}
                 />

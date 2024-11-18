@@ -3,9 +3,9 @@ import Modal from "./Modal";
 
 export default function GameTracking({players, setPlayers, getCurrentTime, toInput, toResults, heartRateOne, heartRateOneOnly,
     deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
-    handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, heartRateTwo, heartRateTwoOnly,
+    handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
-    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, matchDetails, mockData
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, matchDetails, mockData
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -240,7 +240,7 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <li className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
                         {deviceInitialisedOne || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
@@ -259,7 +259,7 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                                     )}
                                 </div>
                                 <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[1].age)}%`}</div>
+                                    <div>{`${calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age)}%`}</div>
                                     <div className="hr-absolute">
                                         <div>{heartRateOne[heartRateOne.length - 1].value}</div>
                                         <div className="hr-extremities">
@@ -285,6 +285,16 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                                     <div style={chooseStatusColor(deviceStatusOne)} className="device-status-circle"></div>
                                     <div className="device-status-text">{deviceStatusOne}</div>
                                 </div>
+
+                                {/* Don't display battery level when using mock data */}
+                                {!mockData && 
+                                    <div className="device-battery">
+                                        <svg className="battery-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 7v10h-17v-10h17zm2-2h-21v14h21v-14zm1 11h.75c.69 0 1.25-.56 1.25-1.25v-5.5c0-.69-.56-1.25-1.25-1.25h-.75v8z"/>
+                                        </svg>
+                                        <div className="device-battery-value">{batteryLevelOne ? `${batteryLevelOne}%` : "Loading..."}</div>
+                                    </div>
+                                }
                             </div>
                             ) : (
                             <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensorOne}>Connect HR Monitor</button>
@@ -368,6 +378,16 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                                     <div style={chooseStatusColor(deviceStatusTwo)} className="device-status-circle"></div>
                                     <div className="device-status-text">{deviceStatusTwo}</div>
                                 </div>
+
+                                {/* Don't display battery level when using mock data */}
+                                {!mockData && 
+                                    <div className="device-battery">
+                                        <svg className="battery-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 7v10h-17v-10h17zm2-2h-21v14h21v-14zm1 11h.75c.69 0 1.25-.56 1.25-1.25v-5.5c0-.69-.56-1.25-1.25-1.25h-.75v8z"/>
+                                        </svg>
+                                        <div className="device-battery-value">{batteryLevelTwo ? `${batteryLevelTwo}%` : "Loading..."}</div>
+                                    </div>
+                                }
                             </div>
                             ) : (
                             <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensorTwo}>Connect HR Monitor</button>
