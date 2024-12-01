@@ -1,4 +1,9 @@
-import LineGraph from "./Line";
+// import GraphTest from "./GraphTest";
+// import GraphTestTwo from "./GraphTestTwo";
+// import GraphTestThree from "./GraphTestThree";
+// import BarGraphOnly from "./BarGraphOnly";
+import BarGraphOnlyTwo from "./BarGraphOnlyTwo";
+// import LineGraph from "./Line";
 
 export default function Results({toScores, toDashboard, players, heartRateOneOnly, heartRateOneTimeOnly, heartRateTwoOnly, heartRateTwoTimeOnly}){
     return (
@@ -9,13 +14,20 @@ export default function Results({toScores, toDashboard, players, heartRateOneOnl
             </svg>
             <div className="results-page">
                 <h1 className="title-text">Results</h1>
-                <LineGraph 
-                    players={players}
-                    heartRateOneOnly={heartRateOneOnly}
-                    heartRateOneTimeOnly={heartRateOneTimeOnly}
-                    heartRateTwoOnly={heartRateTwoOnly}
-                    heartRateTwoTimeOnly={heartRateTwoTimeOnly}
-                />
+                <div className="results-graph">
+                    {/* <LineGraph 
+                        players={players}
+                        heartRateOneOnly={heartRateOneOnly}
+                        heartRateOneTimeOnly={heartRateOneTimeOnly}
+                        heartRateTwoOnly={heartRateTwoOnly}
+                        heartRateTwoTimeOnly={heartRateTwoTimeOnly}
+                    /> */}
+                    {/* <GraphTest /> */}
+                    {/* <GraphTestTwo /> */}
+                    {/* <GraphTestThree /> */}
+                    {/* <BarGraphOnly /> */}
+                    <BarGraphOnlyTwo />
+                </div>
             </div>
             {/* Results button */}
             <svg onClick={toDashboard} className="next-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

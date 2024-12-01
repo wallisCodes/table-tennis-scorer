@@ -35,6 +35,31 @@ export default function LineGraph({players, heartRateOneOnly, heartRateOneTimeOn
 
     // console.log(`longestDataset: ${longestDatasetTimeOnly}`);
     
+    // const exampleHRDataOne = [
+    //     {time: "14:55:3", value: 172},
+    //     {time: "14:55:3", value: 158},
+    //     {time: "14:55:4", value: 169},
+    //     {time: "14:55:5", value: 156},
+    //     {time: "14:55:6", value: 145},
+    //     {time: "14:55:7", value: 144}
+    // ];
+    
+    // const exampleHRDataTwo = [
+    //     {time: "14:55:3", value: 72},
+    //     {time: "14:55:3", value: 58},
+    //     {time: "14:55:4", value: 69},
+    //     {time: "14:55:5", value: 56},
+    //     {time: "14:55:6", value: 45},
+    //     {time: "14:55:7", value: 44}
+    // ];
+    
+    // const exampleScoringData = [
+    //     {player: "P2", time: "14:58:28"},
+    //     {player: "P1", time: "14:58:32"},
+    //     {player: "P1", time: "14:58:37"},
+    //     {player: "P2", time: "14:58:41"},
+    //     {player: "P1", time: "14:58:47"}
+    // ];
 
     const options = {
         responsive: true,
@@ -65,7 +90,23 @@ export default function LineGraph({players, heartRateOneOnly, heartRateOneTimeOn
         }
     };
 
-    const data_test = {
+    // const data_test = {
+    //     labels: longestTimeDataset,
+    //     datasets: [
+    //         {
+    //             label: players[0].name,
+    //             data: p1HROnlyFormatted,
+    //             borderColor: players[0].colour
+    //         },
+    //         {
+    //             label: players[1].name,
+    //             data: p2HROnlyFormatted,
+    //             borderColor: players[1].colour
+    //         }
+    //     ]
+    // };
+
+    const data_test_2 = {
         labels: longestTimeDataset,
         datasets: [
             {
@@ -82,9 +123,6 @@ export default function LineGraph({players, heartRateOneOnly, heartRateOneTimeOn
     };
 
 
-    return (
-        <>
-            <Line options={options} data={data_test}/>
-        </>
-    )
+    return <Line options={options} data={data_test_2}/>
 }
+
