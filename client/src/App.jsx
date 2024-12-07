@@ -22,7 +22,7 @@ export default function App(){
             id: uuidv4(),
             name: "Wallis",
             age: 28,
-            colour: "#ffffff",
+            colour: "#ff00ff",
             serving: false,
             points: 0,
         },
@@ -30,11 +30,12 @@ export default function App(){
             id: uuidv4(),
             name: "Lau",
             age: 56,
-            colour: "#000000",
+            colour: "#00ff00",
             serving: false,
             points: 0,
         }
     ]);
+    const [scoreHistory, setScoreHistory] = useState([]);
     const [display, setDisplay] = useState("input");
 
 
@@ -55,17 +56,51 @@ export default function App(){
 
     function getCurrentTime(){
         const currentTime = new Date();
-        const hours = currentTime.getHours();
-        const minutes = currentTime.getMinutes();
-        const seconds = currentTime.getSeconds();
+        // optionally padding with a 0 is crucial when sorting times inside of CombinedGraph component
+        const hours = `${("0" + currentTime.getHours()).slice(-2)}`;
+        const minutes = `${("0" + currentTime.getMinutes()).slice(-2)}`;
+        const seconds = `${("0" + currentTime.getSeconds()).slice(-2)}`;
         
         const timeFormatted = `${hours}:${minutes}:${seconds}`;
         return timeFormatted;
     }
     
 
-    // // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(false);
+    // Formatting function which ensures there is exactly one HR value every second
+    function smoothHeartRateData(rawData, firstTime, finalTime){
+        const smoothedData = [];
+        let previousValue = null;
+
+        for (let timestamp = firstTime; timestamp <= finalTime; timestamp += 1000) {
+            // Get all readings for the current second
+            const readings = rawData.filter(
+                (entry) => new Date(`1970-01-01T${entry.time}`).getTime() === timestamp
+            );
+
+            // Convert timestamp back into date format
+            const date = new Date(timestamp); // divide by 1000 to get date correct?
+            const timestampDate = `${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`;
+
+            if (readings.length > 0) {
+                // Average multiple readings for the same second
+                const average = Math.ceil(
+                    readings.reduce((sum, entry) => sum + entry.value, 0) / readings.length
+                );
+                smoothedData.push({ time: timestampDate, value: average });
+                previousValue = average; // Update previousValue
+            } 
+            else if (previousValue !== null) {
+                // Fill gaps with the previous value
+                smoothedData.push({ time: timestampDate, value: previousValue });
+            }
+        }
+        return smoothedData;
+    }
+
+
+    // Used to generate mock HR data for testing purposes
+    // const [mockData, setMockData] = useState(false);
+    const [mockData, setMockData] = useState(true);
 
     if (mockData === true){
         useEffect(() => {
@@ -128,7 +163,6 @@ export default function App(){
         }
     ]);
     const heartRateOneOnly = heartRateOne.map(data => data.value);
-    const heartRateOneTimeOnly = heartRateOne.map(data => data.time);
     const [deviceInitialisedOne, setDeviceInitialisedOne] = useState(false);
     const [deviceStatusOne, setDeviceStatusOne] = useState("disconnected");
     const [pausedOne, setPausedOne] = useState(false);
@@ -361,7 +395,6 @@ export default function App(){
         }
     ]);
     const heartRateTwoOnly = heartRateTwo.map(data => data.value);
-    const heartRateTwoTimeOnly = heartRateTwo.map(data => data.time);
     const [deviceInitialisedTwo, setDeviceInitialisedTwo] = useState(false);
     const [deviceStatusTwo, setDeviceStatusTwo] = useState("disconnected");
     const [pausedTwo, setPausedTwo] = useState(false);
@@ -611,6 +644,8 @@ export default function App(){
                     toResults={toResults}
                     heartRateOne={heartRateOne}
                     heartRateOneOnly={heartRateOneOnly}
+                    scoreHistory={scoreHistory}
+                    setScoreHistory={setScoreHistory}
                     deviceInitialisedOne={deviceInitialisedOne}
                     deviceStatusOne={deviceStatusOne}
                     pausedOne={pausedOne}
@@ -646,10 +681,10 @@ export default function App(){
                     toScores={toScores}
                     toDashboard={toDashboard}
                     players={players}
-                    heartRateOneOnly={heartRateOneOnly}
-                    heartRateOneTimeOnly={heartRateOneTimeOnly}
-                    heartRateTwoOnly={heartRateTwoOnly}
-                    heartRateTwoTimeOnly={heartRateTwoTimeOnly}
+                    heartRateOne={heartRateOne}
+                    heartRateTwo={heartRateTwo}
+                    smoothHeartRateData={smoothHeartRateData}
+                    scoreHistory={scoreHistory}
                 />
             }
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
 
-export default function GameTracking({players, setPlayers, getCurrentTime, toInput, toResults, heartRateOne, heartRateOneOnly,
+export default function GameTracking({
+    players, setPlayers, getCurrentTime, toInput, toResults, heartRateOne, heartRateOneOnly, scoreHistory, setScoreHistory,
     deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
@@ -80,7 +81,6 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
     // SCORING STATE & LOGIC
     const [winner, setWinner] = useState(null);
     const [showWinner, setShowWinner] = useState(false);
-    const [scoreHistory, setScoreHistory] = useState([]);
     const [modal, setModal] = useState(false); // Modal for receiver to choose extra points played if tied 14-14
     const [receiversChoice, setReceiversChoice] = useState(0); 
 
@@ -104,6 +104,7 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
             return updatedPlayers;
         });
 
+        // if incrementing points
         if (increment) {
             const currentTime = getCurrentTime();
             setScoreHistory(prevScoreHistory => [
@@ -113,7 +114,8 @@ export default function GameTracking({players, setPlayers, getCurrentTime, toInp
                     time: currentTime
                 }
             ]);
-
+        
+        // if decrementing points and points are non-zero
         } else if (!increment && players[playerIndex].points > 0) {
             setScoreHistory(prevScoreHistory => prevScoreHistory.slice(0, -1));
         }

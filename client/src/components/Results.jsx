@@ -1,11 +1,7 @@
-// import GraphTest from "./GraphTest";
-// import GraphTestTwo from "./GraphTestTwo";
-// import GraphTestThree from "./GraphTestThree";
-// import BarGraphOnly from "./BarGraphOnly";
-import BarGraphOnlyTwo from "./BarGraphOnlyTwo";
-// import LineGraph from "./Line";
+import CombinedGraph from "./CombinedGraph";
+// import CombinedGraphMock from "./CombinedGraphMock";
 
-export default function Results({toScores, toDashboard, players, heartRateOneOnly, heartRateOneTimeOnly, heartRateTwoOnly, heartRateTwoTimeOnly}){
+export default function Results({toScores, toDashboard, players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory}){
     return (
         <>
             {/* Back button */}
@@ -15,18 +11,14 @@ export default function Results({toScores, toDashboard, players, heartRateOneOnl
             <div className="results-page">
                 <h1 className="title-text">Results</h1>
                 <div className="results-graph">
-                    {/* <LineGraph 
+                    <CombinedGraph 
                         players={players}
-                        heartRateOneOnly={heartRateOneOnly}
-                        heartRateOneTimeOnly={heartRateOneTimeOnly}
-                        heartRateTwoOnly={heartRateTwoOnly}
-                        heartRateTwoTimeOnly={heartRateTwoTimeOnly}
-                    /> */}
-                    {/* <GraphTest /> */}
-                    {/* <GraphTestTwo /> */}
-                    {/* <GraphTestThree /> */}
-                    {/* <BarGraphOnly /> */}
-                    <BarGraphOnlyTwo />
+                        heartRateOne={heartRateOne}
+                        heartRateTwo={heartRateTwo}
+                        smoothHeartRateData={smoothHeartRateData}
+                        scoreHistory={scoreHistory}
+                    />
+                    {/* <CombinedGraphMock /> */}
                 </div>
             </div>
             {/* Results button */}
