@@ -128,6 +128,15 @@
     width: 50px;
 }
 
+.start-game-btn {
+    font-size: 48px;
+    padding: 16px 32px;
+    cursor: pointer;
+    border: 1px solid black;
+    background-color: white;
+    color: #192734;
+}
+
 .winner-box {
     display: flex;
     flex-direction: column;
@@ -140,7 +149,12 @@
     font-size: 48px;
 }
 
-.view-score-btn {
+.post-match-buttons {
+    display: flex;
+    gap: 1em;
+}
+
+.post-match-btn {
     font-size: 24px;
     padding: 6px 12px;
     cursor: pointer;

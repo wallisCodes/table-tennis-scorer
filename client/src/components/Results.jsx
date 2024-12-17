@@ -1,7 +1,6 @@
 import CombinedGraph from "./CombinedGraph";
-// import CombinedGraphMock from "./CombinedGraphMock";
 
-export default function Results({toScores, toDashboard, players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory}){
+export default function Results({toScores, toDashboard, matchDetails, players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory}){
     return (
         <>
             {/* Back button */}
@@ -11,14 +10,14 @@ export default function Results({toScores, toDashboard, players, heartRateOne, h
             <div className="results-page">
                 <h1 className="title-text">Results</h1>
                 <div className="results-graph">
-                    <CombinedGraph 
+                    <CombinedGraph
+                        matchDetails={matchDetails} 
                         players={players}
                         heartRateOne={heartRateOne}
                         heartRateTwo={heartRateTwo}
                         smoothHeartRateData={smoothHeartRateData}
                         scoreHistory={scoreHistory}
                     />
-                    {/* <CombinedGraphMock /> */}
                 </div>
             </div>
             {/* Results button */}

@@ -1,99 +1,72 @@
 import React from "react";
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
-export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory }){
-    // Test arrays used to ensure correct baseTime and lastTime values are selected when comparing the two HR datasets
-    // (spoiler: latest possible timestamps are chosen)
-    // const arrayOne = [
-    //     // { time: "14:55:05", value: 156 },
-    //     // { time: "14:55:06", value: 145 },
-    //     { time: "14:55:07", value: 144 },
-    //     { time: "14:55:08", value: 150 },
-    //     { time: "14:55:09", value: 140 },
-    //     // { time: "14:55:10", value: 143 }
-    // ];
-    // const arrayTwo = [
-    //     { time: "14:55:05", value: 156 },
-    //     { time: "14:55:06", value: 145 },
-    //     { time: "14:55:07", value: 144 },
-    //     { time: "14:55:08", value: 150 },
-    //     { time: "14:55:09", value: 140 },
-    //     { time: "14:55:10", value: 143 }
-    // ];
+export default function CombinedGraph({ matchDetails, matchStatus, players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory }){
+    const baseTime = new Date(`1970-01-01T${matchDetails.startTime}`).getTime();
+    let lastTime;
+    let xAxisInterval = "preserveEnd"; // default value
 
-    // TODO/test: remove first value of heartRateOne and heartRateTwo ({time: "", value: 80}) to see if that fixes null issues
-    const heartRateOneClean = heartRateOne.slice(1);
-    const heartRateTwoClean = heartRateTwo.slice(1);
-    console.log("heartRateOne (clean):");
-    console.log(heartRateOneClean);
-    console.log("heartRateTwo (clean):");
-    console.log(heartRateTwoClean);
+    // Due to the way the smoothHeartRateData function works (i.e. when using the previous value to fill in gaps in data),
+    // if there's any discrepancy between heart rate datasets regarding last time values, e.g. "15:45:41" for P1
+    // and "15:45:00" for P2, the lastTime variable should utilise the latest time available.
+    // This is of course, assuming there are two sets of heart rate data being applied - this won't always be the case...
+    // Goal: lastTime = endTime if match finished, latestFinishTime (HR) if two sets of HR data supplied, 
+    // latestHRtimestamp if one set supplied, or latestScoreTimestamp if no HR data supplied
+    if (matchStatus === "complete"){
+        // console.log("Condition 1 met.");
+        lastTime = new Date(`1970-01-01T${matchDetails.endTime}`).getTime();
+    }
+    else if (heartRateOne.length > 0 && heartRateTwo.length > 0){
+        // console.log("Condition 2 met.");
+        const latestFinishTime = [heartRateOne[heartRateOne.length - 1].time, heartRateTwo[heartRateTwo.length - 1].time].sort()[1];
+        lastTime = new Date(`1970-01-01T${latestFinishTime}`).getTime();
+    }
+    else if (heartRateOne.length > 0 && !(heartRateTwo.length > 0)){
+        // console.log("Condition 3 met.");
+        lastTime = new Date(`1970-01-01T${heartRateOne[heartRateOne.length - 1].time}`).getTime();
+    }
+    else if (!(heartRateOne.length > 0) && heartRateTwo.length > 0){
+        // console.log("Condition 4 met.");
+        lastTime = new Date(`1970-01-01T${heartRateTwo[heartRateTwo.length - 1].time}`).getTime();
+    }
+    else {
+        // console.log("Condition 5 met.");
+        const scoringTimestamps = scoreHistory.map((d) => d.time);
+        lastTime = new Date(`1970-01-01T${scoringTimestamps[scoringTimestamps.length - 1]}`).getTime();
+        xAxisInterval = 0;
+    }
 
-    // Potential problem: when choosing a baseTime, if there's a different value for earliest timestamp between both HR datasets,
-    // e.g. "15:45:01" for P1 and "15:45:00" for P2, due to the way the smoothHeartRateData function works, I need to work with the
-    // later timestamp. Similarly, when choosing a lastTime, pick the later timestamp.
-    
-    // const latestStartTimes = [arrayOne[0].time, arrayTwo[0].time]; // used for testing purposes
-    const latestStartTimes = [heartRateOneClean[0].time, heartRateTwoClean[0].time];
-    // console.log("latestStartTimes:");
-    // console.log(latestStartTimes);
-    const latestStartTime = latestStartTimes.sort()[1];
-    // console.log(`latestStartTime: ${latestStartTime}`);
-        
-    // const latestFinishTimes = [arrayOne[arrayOne.length - 1].time, arrayTwo[arrayTwo.length - 1].time]; // used for testing purposes
-    const latestFinishTimes = [heartRateOneClean[heartRateOneClean.length - 1].time, heartRateTwoClean[heartRateTwoClean.length - 1].time];
-    // console.log("latestFinishTimes:");
-    // console.log(latestFinishTimes);
-    const latestFinishTime = latestFinishTimes.sort()[1];
-    // console.log(`latestFinishTime: ${latestFinishTime}`);
-        
-    // const baseTime = new Date(`1970-01-01T${arrayOne[0].time}`).getTime();
-    // const baseTime = new Date(`1970-01-01T${heartRateOneClean[0].time}`).getTime();
-    // console.log(`OLD baseTime: ${baseTime}`);
-    // const lastTime = new Date(`1970-01-01T${arrayOne[arrayOne.length - 1].time}`).getTime();
-    // const lastTime = new Date(`1970-01-01T${heartRateOneClean[heartRateOneClean.length - 1].time}`).getTime();
-    // console.log(`OLD lastTime: ${lastTime}`);
+    console.log(`baseTime: ${baseTime}`);
+    console.log(`lastTime: ${lastTime}`);
+    console.log(`xAxisInterval: ${xAxisInterval}`);
 
-    const baseTime = new Date(`1970-01-01T${latestStartTime}`).getTime();
-    console.log(`NEW baseTime: ${baseTime}`);
-    const lastTime = new Date(`1970-01-01T${latestFinishTime}`).getTime();
-    console.log(`NEW lastTime: ${lastTime}`);
+    // const lastTime = new Date(`1970-01-01T${latestFinishTime}`).getTime();
 
-
-    // Another potential problem: At the beginning when data is coming in, baseTime = lastTime. Does this matter for domain?
-    // I don't think so!
-    const heartRateOneFormatted = smoothHeartRateData(heartRateOneClean, baseTime, lastTime);
-    const heartRateTwoFormatted = smoothHeartRateData(heartRateTwoClean, baseTime, lastTime);
-    console.log("HR 1 formatted/smoothed:");
-    console.log(heartRateOneFormatted);
-    console.log("HR 2 formatted/smoothed:");
-    console.log(heartRateTwoFormatted);
+    // Ensuring only one heart rate value per second
+    const heartRateOneFormatted = smoothHeartRateData(heartRateOne, baseTime, lastTime);
+    const heartRateTwoFormatted = smoothHeartRateData(heartRateTwo, baseTime, lastTime);
 
 
     // Creates an array of all recorded timestamps in chronological order ensuring no duplicates (hh:mm:ss format)
     const masterTimeDataset = Array.from(new Set([
         ...scoreHistory.map((d) => d.time),
-        ...heartRateOneFormatted.map((d) => d.time),
-        ...heartRateTwoFormatted.map((d) => d.time)
+        ...(heartRateOneFormatted ? heartRateOneFormatted.map((d) => d.time) : []),
+        ...(heartRateTwoFormatted ? heartRateTwoFormatted.map((d) => d.time) : [])
     ])).sort();
-    console.log("masterTimeDataset (unifiedTimeData):");
-    console.log(masterTimeDataset);
-    
-    let latestTimestamp = baseTime; // initial prevTime value, gets updated whenever a point is won
+   
     
     // Converting masterTimeDataset into unix time to be used as x axis tick values
     const xAxisTicks = masterTimeDataset.map(time => new Date(`1970-01-01T${time}`).getTime());
-    console.log("xAxisTicks (unifiedUnixTimeData):");
-    console.log(xAxisTicks);
-    
+    let latestTimestamp = baseTime; // initial prevTime value, gets updated whenever a point is won
 
+    
     // Creating an array where each object represents all vital info regarding plotted data (current time, heart rates
     // for both players, point winner at given time (if any) and time of previous point winner used to calculate bar widths)
     const unifiedDataset = masterTimeDataset.map((time) => {
         const timestamp = new Date(`1970-01-01T${time}`).getTime();
         const scoringData = scoreHistory.find((d) => d.time === time);
-        const hrOneData = heartRateOneFormatted.find((d) => d.time === time);
-        const hrTwoData = heartRateTwoFormatted.find((d) => d.time === time);
+        const hrOneData = heartRateOneFormatted ? heartRateOneFormatted.find((d) => d.time === time) : null;
+        const hrTwoData = heartRateTwoFormatted ? heartRateTwoFormatted.find((d) => d.time === time) : null;
         
         // Add "prevTime" attribute wherever a point was won by someone and set it to the timestamp 
         // ...of the previous point winner or the very first timestamp for the first point
@@ -110,8 +83,7 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
             heartRateTwo: hrTwoData?.value || null,
         };
     });
-    console.log("unifiedDataset");
-    console.log(unifiedDataset);
+
     
     // Defining important constants to calcluate bar widths, heights etc.
     const chartWidth = 1350;
@@ -119,12 +91,17 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
     const xAxisHeight = 80;
     const yAxisWidth = 50;
     const legendHeight = 1; // Seems to be the best value to maximise the graph height
-    
-    // const lastTime = new Date(`1970-01-01T${masterTimeDataset[masterTimeDataset.length - 1]}`).getTime();
-    // console.log(`lastTime: ${lastTime}`);
-    // const xDomain = [baseTime, lastTime];
-    // console.log(`xDomain: ${xDomain}`);
-    
+
+    // Using custom payload to remove score key and add custom names/colours to line keys
+    const legendPayload = [];
+    if (heartRateOneFormatted) {
+        legendPayload.push({ value: players[0].name, type: "line", id: "heartRateOne", color: players[0].colour });
+        
+    }
+    if (heartRateTwoFormatted) {
+        legendPayload.push({ value: players[1].name, type: "line", id: "heartRateTwo", color: players[1].colour });
+    }
+      
     
     return (
         <ResponsiveContainer width={chartWidth} height={chartHeight}>
@@ -149,10 +126,10 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
                     tick={{fill: "white"}}
                     tickLine={{ stroke: "white", strokeWidth: 1 }}
                     axisLine={{ stroke: "white", strokeWidth: 1 }}
-                    // interval="preserveStartEnd"
-                    // interval={0}
+                    interval={xAxisInterval} // FIX: not showing all ticks when no HR data is present (i.e. just scoring data)
                 />
                 <YAxis 
+                    domain={['dataMin - 10', 'dataMax + 10']}
                     orientation="left"
                     tick={{fill: "white"}}
                     tickLine={{ stroke: "white", strokeWidth: 1 }}
@@ -181,15 +158,13 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
                         const secondsOnly = Math.floor(durationInSeconds % 60) || 0;
 
                         // Extract heart rate data
-                        const heartRateOneData = payload.find((item) => item.dataKey === "heartRateOne");
-                        const heartRateTwoData = payload.find((item) => item.dataKey === "heartRateTwo");
-                        // console.log("heartRateOneData:");
-                        // console.log(heartRateOneData);
+                        const heartRateOneText = payload.find((item) => item.dataKey === "heartRateOne");
+                        const heartRateTwoText = payload.find((item) => item.dataKey === "heartRateTwo");
 
                         return (
                             <div style={{ backgroundColor: "lightgrey", color: "black", border: "1px solid black", padding: "5px" }}>
                                 {
-                                    // TODO: if total unifiedDataset.length > X, only render tooltips for scoreBarData
+                                    // TODO (awaiting feedback): if total unifiedDataset.length > X, only render tooltips for scoreBarData
                                 }
                                 
                                 {/* Scoring Bar Tooltip */}
@@ -201,8 +176,8 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
                                 )}
 
                                 {/* Heart Rate Tooltip */}
-                                {heartRateOneData && <p>{`${players[0].name} HR: ${heartRateOneData.value}`}</p>}
-                                {heartRateTwoData && <p>{`${players[1].name} HR: ${heartRateTwoData.value}`}</p>}
+                                {heartRateOneText && <p>{`${players[0].name} HR: ${heartRateOneText.value}`}</p>}
+                                {heartRateTwoText && <p>{`${players[1].name} HR: ${heartRateTwoText.value}`}</p>}
                             </div>
                         );
                     }}
@@ -211,11 +186,7 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
                 <Legend
                     verticalAlign="bottom"
                     height={legendHeight}
-                    // Using custom payload to remove score key and add custom names/colours to line keys
-                    payload={[
-                        { value: players[0].name, type: "line", id: "heartRateOne", color: players[0].colour },
-                        { value: players[1].name, type: "line", id: "heartRateTwo", color: players[1].colour }
-                    ]}
+                    payload={legendPayload}
                 />
 
                 {/* Only start generating bars when scoreHistory has data to be displayed */}
@@ -223,11 +194,7 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
                     <Bar 
                         dataKey="player"
                         name="point winner"
-                        // height="90%"
                         shape={({ payload, index }) => {
-                            // console.log("payload:");
-                            // console.log(payload);
-
                             const barBorder = 1;
                             const barHeight = chartHeight - xAxisHeight - legendHeight;
                             // appending "4D" to hex colour string to add 30% opacity
@@ -264,19 +231,24 @@ export default function CombinedGraph({ players, heartRateOne, heartRateTwo, smo
                     />
                 )}
 
-                {/* Line Graphs */}
+                {/* Line Graphs - only plot where data is available */}
+                {heartRateOneFormatted && 
                 <Line
                     name={players[0].name}
                     dataKey="heartRateOne"
                     stroke={players[0].colour}
                     dot={false}
-                />
+                    isAnimationActive={false}
+                />}
+
+                {heartRateTwoFormatted && 
                 <Line
                     name={players[1].name}
                     dataKey="heartRateTwo"
                     stroke={players[1].colour}
                     dot={false}
-                />
+                    isAnimationActive={false}
+                />}
             </ComposedChart>
         </ResponsiveContainer>
     )

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 export default function GameTracking({
-    players, setPlayers, getCurrentTime, toInput, toResults, heartRateOne, heartRateOneOnly, scoreHistory, setScoreHistory,
-    deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
+    setMatchDetails, matchStatus, players, setPlayers, getCurrentTime, getCurrentDate, toInput, toResults, heartRateOne, heartRateOneOnly, scoreHistory,
+    setScoreHistory, deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
     handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, matchDetails, mockData
@@ -22,7 +22,6 @@ export default function GameTracking({
         backgroundColor: players[1].colour,
         borderLeft: "2px solid white"
     }
-
 
     function calcHRPercent(heartRate, age){
         return Math.round(heartRate * 100 / maxHeartRate(age));
@@ -77,6 +76,62 @@ export default function GameTracking({
         return {backgroundColor: bgColor};
     }
 
+    // Get current date in text (for displaying) and numeric formats (for filtering) for Dashboard
+    function getCurrentDate(){
+        const weekdayArray = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayArray = [
+            "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
+            "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th", "20th",
+            "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th", "29th", "30th", "31st"
+        ];
+        const monthArray = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+        
+        const fullDate = new Date();
+        const weekdayText = weekdayArray[fullDate.getDay()];
+        const dayText = dayArray[fullDate.getDate() - 1];
+        const monthText = monthArray[fullDate.getMonth()];
+        const year = fullDate.getFullYear();
+        
+        const currentDateText = `${weekdayText} ${dayText} ${monthText}, ${year}`;
+        const currentDate = fullDate.getTime();
+        
+        return [currentDateText, currentDate];
+    }
+
+    // Calculate match duration from matchDetails start and end times (in hh:mm:ss format)
+    function getMatchDuration(start, finish){
+        const startTimestamp = new Date(`1970-01-01T${start}`).getTime();
+        const finishTimestamp = new Date(`1970-01-01T${finish}`).getTime();
+        const duration = new Date(finishTimestamp - startTimestamp);
+        const matchDuration = duration.getTime(); // unix timestamp value in ms
+
+        // Important to use UTC time here when displaying match duration to ignore daylight savings time offset
+        const hours = duration.getUTCHours();
+        const minutes = duration.getMinutes();
+        const seconds = duration.getSeconds();
+        let matchDurationText = "";
+
+        // Choosing a duration text format based on hours, minutes and seconds
+        // Conditional statements are laid out with the most common scenario first, least common scenario last
+        if (hours === 0 && minutes > 0){
+            matchDurationText = `${minutes} minute${minutes > 1 ? "s" : ""}`;
+        } 
+        else if (hours != 0 && minutes != 0){
+            matchDurationText = `${hours}h ${minutes}m`;
+        }
+        else if (hours != 0 && minutes === 0){
+            matchDurationText = `${hours} hour${hours > 1 ? "s" : ""}`;
+        }
+        else {
+            matchDurationText = `${seconds} second${seconds > 1 ? "s" : ""}`;
+        }
+
+        return [matchDurationText, matchDuration]
+    }
+
 
     // SCORING STATE & LOGIC
     const [winner, setWinner] = useState(null);
@@ -104,7 +159,7 @@ export default function GameTracking({
             return updatedPlayers;
         });
 
-        // if incrementing points
+        // If incrementing points
         if (increment) {
             const currentTime = getCurrentTime();
             setScoreHistory(prevScoreHistory => [
@@ -115,7 +170,7 @@ export default function GameTracking({
                 }
             ]);
         
-        // if decrementing points and points are non-zero
+        // If decrementing points and points are non-zero
         } else if (!increment && players[playerIndex].points > 0) {
             setScoreHistory(prevScoreHistory => prevScoreHistory.slice(0, -1));
         }
@@ -192,6 +247,38 @@ export default function GameTracking({
     const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.player === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
     const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.player === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
 
+
+    function startMatch(){
+        // setMatchStatus("active");
+        matchStatus.current = "active";
+        // Record start of match in matchDetails
+        const currentTime = getCurrentTime();
+        const [currentDateText, currentDate] = getCurrentDate();
+        setMatchDetails({
+            ...matchDetails,
+            startTime: currentTime,
+            date: currentDate,
+            dateText: currentDateText
+        });
+    }
+
+
+    function finishMatch(){
+        // setMatchStatus("complete");
+        matchStatus.current = "complete";
+        // Record end of match in matchDetails
+        const currentTime = getCurrentTime();
+        const [matchDurationText, matchDuration] = getMatchDuration(matchDetails.startTime, currentTime);
+        setMatchDetails({
+            ...matchDetails,
+            endTime: currentTime,
+            duration: matchDuration,
+            durationText: matchDurationText
+        });
+        // toResults();
+    }
+
+
     return (
         <>
             <div className="players-container">
@@ -219,30 +306,40 @@ export default function GameTracking({
                 <ul className="player-one">
                     {/* Player name, colour and score */}
                     <div className="player-details">
-                        <li className="player-one-banner">
+                        <div className="player-one-banner">
                             <div className="player-team-one" style={p1TeamStyles}></div>
                             <span className="player-one-name">{players[0].name}</span>
-                        </li>
+                        </div>
 
-                        {showWinner ? (
-                            <div className="winner-box">
-                                <h1 className="winner-name">{winner} wins!</h1>
-                                <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
-                            </div>
+                        {matchStatus.current === "pending" ? (
+                            <button className="start-game-btn" onClick={startMatch}>Start Match</button>
                             ) : (
-                            <div>
-                                <li className="player-points">
-                                    <span onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0} className="score-minus">-</span>
-                                    <span>{players[0].points}</span>
-                                    <span onClick={() => updatePlayerPoints(0, true)} className="score-plus">+</span>
-                                </li>
-                                <div className="recent-points">{recentPointsP1}</div>
-                            </div>
-                        )}
+                                matchStatus.current === "active" ? (showWinner ? (
+                                    <div className="winner-box">
+                                        <h1 className="winner-name">{winner} wins!</h1>
+                                        <div className="post-match-buttons">
+                                            <button className="post-match-btn" onClick={handleGoBack}>View Score</button>
+                                            <button className="post-match-btn" onClick={finishMatch}>Match Complete</button>
+                                        </div>
+                                    </div>
+                                    ) : (
+                                    <div>
+                                        <div className="player-points">
+                                            <span onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0} className="score-minus">-</span>
+                                            <span>{players[0].points}</span>
+                                            <span onClick={() => updatePlayerPoints(0, true)} className="score-plus">+</span>
+                                        </div>
+                                        <div className="recent-points">{recentPointsP1}</div>
+                                    </div>
+                                )) : (
+                                    <h1 className="">Match complete!</h1>
+                                )
+                            )
+                        }
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <li className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne.length > 0 ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
                         {deviceInitialisedOne || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
@@ -260,29 +357,38 @@ export default function GameTracking({
                                         <button onClick={handleManualDisconnectOne} className="bluetooth-disconnect-btn">Disconnect</button>
                                     )}
                                 </div>
-                                <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age)}%`}</div>
-                                    <div className="hr-absolute">
-                                        <div>{heartRateOne[heartRateOne.length - 1].value}</div>
-                                        <div className="hr-extremities">
-                                            <div className="player-max-heart-rate">
-                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
-                                                </svg>
-                                                <span>{Math.max(...heartRateOneOnly)}</span>
-                                            </div>
-                                            <div className="player-min-heart-rate">
-                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
-                                                </svg>
-                                                <span>{Math.min(...heartRateOneOnly)}</span>
+
+                                {/* Wait until readings come in to display them */}
+                                {heartRateOne.length > 0 ? (
+                                    <>
+                                        <div className="heart-rate-stats">
+                                            <div>{`${calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age)}%`}</div>
+                                            <div className="hr-absolute">
+                                                <div>{heartRateOne[heartRateOne.length - 1].value}</div>
+                                                <div className="hr-extremities">
+                                                    <div className="player-max-heart-rate">
+                                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
+                                                        </svg>
+                                                        <span>{Math.max(...heartRateOneOnly)}</span>
+                                                    </div>
+                                                    <div className="player-min-heart-rate">
+                                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
+                                                        </svg>
+                                                        <span>{Math.min(...heartRateOneOnly)}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
-                                    <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
-                                </svg>
+                                        <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
+                                            <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
+                                        </svg>
+                                    </>
+                                    ) : (
+                                    <h3>Loading...</h3>
+                                )}
+
                                 <div className="device-status">
                                     <div style={chooseStatusColor(deviceStatusOne)} className="device-status-circle"></div>
                                     <div className="device-status-text">{deviceStatusOne}</div>
@@ -305,37 +411,40 @@ export default function GameTracking({
                 </ul>
 
                 
-
-
-
                 {/* Second player/team display */}
                 <ul className="player-two">
                     {/* Player name, colour and score */}
                     <div className="player-details">
-                        <li className="player-two-banner">
+                        <div className="player-two-banner">
                             <span className="player-two-name">{players[1].name}</span>
                             <div className="player-team-two" style={p2TeamStyles}></div>
-                        </li>
+                        </div>
 
-                        {showWinner ? (
-                            <div className="winner-box">
-                                <h1 className="winner-name">{winner} wins!</h1>
-                                <button className="view-score-btn" onClick={handleGoBack}>View Score</button>
-                            </div>
-                            ) : (
-                            <div>
-                                <li className="player-points">
-                                    <span onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0} className="score-minus">-</span>
-                                    <span>{players[1].points}</span>
-                                    <span onClick={() => updatePlayerPoints(1, true)} className="score-plus">+</span>
-                                </li>
-                                <div className="recent-points">{recentPointsP2}</div>
-                            </div>
+                        {matchStatus.current === "active" ? (
+                            showWinner ? (
+                                <div className="winner-box">
+                                    <h1 className="winner-name">{winner} wins!</h1>
+                                    <div className="post-match-buttons">
+                                        <button className="post-match-btn" onClick={handleGoBack}>View Score</button>
+                                        <button className="post-match-btn" onClick={finishMatch}>Match Complete</button>
+                                    </div>
+                                </div>
+                                ) : (
+                                <div>
+                                    <div className="player-points">
+                                        <span onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0} className="score-minus">-</span>
+                                        <span>{players[1].points}</span>
+                                        <span onClick={() => updatePlayerPoints(1, true)} className="score-plus">+</span>
+                                    </div>
+                                    <div className="recent-points">{recentPointsP2}</div>
+                                </div>
+                            )) : ( 
+                            matchStatus.current === "complete" && <h1 className="">Match complete!</h1>
                         )}
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={(deviceStatusTwo === "connected" || mockData) && heartRateTwo ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <li className="heart-rate-box" style={(deviceStatusTwo === "connected" || mockData) && heartRateTwo.length > 0 ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {deviceInitialisedTwo || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
@@ -353,29 +462,38 @@ export default function GameTracking({
                                         <button onClick={handleManualDisconnectTwo} className="bluetooth-disconnect-btn">Disconnect</button>
                                     )}
                                 </div>
-                                <div className="heart-rate-stats">
-                                    <div>{`${calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age)}%`}</div>
-                                    <div className="hr-absolute">
-                                        <div>{heartRateTwo[heartRateTwo.length - 1].value}</div>
-                                        <div className="hr-extremities">
-                                            <div className="player-max-heart-rate">
-                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
-                                                </svg>
-                                                <span>{Math.max(...heartRateTwoOnly)}</span>
-                                            </div>
-                                            <div className="player-min-heart-rate">
-                                                <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
-                                                </svg>
-                                                <span>{Math.min(...heartRateTwoOnly)}</span>
+
+                                {/* Wait until readings come in to display them */}
+                                {heartRateTwo.length > 0 ? (
+                                    <>
+                                        <div className="heart-rate-stats">
+                                            <div>{`${calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age)}%`}</div>
+                                            <div className="hr-absolute">
+                                                <div>{heartRateTwo[heartRateTwo.length - 1].value}</div>
+                                                <div className="hr-extremities">
+                                                    <div className="player-max-heart-rate">
+                                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="m16.843 13.789c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291 1.002 1.299 3.044 3.945 4.243 5.498z"/>
+                                                        </svg>
+                                                        <span>{Math.max(...heartRateTwoOnly)}</span>
+                                                    </div>
+                                                    <div className="player-min-heart-rate">
+                                                        <svg className="hr-max-icon" height="40" width="32" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="m16.843 10.211c.108-.141.157-.3.157-.456 0-.389-.306-.755-.749-.755h-8.501c-.445 0-.75.367-.75.755 0 .157.05.316.159.457 1.203 1.554 3.252 4.199 4.258 5.498.142.184.36.29.592.29.23 0 .449-.107.591-.291 1.002-1.299 3.044-3.945 4.243-5.498z"/>
+                                                        </svg>
+                                                        <span>{Math.min(...heartRateTwoOnly)}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
-                                    <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
-                                </svg>
+                                        <svg className="heart-rate-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
+                                            <path d="M18.905 14c-2.029 2.401-4.862 5.005-7.905 8-5.893-5.8-11-10.134-11-14.371 0-6.154 8.114-7.587 11-2.676 2.865-4.875 11-3.499 11 2.676 0 .784-.175 1.572-.497 2.371h-6.278c-.253 0-.486.137-.61.358l-.813 1.45-2.27-4.437c-.112-.219-.331-.364-.576-.38-.246-.016-.482.097-.622.299l-1.88 2.71h-1.227c-.346-.598-.992-1-1.732-1-1.103 0-2 .896-2 2s.897 2 2 2c.74 0 1.386-.402 1.732-1h1.956c.228 0 .441-.111.573-.297l.989-1.406 2.256 4.559c.114.229.343.379.598.389.256.011.496-.118.629-.337l1.759-2.908h8.013v2h-5.095z"/>
+                                        </svg>
+                                    </>
+                                    ) : (
+                                    <h3>Loading...</h3>
+                                )}
+
                                 <div className="device-status">
                                     <div style={chooseStatusColor(deviceStatusTwo)} className="device-status-circle"></div>
                                     <div className="device-status-text">{deviceStatusTwo}</div>
@@ -397,10 +515,12 @@ export default function GameTracking({
                     </li>
                 </ul>
 
-                {/* Results button */}
-                <svg onClick={toResults} className="next-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1z" fillRule="nonzero"/>
-                </svg>
+                {/* Results button, only render if the match is either active or complete AND at least one type of data is available */}
+                {(matchStatus != "pending" && (scoreHistory.length > 0 || heartRateOne.length > 0 || heartRateTwo.length > 0)) &&
+                    <svg onClick={toResults} className="next-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1z" fillRule="nonzero"/>
+                    </svg>
+                }
             </div>
         </>
     )

@@ -13,9 +13,17 @@ export default function App(){
         {
             sport: "table-tennis",
             matchType: "singles",
-            bestOf: "1"
+            bestOf: "1",
+            date: null, // Unix timestamp, used for filtering in dashboard
+            dateText: null, // Displayed in dashboard
+            startTime: null, // hh:mm:ss format
+            endTime: null, // hh:mm:ss format
+            duration: null, // Unix timestamp, used for filtering in dashboard
+            durationText: null, // Displayed in dashboard (hours and minutes)
         }
     );
+    // const [matchStatus, setMatchStatus] = useState("pending"); // pending, active or complete
+    const matchStatus = useRef("pending"); // pending, active or complete
     // const [players, setPlayers] = useState([]);
     const [players, setPlayers] = useState([ // for testing purposes
         {
@@ -54,6 +62,7 @@ export default function App(){
     }
 
 
+    // Get current time in hh:mm:ss format
     function getCurrentTime(){
         const currentTime = new Date();
         // optionally padding with a 0 is crucial when sorting times inside of CombinedGraph component
@@ -78,7 +87,7 @@ export default function App(){
             );
 
             // Convert timestamp back into date format
-            const date = new Date(timestamp); // divide by 1000 to get date correct?
+            const date = new Date(timestamp);
             const timestampDate = `${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`;
 
             if (readings.length > 0) {
@@ -99,8 +108,8 @@ export default function App(){
 
 
     // Used to generate mock HR data for testing purposes
-    // const [mockData, setMockData] = useState(false);
-    const [mockData, setMockData] = useState(true);
+    const [mockData, setMockData] = useState(false);
+    // const [mockData, setMockData] = useState(true);
 
     if (mockData === true){
         useEffect(() => {
@@ -155,13 +164,7 @@ export default function App(){
 
 
     //////////////////////////////   BLUETOOTH CODE   //////////////////////////////
-    // const [heartRate, setHeartRate] = useState(null);
-    const [heartRateOne, setHeartRateOne] = useState([
-        {
-            value: 80,
-            time: ""
-        }
-    ]);
+    const [heartRateOne, setHeartRateOne] = useState([]);
     const heartRateOneOnly = heartRateOne.map(data => data.value);
     const [deviceInitialisedOne, setDeviceInitialisedOne] = useState(false);
     const [deviceStatusOne, setDeviceStatusOne] = useState("disconnected");
@@ -177,44 +180,52 @@ export default function App(){
 
     // Function to connect to Bluetooth heart rate sensor one
     async function connectToHeartRateSensorOne() {
-        console.log("Function called: connectToHeartRateSensorOne()");
-        try {
-            const deviceOne = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ["heart_rate"] }],
-                optionalServices: ["battery_service"],
-            });
-            setDeviceStatusOne("connecting");
-            deviceRefOne.current = deviceOne;
-            deviceOne.addEventListener('gattserverdisconnected', handleDisconnectionOne);
-            setDeviceInitialisedOne(true);
-            disconnectedManuallyRefOne.current = false;
-
-            console.log('Connecting to GATT Server...');
-            const server = await deviceOne.gatt.connect();
-            setDeviceStatusOne("connected");
-            console.log('Getting Heart Rate...');
-            const service = await server.getPrimaryService("heart_rate");
-            console.log('Getting Heart Rate Measurement Characteristic...');
-            const characteristicOne = await service.getCharacteristic("heart_rate_measurement");
-            
-            // Listen for heart rate changes by re-adding event listener
-            characteristicOne.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
-            characteristicRefOne.current = characteristicOne; // Store heart rate characteristic
-            await startHeartRateNotificationsOne(characteristicOne); // Subscribe to heart rate changes
-
-            // Access battery service and read battery level
-            const batteryServiceOne = await server.getPrimaryService("battery_service");
-            const batteryLevelCharacteristicOne = await batteryServiceOne.getCharacteristic("battery_level");
-            const batteryLevelValueOne = await batteryLevelCharacteristicOne.readValue();
-            setBatteryLevelOne(batteryLevelValueOne.getUint8(0)); // Read and store initial battery level
-
-            // Listen for battery level changes by re-adding event listener
-            batteryLevelCharacteristicOne.addEventListener("characteristicvaluechanged", handleBatteryLevelOne);
-            batteryCharacteristicRefOne.current = batteryLevelCharacteristicOne; // Store battery level characteristic
-            await batteryLevelCharacteristicOne.startNotifications(); // Start notifications for battery level changes
-        } 
-        catch (error) {
-            console.error("Failed to connect to heart rate sensor one:", error);
+        if (matchStatus.current === "pending"){
+            console.log("Function called: connectToHeartRateSensorOne()");
+            try {
+                const deviceOne = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: ["heart_rate"] }],
+                    optionalServices: ["battery_service"],
+                });
+                setDeviceStatusOne("connecting");
+                deviceRefOne.current = deviceOne;
+                deviceOne.addEventListener('gattserverdisconnected', handleDisconnectionOne);
+                setDeviceInitialisedOne(true);
+                disconnectedManuallyRefOne.current = false;
+    
+                console.log('Connecting to GATT Server...');
+                const server = await deviceOne.gatt.connect();
+                setDeviceStatusOne("connected");
+                console.log('Getting Heart Rate...');
+                const service = await server.getPrimaryService("heart_rate");
+                console.log('Getting Heart Rate Measurement Characteristic...');
+                const characteristicOne = await service.getCharacteristic("heart_rate_measurement");
+                
+                // Listen for heart rate changes by re-adding event listener
+                characteristicOne.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementOne);
+                characteristicRefOne.current = characteristicOne; // Store heart rate characteristic
+                await startHeartRateNotificationsOne(characteristicOne); // Subscribe to heart rate changes
+    
+                // Access battery service and read battery level
+                const batteryServiceOne = await server.getPrimaryService("battery_service");
+                const batteryLevelCharacteristicOne = await batteryServiceOne.getCharacteristic("battery_level");
+                const batteryLevelValueOne = await batteryLevelCharacteristicOne.readValue();
+                setBatteryLevelOne(batteryLevelValueOne.getUint8(0)); // Read and store initial battery level
+    
+                // Listen for battery level changes by re-adding event listener
+                batteryLevelCharacteristicOne.addEventListener("characteristicvaluechanged", handleBatteryLevelOne);
+                batteryCharacteristicRefOne.current = batteryLevelCharacteristicOne; // Store battery level characteristic
+                await batteryLevelCharacteristicOne.startNotifications(); // Start notifications for battery level changes
+            } 
+            catch (error) {
+                console.error("Failed to connect to heart rate sensor one:", error);
+            }
+        }
+        else if (matchStatus.current === "active") {
+            alert("You cannot connect a device after the game has started. You must restart.");
+        }
+        else {
+            console.log(`Error: matchStatus: ${matchStatus.current}`);
         }
     };
 
@@ -388,12 +399,7 @@ export default function App(){
 
     
     /////////////////////////////////////////////////////////////////////////////////
-    const [heartRateTwo, setHeartRateTwo] = useState([
-        {
-            value: 80,
-            time: ""
-        }
-    ]);
+    const [heartRateTwo, setHeartRateTwo] = useState([]);
     const heartRateTwoOnly = heartRateTwo.map(data => data.value);
     const [deviceInitialisedTwo, setDeviceInitialisedTwo] = useState(false);
     const [deviceStatusTwo, setDeviceStatusTwo] = useState("disconnected");
@@ -409,44 +415,52 @@ export default function App(){
 
     // Function to connect to Bluetooth heart rate sensor Two
     async function connectToHeartRateSensorTwo() {
-        console.log("Function called: connectToHeartRateSensorTwo()");
-        try {
-            const deviceTwo = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ["heart_rate"] }],
-                optionalServices: ["battery_service"],
-            });
-            setDeviceStatusTwo("connecting");
-            deviceRefTwo.current = deviceTwo;
-            deviceTwo.addEventListener('gattserverdisconnected', handleDisconnectionTwo);
-            setDeviceInitialisedTwo(true);
-            disconnectedManuallyRefTwo.current = false;
-
-            console.log('Connecting to GATT Server...');
-            const server = await deviceTwo.gatt.connect();
-            setDeviceStatusTwo("connected");
-            console.log('Getting Heart Rate...');
-            const service = await server.getPrimaryService("heart_rate");
-            console.log('Getting Heart Rate Measurement Characteristic...');
-            const characteristicTwo = await service.getCharacteristic("heart_rate_measurement");
-            
-            // Listen for heart rate changes by re-adding event listener
-            characteristicTwo.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
-            characteristicRefTwo.current = characteristicTwo; // Store heart rate characteristic
-            await startHeartRateNotificationsTwo(characteristicTwo); // Subscribe to heart rate changes
-
-            // Access battery service and read battery level
-            const batteryServiceTwo = await server.getPrimaryService("battery_service");
-            const batteryLevelCharacteristicTwo = await batteryServiceTwo.getCharacteristic("battery_level");
-            const batteryLevelValueTwo = await batteryLevelCharacteristicTwo.readValue();
-            setBatteryLevelTwo(batteryLevelValueTwo.getUint8(0)); // Read and store initial battery level
-
-            // Listen for battery level changes by re-adding event listener
-            batteryLevelCharacteristicTwo.addEventListener("characteristicvaluechanged", handleBatteryLevelTwo);
-            batteryCharacteristicRefTwo.current = batteryLevelCharacteristicTwo; // Store battery level characteristic
-            await batteryLevelCharacteristicTwo.startNotifications(); // Start notifications for battery level changes
-        } 
-        catch (error) {
-            console.error("Failed to connect to heart rate sensor Two:", error);
+        if (matchStatus.current === "pending"){
+            console.log("Function called: connectToHeartRateSensorTwo()");
+            try {
+                const deviceTwo = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: ["heart_rate"] }],
+                    optionalServices: ["battery_service"],
+                });
+                setDeviceStatusTwo("connecting");
+                deviceRefTwo.current = deviceTwo;
+                deviceTwo.addEventListener('gattserverdisconnected', handleDisconnectionTwo);
+                setDeviceInitialisedTwo(true);
+                disconnectedManuallyRefTwo.current = false;
+    
+                console.log('Connecting to GATT Server...');
+                const server = await deviceTwo.gatt.connect();
+                setDeviceStatusTwo("connected");
+                console.log('Getting Heart Rate...');
+                const service = await server.getPrimaryService("heart_rate");
+                console.log('Getting Heart Rate Measurement Characteristic...');
+                const characteristicTwo = await service.getCharacteristic("heart_rate_measurement");
+                
+                // Listen for heart rate changes by re-adding event listener
+                characteristicTwo.addEventListener("characteristicvaluechanged", handleHeartRateMeasurementTwo);
+                characteristicRefTwo.current = characteristicTwo; // Store heart rate characteristic
+                await startHeartRateNotificationsTwo(characteristicTwo); // Subscribe to heart rate changes
+    
+                // Access battery service and read battery level
+                const batteryServiceTwo = await server.getPrimaryService("battery_service");
+                const batteryLevelCharacteristicTwo = await batteryServiceTwo.getCharacteristic("battery_level");
+                const batteryLevelValueTwo = await batteryLevelCharacteristicTwo.readValue();
+                setBatteryLevelTwo(batteryLevelValueTwo.getUint8(0)); // Read and store initial battery level
+    
+                // Listen for battery level changes by re-adding event listener
+                batteryLevelCharacteristicTwo.addEventListener("characteristicvaluechanged", handleBatteryLevelTwo);
+                batteryCharacteristicRefTwo.current = batteryLevelCharacteristicTwo; // Store battery level characteristic
+                await batteryLevelCharacteristicTwo.startNotifications(); // Start notifications for battery level changes
+            } 
+            catch (error) {
+                console.error("Failed to connect to heart rate sensor Two:", error);
+            }
+        }
+        else if (matchStatus.current === "active"){
+            alert("You cannot connect a device after the game has started. You must restart.");
+        }
+        else {
+            console.log(`Error: matchStatus: ${matchStatus.current}`);
         }
     };
 
@@ -636,7 +650,10 @@ export default function App(){
             }
             
             {display === "scores" &&
-                <GameTracking 
+                <GameTracking
+                    setMatchDetails={setMatchDetails} 
+                    matchStatus={matchStatus}
+                    // setMatchStatus={setMatchStatus}
                     players={players}
                     setPlayers={setPlayers}
                     getCurrentTime={getCurrentTime}
@@ -680,6 +697,8 @@ export default function App(){
                 <Results 
                     toScores={toScores}
                     toDashboard={toDashboard}
+                    matchDetails={matchDetails}
+                    matchStatus={matchStatus}
                     players={players}
                     heartRateOne={heartRateOne}
                     heartRateTwo={heartRateTwo}
