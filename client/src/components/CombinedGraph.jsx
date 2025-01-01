@@ -4,43 +4,31 @@ import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, L
 export default function CombinedGraph({ matchDetails, matchStatus, players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory }){
     const baseTime = new Date(`1970-01-01T${matchDetails.startTime}`).getTime();
     let lastTime;
-    let xAxisInterval = "preserveEnd"; // default value
 
     // Due to the way the smoothHeartRateData function works (i.e. when using the previous value to fill in gaps in data),
     // if there's any discrepancy between heart rate datasets regarding last time values, e.g. "15:45:41" for P1
     // and "15:45:00" for P2, the lastTime variable should utilise the latest time available.
     // This is of course, assuming there are two sets of heart rate data being applied - this won't always be the case...
-    // Goal: lastTime = endTime if match finished, latestFinishTime (HR) if two sets of HR data supplied, 
+    
+    // lastTime = endTime if match finished, latestFinishTime (HR) if two sets of HR data supplied, 
     // latestHRtimestamp if one set supplied, or latestScoreTimestamp if no HR data supplied
     if (matchStatus === "complete"){
-        // console.log("Condition 1 met.");
         lastTime = new Date(`1970-01-01T${matchDetails.endTime}`).getTime();
     }
     else if (heartRateOne.length > 0 && heartRateTwo.length > 0){
-        // console.log("Condition 2 met.");
         const latestFinishTime = [heartRateOne[heartRateOne.length - 1].time, heartRateTwo[heartRateTwo.length - 1].time].sort()[1];
         lastTime = new Date(`1970-01-01T${latestFinishTime}`).getTime();
     }
     else if (heartRateOne.length > 0 && !(heartRateTwo.length > 0)){
-        // console.log("Condition 3 met.");
         lastTime = new Date(`1970-01-01T${heartRateOne[heartRateOne.length - 1].time}`).getTime();
     }
     else if (!(heartRateOne.length > 0) && heartRateTwo.length > 0){
-        // console.log("Condition 4 met.");
         lastTime = new Date(`1970-01-01T${heartRateTwo[heartRateTwo.length - 1].time}`).getTime();
     }
     else {
-        // console.log("Condition 5 met.");
         const scoringTimestamps = scoreHistory.map((d) => d.time);
         lastTime = new Date(`1970-01-01T${scoringTimestamps[scoringTimestamps.length - 1]}`).getTime();
-        xAxisInterval = 0;
     }
-
-    console.log(`baseTime: ${baseTime}`);
-    console.log(`lastTime: ${lastTime}`);
-    console.log(`xAxisInterval: ${xAxisInterval}`);
-
-    // const lastTime = new Date(`1970-01-01T${latestFinishTime}`).getTime();
 
     // Ensuring only one heart rate value per second
     const heartRateOneFormatted = smoothHeartRateData(heartRateOne, baseTime, lastTime);
@@ -49,11 +37,12 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
 
     // Creates an array of all recorded timestamps in chronological order ensuring no duplicates (hh:mm:ss format)
     const masterTimeDataset = Array.from(new Set([
+        matchDetails.startTime, // baseTime in hh:mm:ss format to be included inside the masterTimeDataset
         ...scoreHistory.map((d) => d.time),
         ...(heartRateOneFormatted ? heartRateOneFormatted.map((d) => d.time) : []),
         ...(heartRateTwoFormatted ? heartRateTwoFormatted.map((d) => d.time) : [])
     ])).sort();
-   
+
     
     // Converting masterTimeDataset into unix time to be used as x axis tick values
     const xAxisTicks = masterTimeDataset.map(time => new Date(`1970-01-01T${time}`).getTime());
@@ -92,11 +81,40 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
     const yAxisWidth = 50;
     const legendHeight = 1; // Seems to be the best value to maximise the graph height
 
+
+    // Generating Y Axis ticks from available heart rate data
+    function generateYAxisTicks(datasetOne, datasetTwo){
+        const combinedDataset = [
+            ...(datasetOne.map((d) => d.value) || []),
+            ...(datasetTwo.map((d) => d.value) || []),
+        ];
+        console.log("combinedDataset:");        
+        console.log(combinedDataset);
+      
+        // Handling the scenario where there are no HR datasets
+        if (combinedDataset.length === 0) {
+            return [];
+        }
+      
+        // Calculating overall min and max values and round to nearest multiple of 10
+        const roundedMin = Math.floor(Math.min(...combinedDataset) / 10) * 10;
+        const roundedMax = Math.ceil(Math.max(...combinedDataset) / 10) * 10;
+      
+        // Generating the Y Axis Ticks
+        const yAxisTicks = [];
+        for (let i = roundedMin; i <= roundedMax; i += 10) {
+            yAxisTicks.push(i);
+        }
+      
+        return yAxisTicks;
+    };
+    const yAxisTicks = generateYAxisTicks(heartRateOneFormatted, heartRateTwoFormatted);
+
+
     // Using custom payload to remove score key and add custom names/colours to line keys
     const legendPayload = [];
     if (heartRateOneFormatted) {
         legendPayload.push({ value: players[0].name, type: "line", id: "heartRateOne", color: players[0].colour });
-        
     }
     if (heartRateTwoFormatted) {
         legendPayload.push({ value: players[1].name, type: "line", id: "heartRateTwo", color: players[1].colour });
@@ -126,21 +144,21 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                     tick={{fill: "white"}}
                     tickLine={{ stroke: "white", strokeWidth: 1 }}
                     axisLine={{ stroke: "white", strokeWidth: 1 }}
-                    interval={xAxisInterval} // FIX: not showing all ticks when no HR data is present (i.e. just scoring data)
+                    interval={"preserveStartEnd"}
                 />
                 <YAxis 
-                    domain={['dataMin - 10', 'dataMax + 10']}
-                    orientation="left"
-                    tick={{fill: "white"}}
-                    tickLine={{ stroke: "white", strokeWidth: 1 }}
-                    axisLine={{ stroke: "white", strokeWidth: 1 }}
-                    width={yAxisWidth}
                     label={{
                         value: "Heart Rate (bpm)",
                         angle: -90,
                         position: "insideLeft",
                         style: { textAnchor: "middle", fill: "white" }
                     }}
+                    domain={[yAxisTicks[0], yAxisTicks[yAxisTicks.length - 1]]}
+                    tick={{fill: "white"}}
+                    ticks={yAxisTicks}
+                    tickLine={{ stroke: "white", strokeWidth: 1 }}
+                    axisLine={{ stroke: "white", strokeWidth: 1 }}
+                    width={yAxisWidth}
                 />
 
                 {/* Tooltips */}
@@ -162,11 +180,7 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                         const heartRateTwoText = payload.find((item) => item.dataKey === "heartRateTwo");
 
                         return (
-                            <div style={{ backgroundColor: "lightgrey", color: "black", border: "1px solid black", padding: "5px" }}>
-                                {
-                                    // TODO (awaiting feedback): if total unifiedDataset.length > X, only render tooltips for scoreBarData
-                                }
-                                
+                            <div style={{ backgroundColor: "lightgrey", color: "black", border: "1px solid black", padding: "5px" }}>                                
                                 {/* Scoring Bar Tooltip */}
                                 {scoreBarData && (
                                     <>
@@ -174,7 +188,6 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                                         <p>{`Duration: ${minutes !== 0 ? `${minutes}m ` : ""}${secondsOnly}s`}</p>
                                     </>
                                 )}
-
                                 {/* Heart Rate Tooltip */}
                                 {heartRateOneText && <p>{`${players[0].name} HR: ${heartRateOneText.value}`}</p>}
                                 {heartRateTwoText && <p>{`${players[1].name} HR: ${heartRateTwoText.value}`}</p>}
@@ -203,10 +216,8 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                             const width = ((payload.time - payload.prevTime) / (lastTime - baseTime)) * (chartWidth - yAxisWidth ) - barBorder;
                             
                             // Don't render any bars if nobody has won a point
-                            if (!payload.player || width <= 0) {
-                                return null; // Skip this bar
-                            }
-
+                            if (!payload.player || width <= 0) return null;
+                            
                             return (
                                 <g>
                                     <rect

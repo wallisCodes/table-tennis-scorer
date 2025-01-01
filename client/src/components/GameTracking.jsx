@@ -137,42 +137,51 @@ export default function GameTracking({
     const [winner, setWinner] = useState(null);
     const [showWinner, setShowWinner] = useState(false);
     const [modal, setModal] = useState(false); // Modal for receiver to choose extra points played if tied 14-14
-    const [receiversChoice, setReceiversChoice] = useState(0); 
-
+    const [receiversChoice, setReceiversChoice] = useState(0);
+    const [scoreCooldown, setScoreCooldown] = useState(false);
+    const shortCooldown = 1000;
+    const longCooldown = 3000;
 
     function updatePlayerPoints(playerIndex, increment = true){
-        setPlayers(prevPlayers => {
-            const updatedPlayers = [...prevPlayers]; // Creating shallow copy of players array
-
-            if (playerIndex >= 0 && playerIndex < updatedPlayers.length) {
-                const currentPoints = updatedPlayers[playerIndex].points;
-
-                // Only update points if no one has won yet or if decrementing
-                if ((!winner) || !increment) {
-                    const newPoints = increment
-                        ? currentPoints + 1
-                        : Math.max(0, currentPoints - 1);
-
-                    updatedPlayers[playerIndex] = { ...updatedPlayers[playerIndex], points: newPoints };
+        // Only update scores if they haven't been updated within [cooldownDuration] ms
+        if (!scoreCooldown){
+            // Update individual player inside players state with latest points
+            setPlayers(prevPlayers => {
+                const updatedPlayers = [...prevPlayers]; // Creating shallow copy of players array
+    
+                if (playerIndex >= 0 && playerIndex < updatedPlayers.length) {
+                    const currentPoints = updatedPlayers[playerIndex].points;
+    
+                    // Only update points if no one has won yet or if decrementing
+                    if ((!winner) || !increment) {
+                        const newPoints = increment ? currentPoints + 1 : Math.max(0, currentPoints - 1);
+                        updatedPlayers[playerIndex] = {
+                            ...updatedPlayers[playerIndex],
+                            points: newPoints
+                        };
+                    }
                 }
+                return updatedPlayers;
+            });
+    
+            // If incrementing points, also add entry to scoreHistory
+            if (increment) {
+                const currentTime = getCurrentTime();
+                setScoreHistory(prevScoreHistory => [
+                    ...prevScoreHistory,
+                    {
+                        player: `P${playerIndex + 1}`,
+                        time: currentTime
+                    }
+                ]);
+            
+            // If decrementing points and points are non-zero, remove latest entry from scoreHistory
+            } else if (!increment && players[playerIndex].points > 0) {
+                setScoreHistory(prevScoreHistory => prevScoreHistory.slice(0, -1));
             }
-            return updatedPlayers;
-        });
 
-        // If incrementing points
-        if (increment) {
-            const currentTime = getCurrentTime();
-            setScoreHistory(prevScoreHistory => [
-                ...prevScoreHistory,
-                {
-                    player: `P${playerIndex + 1}`,
-                    time: currentTime
-                }
-            ]);
-        
-        // If decrementing points and points are non-zero
-        } else if (!increment && players[playerIndex].points > 0) {
-            setScoreHistory(prevScoreHistory => prevScoreHistory.slice(0, -1));
+            setScoreCooldown(true);
+            setTimeout(() => setScoreCooldown(false), longCooldown);
         }
     };
 
@@ -249,8 +258,8 @@ export default function GameTracking({
 
 
     function startMatch(){
-        // setMatchStatus("active");
         matchStatus.current = "active";
+        setScoreCooldown(true);
         // Record start of match in matchDetails
         const currentTime = getCurrentTime();
         const [currentDateText, currentDate] = getCurrentDate();
@@ -260,11 +269,11 @@ export default function GameTracking({
             date: currentDate,
             dateText: currentDateText
         });
+        setTimeout(() => setScoreCooldown(false), shortCooldown);
     }
 
 
     function finishMatch(){
-        // setMatchStatus("complete");
         matchStatus.current = "complete";
         // Record end of match in matchDetails
         const currentTime = getCurrentTime();
@@ -275,7 +284,7 @@ export default function GameTracking({
             duration: matchDuration,
             durationText: matchDurationText
         });
-        // toResults();
+        toResults();
     }
 
 
@@ -303,7 +312,7 @@ export default function GameTracking({
                 
 
                 {/* First player/team display */}
-                <ul className="player-one">
+                <div className="player-one">
                     {/* Player name, colour and score */}
                     <div className="player-details">
                         <div className="player-one-banner">
@@ -323,11 +332,11 @@ export default function GameTracking({
                                         </div>
                                     </div>
                                     ) : (
-                                    <div>
+                                    <div className="score-container">
                                         <div className="player-points">
-                                            <span onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0} className="score-minus">-</span>
-                                            <span>{players[0].points}</span>
-                                            <span onClick={() => updatePlayerPoints(0, true)} className="score-plus">+</span>
+                                            <button onClick={() => updatePlayerPoints(0, false)} disabled={players[0].points === 0 || scoreCooldown} className="score-minus">-</button>
+                                            <div className="score-value">{players[0].points}</div>
+                                            <button onClick={() => updatePlayerPoints(0, true)} disabled={scoreCooldown} className="score-plus">+</button>
                                         </div>
                                         <div className="recent-points">{recentPointsP1}</div>
                                     </div>
@@ -339,7 +348,7 @@ export default function GameTracking({
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne.length > 0 ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <div className="heart-rate-box" style={(deviceStatusOne === "connected" || mockData) && heartRateOne.length > 0 ? (chooseBackgroundColor(calcHRPercent(heartRateOne[heartRateOne.length - 1].value, players[0].age))) : ({backgroundColor: "#c2cbca"})}>
                         {deviceInitialisedOne || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
@@ -407,12 +416,12 @@ export default function GameTracking({
                             ) : (
                             <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensorOne}>Connect HR Monitor</button>
                         )}
-                    </li>
-                </ul>
+                    </div>
+                </div>
 
                 
                 {/* Second player/team display */}
-                <ul className="player-two">
+                <div className="player-two">
                     {/* Player name, colour and score */}
                     <div className="player-details">
                         <div className="player-two-banner">
@@ -430,11 +439,11 @@ export default function GameTracking({
                                     </div>
                                 </div>
                                 ) : (
-                                <div>
+                                <div className="score-container">
                                     <div className="player-points">
-                                        <span onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0} className="score-minus">-</span>
-                                        <span>{players[1].points}</span>
-                                        <span onClick={() => updatePlayerPoints(1, true)} className="score-plus">+</span>
+                                        <button onClick={() => updatePlayerPoints(1, false)} disabled={players[1].points === 0 || scoreCooldown} className="score-minus">-</button>
+                                        <div className="score-value">{players[1].points}</div>
+                                        <button onClick={() => updatePlayerPoints(1, true)} disabled={scoreCooldown} className="score-plus">+</button>
                                     </div>
                                     <div className="recent-points">{recentPointsP2}</div>
                                 </div>
@@ -444,7 +453,7 @@ export default function GameTracking({
                     </div>
                     
                     {/* Heart rate display */}
-                    <li className="heart-rate-box" style={(deviceStatusTwo === "connected" || mockData) && heartRateTwo.length > 0 ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
+                    <div className="heart-rate-box" style={(deviceStatusTwo === "connected" || mockData) && heartRateTwo.length > 0 ? (chooseBackgroundColor(calcHRPercent(heartRateTwo[heartRateTwo.length - 1].value, players[1].age))) : ({backgroundColor: "#c2cbca"})}>
                         {deviceInitialisedTwo || mockData ? (
                             <div className="player-heart-rate">
                                 <div className="bluetooth-buttons">                                  
@@ -512,11 +521,11 @@ export default function GameTracking({
                             ) : (
                             <button className="bluetooth-connect-btn" onClick={connectToHeartRateSensorTwo}>Connect HR Monitor</button>
                         )}
-                    </li>
-                </ul>
+                    </div>
+                </div>
 
                 {/* Results button, only render if the match is either active or complete AND at least one type of data is available */}
-                {(matchStatus != "pending" && (scoreHistory.length > 0 || heartRateOne.length > 0 || heartRateTwo.length > 0)) &&
+                {(matchStatus.current != "pending" && (scoreHistory.length > 0 || heartRateOne.length > 0 || heartRateTwo.length > 0)) &&
                     <svg onClick={toResults} className="next-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1z" fillRule="nonzero"/>
                     </svg>

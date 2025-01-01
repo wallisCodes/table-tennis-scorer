@@ -38,67 +38,7 @@ export default function GeneralForm({matchDetails, setMatchDetails, toScores, pl
                             <option value="badminton">Badminton</option>
                             {/* <option value="tennis">Tennis</option> */}
                         </select>
-                    </div>
-
-                    <legend className="">Match Type</legend>
-                    <input 
-                        type="radio"
-                        id="singles"
-                        name="matchType"
-                        value="singles"
-                        checked={matchDetails.matchType === "singles"}
-                        onChange={(e) => setMatchDetails({
-                            ...matchDetails,
-                            matchType: e.target.value
-                        })}
-                    />
-                    <label htmlFor="singles" className="">Singles</label>
-                    <br />
-
-                    <input 
-                        type="radio"
-                        id="doubles"
-                        name="matchType"
-                        value="doubles"
-                        checked={matchDetails.matchType === "doubles"}
-                        onChange={(e) => setMatchDetails({
-                            ...matchDetails,
-                            matchType: e.target.value
-                        })}
-                        disabled
-                    />
-                    <label htmlFor="doubles" className="">Doubles</label>
-                    <br />
-
-                    <legend className="">Match Format</legend>
-                    <input 
-                        type="radio"
-                        id="bo1"
-                        name="bestOf"
-                        value="1"
-                        checked={matchDetails.bestOf === "1"}
-                        onChange={(e) => setMatchDetails({
-                            ...matchDetails,
-                            bestOf: e.target.value
-                        })}
-                    />
-                    <label htmlFor="bo1" className="">Best of 1</label>
-                    <br />
-
-                    <input 
-                        type="radio"
-                        id="bo3"
-                        name="bestOf"
-                        value="3"
-                        checked={matchDetails.bestOf === "3"}
-                        onChange={(e) => setMatchDetails({
-                            ...matchDetails,
-                            bestOf: e.target.value
-                        })}
-                        disabled
-                    />
-                    <label htmlFor="bo3" className="">Best of 3</label>
-                    <br />
+                    </div>                    
                 </fieldset>   
                 <button className="">Start Game</button>
             </form>
