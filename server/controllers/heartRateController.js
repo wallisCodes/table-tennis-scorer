@@ -13,7 +13,25 @@ export const addHeartRate = async (req, res) => {
         });
         res.status(201).json(newHeartRate);
     } catch (error) {
-        res.status(400).json({ error: 'Error adding heart rate data' });
+        res.status(500).json({ error: 'Error adding heart rate data' });
+    }
+};
+
+export const addHeartRateBatch = async (req, res) => {
+    const { matchId, playerId } = req.params;
+    const heartRates = req.body; // Expect an array of { time, value }
+  
+    try {
+        const records = heartRates.map((hr) => ({
+            ...hr,
+            matchId,
+            playerId,
+        }));
+        
+        await HeartRate.bulkCreate(records);
+        res.status(201).json({ message: 'Heart rate batch data saved successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save heart rate batch data' });
     }
 };
 

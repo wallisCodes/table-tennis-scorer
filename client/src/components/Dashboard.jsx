@@ -1,44 +1,55 @@
 import { useState, useEffect } from "react";
 
-export default function Dashboard({toResults, heartRateOne}){
+export default function Dashboard({toResults, scoreHistory, heartRateOne}){
     // ==================== TESTING FETCH REQUESTS ====================
     const [nonGetRequestCount, setNonGetRequestCount] = useState(0);
     const [allPlayers, setAllPlayers] = useState([]);
     const [newPlayer, setNewPlayer] = useState({ name: "", age: "", colour: "" });
     const [playerIdToDelete, setPlayerIdToDelete] = useState("");
+    const matchId = 1;
+    const playerId = 1;
 
+    const mockPlayersData = [
+        {
+            name: "Wallis",
+            age: 28,
+            colour: "#464646"
+        },
+        {
+            name: "Lau",
+            age: 56,
+            colour: "#535353"
+        }
+    ];
 
     async function readPlayerData(){
         const url = "http://localhost:3000/api/players";
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Failed to read players: ${response.status}`);
             }
             const players = await response.json();           
             setAllPlayers(players);
             console.log("Players loaded successfully.");
 
         } catch (error) {
-            console.error(error.message);
+            console.error('Error:', error.message);
         }
     }
 
 
     async function createPlayer(){
-        const url = "http://localhost:3000/api/players"
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
+        const url = "http://localhost:3000/api/players";
         try {
             const response = await fetch(url, {
                 method: "POST",
-                body: JSON.stringify(newPlayer),
-                headers: myHeaders,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newPlayer)
             });
             
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                throw new Error(`Failed to create player: ${response.status}`);
             }
             const player = await response.json();
             console.log(`JSON response: ${JSON.stringify(player)}`);
@@ -48,36 +59,70 @@ export default function Dashboard({toResults, heartRateOne}){
             setNewPlayer({ name: "", age: "", colour: "" }); // clear input
 
         } catch (error) {
-            console.error(error.message);
+            console.error('Error:', error.message);
+        }
+    }
+
+    async function createPlayers(){
+        // console.log("Function called: createPlayers()");
+        const url = `http://localhost:3000/api/players/batch`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mockPlayersData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to create player batch records: ${response.status}`);
+            }
+            const batch = await response.json();
+            setNonGetRequestCount(count => count + 1);
+            console.log(`JSON response: ${JSON.stringify(batch)}`);
+            console.log("Success! Player batch added to database.");
+
+        } catch (error) {
+            console.error('Error:', error.message);
         }
     }
 
 
     async function deleteSinglePlayer(){
         try {
-            await fetch(`http://localhost:3000/api/players/${playerIdToDelete}`, {
-                method: 'DELETE',
+            const response = await fetch(`http://localhost:3000/api/players/${playerIdToDelete}`, {
+                method: 'DELETE'
             });
             
-            console.log("Success! Player deleted from database.");
+            if (!response.ok) {
+                throw new Error(`Failed to delete player: ${response.status}`);
+            }
+
+            console.log(`Player with ID ${playerIdToDelete} deleted successfully.`);
             setNonGetRequestCount(count => count + 1);
             setPlayerIdToDelete(""); // clear input
         } catch (error) {
-            console.error('Error deleting player:', error);
+            console.error('Error:', error.message);
         }
     }    
 
 
     async function deleteAllPlayers(){
         try {
-            await fetch('http://localhost:3000/api/players', {
-                method: 'DELETE',
+            const response = await fetch('http://localhost:3000/api/players', {
+                method: 'DELETE'
             });
-            // setAllPlayers([]); // clear the players list
+
+            if (!response.ok) {
+                console.log("response not OK");
+                throw new Error(`Failed to delete all players: ${response.status}`);
+            }
+
             console.log("Success! ALL players deleted from database.");
             setNonGetRequestCount(count => count + 1);
         } catch (error) {
-            console.error('Error deleting all players:', error);
+            console.log("Error caught.");
+            console.error('Error:', error.message);
         }
     }
 
@@ -112,10 +157,153 @@ export default function Dashboard({toResults, heartRateOne}){
         );
     }
 
-    // Goal: rerun playersTable whenever
+    // Re-render playersTable whenever a http request is triggered (excluding GET requests)
     useEffect(() => {
         readPlayerData();
     }, [nonGetRequestCount]);
+
+
+
+    // ========================== MATCH TESTING ========================== //
+    async function createMatch() {
+        const mockMatchData = {
+            sport: 'table-tennis',
+            date: Math.floor(Date.now() / 1000), // Unix timestamp for the current date
+            startTime: new Date().toLocaleTimeString('en-GB', { hour12: false }) // HH:mm:ss format
+        };
+      
+        try {
+            const response = await fetch('http://localhost:3000/api/matches', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mockMatchData)
+            });
+      
+            if (response.ok) {
+                const newMatch = await response.json();
+                console.log('Match created:', newMatch);
+            } else {
+                console.error('Failed to create match');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+
+    async function updateMatch() {
+        const mockUpdatedData = {
+            endTime: new Date().toLocaleTimeString('en-GB', { hour12: false }),
+            matchDuration: 3600, // Example duration in seconds
+            winnerId: 1 // Example player ID
+        };
+      
+        try {
+            const response = await fetch(`http://localhost:3000/api/matches/${matchId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mockUpdatedData)
+            });
+        
+            if (response.ok) {
+                const updatedMatch = await response.json();
+                console.log('Match updated:', updatedMatch);
+            } else {
+                console.error('Failed to update match');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+
+
+    // ========================== SCORE HISTORY TESTING ========================== //
+    async function createScoreHistory() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/score-history/${matchId}/${playerId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(scoreHistory[0])
+            });
+        
+            if (!response.ok) {
+                throw new Error(`Failed to create score history record: ${response.status}`);
+            }
+        
+            console.log('Score history record created successfully.');
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
+      
+    async function createScoreHistoryBatch() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/score-history/${matchId}/${playerId}/batch`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(scoreHistory)
+            });
+        
+            if (!response.ok) {
+                throw new Error(`Failed to create score history batch: ${response.status}`);
+            }
+        
+            console.log('Score history batch created successfully.');
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
+
+
+
+    // ========================== HEART RATE TESTING ========================== //
+    async function createHeartRate(){
+        // console.log("Function called: createHeartRate()");
+        const url = `http://localhost:3000/api/heart-rate/${matchId}/${playerId}`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(heartRateOne[0]) // use first value for testing purposes
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to create heart rate record: ${response.status}`);
+            }
+            const singular = await response.json();
+            console.log(`JSON response: ${JSON.stringify(singular)}`);
+            console.log("Success! Singular HR record added to database.");
+            
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
+
+    
+    async function createHeartRateBatch(){
+        console.log("Function called: createHeartRateBatch()");
+        const url = `http://localhost:3000/api/heart-rate/${matchId}/${playerId}/batch`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(heartRateOne)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to create heart rate batch: ${response.status}`);
+            }
+            const batch = await response.json();
+            console.log(`JSON response: ${JSON.stringify(batch)}`);
+            console.log("Success! HR batch added to database.");
+
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
 
 
     return (
@@ -154,6 +342,12 @@ export default function Dashboard({toResults, heartRateOne}){
                     <button onClick={createPlayer} className="block-button">Add Player</button>
                 </div>
 
+                {/* Create two players */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">POST/ADD two players</h3>
+                    <button onClick={createPlayers} className="block-button">Add TWO Players</button>
+                </div>
+
                 {/* Deleting specific player from the database */}
                 <div className="dashboard-test-block">
                     <h3 className="block-title">DELETE specific player</h3>
@@ -178,6 +372,48 @@ export default function Dashboard({toResults, heartRateOne}){
                 <h3 className="block-title">GET/RETRIEVE all players</h3>
                 <button onClick={readPlayerData} className="block-button">Get Players</button>
                 {playersTable(allPlayers)}
+            </div>
+
+            <div className="block-row-container">
+                {/* Create match */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">POST/ADD match</h3>
+                    <button onClick={createMatch} className="block-button">Add Match</button>
+                </div>
+            
+                {/* Update match inside db */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">UPDATE match</h3>
+                    <button onClick={() => updateMatch(matchId)} className="block-button">Update Match</button>
+                </div>
+            </div>
+
+            <div className="block-row-container">
+                {/* Create single score record from scoreHistory data */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">POST/ADD single score record</h3>
+                    <button onClick={createScoreHistory} className="block-button">Add Score</button>
+                </div>
+
+                {/* Create multiple score records from scoreHistory data */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">POST/ADD score history batch</h3>
+                    <button onClick={createScoreHistoryBatch} className="block-button">Add Score Batch</button>
+                </div>
+            </div>
+
+            <div className="block-row-container">
+                {/* Create single HR record from heartRateOne data */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">POST/ADD heart rate</h3>
+                    <button onClick={createHeartRate} className="block-button">Add HR</button>
+                </div>
+
+                {/* Create batched HR record from heartRateOne data */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">POST/ADD heart rate batch</h3>
+                    <button onClick={createHeartRateBatch} className="block-button">Add HR Batch</button>
+                </div>
             </div>
         </div>
     )

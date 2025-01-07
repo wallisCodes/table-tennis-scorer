@@ -10,16 +10,18 @@ HeartRate.init(
             references: {
                 model: 'matches',
                 key: 'id'
-            }
+            },
+            field: 'match_id'
         },
         playerId: {
             type: DataTypes.INTEGER,
             references: {
                 model: 'players',
                 key: 'id'
-            }
+            },
+            field: 'player_id'
         },
-        time: DataTypes.DATE,
+        time: DataTypes.STRING,
         value: DataTypes.INTEGER
     },
     {

@@ -59,15 +59,15 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
         
         // Add "prevTime" attribute wherever a point was won by someone and set it to the timestamp 
         // ...of the previous point winner or the very first timestamp for the first point
-        const prevTimestamp = scoringData?.player ? latestTimestamp : null;
-        if (scoringData?.player) {
+        const prevTimestamp = scoringData?.winner ? latestTimestamp : null;
+        if (scoringData?.winner) {
             latestTimestamp = timestamp; // Update latestTimestamp for the next entry
         }
     
         return {
             time: timestamp,
             prevTime: prevTimestamp,
-            player: scoringData?.player || null,
+            winner: scoringData?.winner || null,
             heartRateOne: hrOneData?.value || null,
             heartRateTwo: hrTwoData?.value || null,
         };
@@ -88,8 +88,6 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
             ...(datasetOne.map((d) => d.value) || []),
             ...(datasetTwo.map((d) => d.value) || []),
         ];
-        console.log("combinedDataset:");        
-        console.log(combinedDataset);
       
         // Handling the scenario where there are no HR datasets
         if (combinedDataset.length === 0) {
@@ -167,7 +165,7 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                         if (!active || !payload || payload.length === 0) return null;
 
                         // Extract scoring bar data (if present)
-                        const scoreBarData = payload.find((item) => item.dataKey === "player");
+                        const scoreBarData = payload.find((item) => item.dataKey === "winner");
 
                         // Calculate duration only if scoreBarData exists
                         const durationInSeconds = (scoreBarData?.payload.time - scoreBarData?.payload.prevTime) / 1000;
@@ -184,7 +182,7 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                                 {/* Scoring Bar Tooltip */}
                                 {scoreBarData && (
                                     <>
-                                        <p>{`Point winner: ${scoreBarData.payload.player === "P1" ? players[0].name : players[1].name}`}</p>                                        
+                                        <p>{`Point winner: ${scoreBarData.payload.winner === "P1" ? players[0].name : players[1].name}`}</p>                                        
                                         <p>{`Duration: ${minutes !== 0 ? `${minutes}m ` : ""}${secondsOnly}s`}</p>
                                     </>
                                 )}
@@ -205,18 +203,18 @@ export default function CombinedGraph({ matchDetails, matchStatus, players, hear
                 {/* Only start generating bars when scoreHistory has data to be displayed */}
                 {scoreHistory.length > 0 && (
                     <Bar 
-                        dataKey="player"
+                        dataKey="winner"
                         name="point winner"
                         shape={({ payload, index }) => {
                             const barBorder = 1;
                             const barHeight = chartHeight - xAxisHeight - legendHeight;
                             // appending "4D" to hex colour string to add 30% opacity
-                            const barColor = payload.player === "P1" ? `${players[0].colour}4D` : payload.player === "P2" ? `${players[1].colour}4D` : "transparent"
+                            const barColor = payload.winner === "P1" ? `${players[0].colour}4D` : payload.winner === "P2" ? `${players[1].colour}4D` : "transparent"
                             const x = ((payload.prevTime - baseTime) / (lastTime - baseTime)) * (chartWidth - yAxisWidth) + yAxisWidth;
                             const width = ((payload.time - payload.prevTime) / (lastTime - baseTime)) * (chartWidth - yAxisWidth ) - barBorder;
                             
                             // Don't render any bars if nobody has won a point
-                            if (!payload.player || width <= 0) return null;
+                            if (!payload.winner || width <= 0) return null;
                             
                             return (
                                 <g>

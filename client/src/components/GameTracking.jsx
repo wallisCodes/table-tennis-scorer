@@ -77,7 +77,7 @@ export default function GameTracking({
     }
 
     // Get current date in text (for displaying) and numeric formats (for filtering) for Dashboard
-    function getCurrentDate(){
+    function getCurrentDateText(){
         const weekdayArray = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const dayArray = [
             "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
@@ -96,17 +96,28 @@ export default function GameTracking({
         const year = fullDate.getFullYear();
         
         const currentDateText = `${weekdayText} ${dayText} ${monthText}, ${year}`;
-        const currentDate = fullDate.getTime();
+        // const currentDate = fullDate.getTime();
         
-        return [currentDateText, currentDate];
+        return currentDateText;
     }
 
-    // Calculate match duration from matchDetails start and end times (in hh:mm:ss format)
+
+    // Calculate match duration as a unix timestamp from matchDetails start and end times
     function getMatchDuration(start, finish){
         const startTimestamp = new Date(`1970-01-01T${start}`).getTime();
         const finishTimestamp = new Date(`1970-01-01T${finish}`).getTime();
         const duration = new Date(finishTimestamp - startTimestamp);
         const matchDuration = duration.getTime(); // unix timestamp value in ms
+
+        return matchDuration;
+    }
+
+
+    // Calculate match duration in text format from matchDetails start and end times (will be used in Dashboard)
+    function getMatchDurationText(start, finish){
+        const startTimestamp = new Date(`1970-01-01T${start}`).getTime();
+        const finishTimestamp = new Date(`1970-01-01T${finish}`).getTime();
+        const duration = new Date(finishTimestamp - startTimestamp);
 
         // Important to use UTC time here when displaying match duration to ignore daylight savings time offset
         const hours = duration.getUTCHours();
@@ -129,7 +140,7 @@ export default function GameTracking({
             matchDurationText = `${seconds} second${seconds > 1 ? "s" : ""}`;
         }
 
-        return [matchDurationText, matchDuration]
+        return matchDurationText;
     }
 
 
@@ -140,7 +151,7 @@ export default function GameTracking({
     const [receiversChoice, setReceiversChoice] = useState(0);
     const [scoreCooldown, setScoreCooldown] = useState(false);
     const shortCooldown = 1000;
-    const longCooldown = 3000;
+    const longCooldown = 1000; // TODO: change back to 3000
 
     function updatePlayerPoints(playerIndex, increment = true){
         // Only update scores if they haven't been updated within [cooldownDuration] ms
@@ -170,7 +181,7 @@ export default function GameTracking({
                 setScoreHistory(prevScoreHistory => [
                     ...prevScoreHistory,
                     {
-                        player: `P${playerIndex + 1}`,
+                        winner: `P${playerIndex + 1}`,
                         time: currentTime
                     }
                 ]);
@@ -189,7 +200,7 @@ export default function GameTracking({
     function promptReceiver(){
         setTimeout(() => {
             setModal(true);
-          }, "200");       
+        }, "200");       
     }
 
 
@@ -253,8 +264,8 @@ export default function GameTracking({
     
     // Generating dots for last 5 points
     const lastFivePoints = scoreHistory.slice(-5);
-    const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.player === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
-    const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.player === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
+    const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.winner === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
+    const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.winner === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
 
 
     function startMatch(){
@@ -262,12 +273,13 @@ export default function GameTracking({
         setScoreCooldown(true);
         // Record start of match in matchDetails
         const currentTime = getCurrentTime();
-        const [currentDateText, currentDate] = getCurrentDate();
+        const currentDate = new Date().getTime();
+        // Testing
+        console.log(`currentDateText: ${getCurrentDateText()}`);
         setMatchDetails({
             ...matchDetails,
-            startTime: currentTime,
             date: currentDate,
-            dateText: currentDateText
+            startTime: currentTime
         });
         setTimeout(() => setScoreCooldown(false), shortCooldown);
     }
@@ -277,12 +289,11 @@ export default function GameTracking({
         matchStatus.current = "complete";
         // Record end of match in matchDetails
         const currentTime = getCurrentTime();
-        const [matchDurationText, matchDuration] = getMatchDuration(matchDetails.startTime, currentTime);
+        const matchDuration = getMatchDuration(matchDetails.startTime, currentTime);
         setMatchDetails({
             ...matchDetails,
             endTime: currentTime,
-            duration: matchDuration,
-            durationText: matchDurationText
+            duration: matchDuration
         });
         toResults();
     }

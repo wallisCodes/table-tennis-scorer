@@ -10,17 +10,19 @@ ScoreHistory.init(
             references: {
                 model: 'matches',
                 key: 'id'
-            }
+            },
+            field: 'match_id'
         },
         playerId: {
             type: DataTypes.INTEGER,
             references: {
                 model: 'players',
                 key: 'id'
-            }
+            },
+            field: 'player_id'
         },
-        timestamp: DataTypes.DATE,
-        scoreEvent: DataTypes.JSONB // Flexible format for event details
+        time: DataTypes.STRING,
+        winner: DataTypes.STRING
     },
     {
         sequelize,

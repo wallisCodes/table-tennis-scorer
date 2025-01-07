@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function PlayerForm({players, addPlayer, matchDetails}){
+export default function PlayerForm({players, addPlayer}){
     const [name, setName] = useState("");
     const [age, setAge] = useState("");
     const [colour, setColour] = useState("#000000");
@@ -9,14 +9,13 @@ export default function PlayerForm({players, addPlayer, matchDetails}){
         event.preventDefault();
         addPlayer(name, age, colour);
 
+        // Resetting form inputs after adding player
         setName("");
         setAge("");
         setColour("#000000");
-        // console.log(`players array: ${JSON.stringify(players)}`);
     }
 
 
-    
     return (
         <>
             <form onSubmit={handleSubmit} className=""> 
@@ -57,7 +56,7 @@ export default function PlayerForm({players, addPlayer, matchDetails}){
                             required
                         />
                     </div>
-                    <button className="" disabled={matchDetails.matchType === "singles" ? players.length >= 2 : players.length >= 4}>Add Player</button>
+                    <button className="" disabled={players.length >= 2}>Add Player</button>
                 </fieldset>
             </form>
         </>

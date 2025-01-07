@@ -13,33 +13,31 @@ export default function App(){
         {
             sport: "table-tennis",
             date: null, // Unix timestamp, used for filtering in dashboard
-            dateText: null, // Displayed in dashboard
             startTime: null, // hh:mm:ss format
             endTime: null, // hh:mm:ss format
             duration: null, // Unix timestamp, used for filtering in dashboard
-            durationText: null, // Displayed in dashboard (hours and minutes)
         }
     );
     const matchStatus = useRef("pending"); // pending, active or complete
-    const [players, setPlayers] = useState([]);
-    // const [players, setPlayers] = useState([ // for testing purposes
-    //     {
-    //         id: uuidv4(),
-    //         name: "Wallis",
-    //         age: 28,
-    //         colour: "#ff00ff",
-    //         // serving: false, // maybe implemented later
-    //         points: 0,
-    //     },
-    //     {
-    //         id: uuidv4(),
-    //         name: "Lau",
-    //         age: 56,
-    //         colour: "#00ff00",
-    //         // serving: false, // maybe implemented later
-    //         points: 0,
-    //     }
-    // ]);
+    // const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([ // for testing purposes
+        {
+            id: uuidv4(),
+            name: "Wallis",
+            age: 28,
+            colour: "#ff00ff",
+            // serving: false, // maybe implemented later
+            points: 0,
+        },
+        {
+            id: uuidv4(),
+            name: "Lau",
+            age: 56,
+            colour: "#00ff00",
+            // serving: false, // maybe implemented later
+            points: 0,
+        }
+    ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     const [display, setDisplay] = useState("input");
 
@@ -105,8 +103,8 @@ export default function App(){
 
 
     // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(false);
-    // const [mockData, setMockData] = useState(true);
+    // const [mockData, setMockData] = useState(false);
+    const [mockData, setMockData] = useState(true);
 
     if (mockData === true){
         useEffect(() => {
@@ -133,10 +131,10 @@ export default function App(){
                 ]);
             }
             generateRandomHRValues(109, 181);
-        
+
             const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
                 generateRandomHRValues(109, 181);
-            }, 1000);
+            }, 30000);
     
             return () => clearInterval(int);
         }, []);
@@ -641,7 +639,6 @@ export default function App(){
                     <PlayerForm
                         players={players}
                         addPlayer={addPlayer}
-                        matchDetails={matchDetails}
                     />
                 </>
             }
@@ -706,7 +703,8 @@ export default function App(){
 
             {display === "dashboard" &&
                 <Dashboard
-                    toResults={toResults} 
+                    toResults={toResults}
+                    scoreHistory={scoreHistory} 
                     heartRateOne={heartRateOne}
                 />
             }

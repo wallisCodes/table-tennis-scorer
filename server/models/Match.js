@@ -6,14 +6,33 @@ class Match extends Model {}
 Match.init(
     {
         sport: DataTypes.STRING,
-        bestOf: DataTypes.INTEGER,
-        matchDuration: DataTypes.TIME,
+        date: {
+            type: DataTypes.INTEGER, // Unix timestamp format
+            allowNull: false
+        },
+        startTime: {
+            type: DataTypes.TIME, // hh:mm:ss format
+            allowNull: false,
+            field: 'start_time'
+        },
+        endTime: {
+            type: DataTypes.TIME, // hh:mm:ss format
+            allowNull: true,
+            field: 'end_time'
+        },
+        matchDuration: {
+            type: DataTypes.INTEGER, // Unix timestamp duration
+            allowNull: true,
+            field: 'match_duration'
+        },
         winnerId: {
             type: DataTypes.INTEGER,
+            allowNull: true,
             references: {
                 model: 'players',
                 key: 'id'
-            }
+            },
+            field: 'winner_id'
         }
     },
     {

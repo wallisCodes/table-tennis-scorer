@@ -7,7 +7,7 @@ Player.init(
     {
         name: DataTypes.STRING,
         age: DataTypes.INTEGER,
-        colour: DataTypes.STRING // HEX color
+        colour: DataTypes.STRING // HEX colour
     },
     {
         sequelize,
