@@ -9,6 +9,7 @@ MatchPlayer.init(
     {
         matchId: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
                 model: 'matches',
                 key: 'id'
@@ -17,6 +18,7 @@ MatchPlayer.init(
         },
         playerId: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
                 model: 'players',
                 key: 'id'
@@ -25,12 +27,13 @@ MatchPlayer.init(
         },
         finalScore: {
             type: DataTypes.INTEGER,
+            allowNull: true,
             field: 'final_score'
         }
     },
     {
         sequelize,
-        modelName: 'match_player',
+        modelName: 'matchPlayer',
         tableName: 'match_player'
     }
 );

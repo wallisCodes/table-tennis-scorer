@@ -14,6 +14,15 @@ export const createMatch = async (req, res) => {
     }
 };
 
+export const getAllMatches = async (req, res) => {
+    try {
+        const matches = await Match.findAll();
+        res.status(200).json(matches);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching matches' });
+    }
+};
+
 export const getMatchById = async (req, res) => {
     try {
         const match = await Match.findByPk(req.params.matchId);

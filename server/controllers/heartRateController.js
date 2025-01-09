@@ -2,23 +2,6 @@ import HeartRate from '../models/HeartRate.js';
 
 export const addHeartRate = async (req, res) => {
     const { matchId, playerId } = req.params;
-    const { time, value } = req.body;
-    
-    try {
-        const newHeartRate = await HeartRate.create({
-            matchId,
-            playerId,
-            time,
-            value
-        });
-        res.status(201).json(newHeartRate);
-    } catch (error) {
-        res.status(500).json({ error: 'Error adding heart rate data' });
-    }
-};
-
-export const addHeartRateBatch = async (req, res) => {
-    const { matchId, playerId } = req.params;
     const heartRates = req.body; // Expect an array of { time, value }
   
     try {
@@ -29,7 +12,7 @@ export const addHeartRateBatch = async (req, res) => {
         }));
         
         await HeartRate.bulkCreate(records);
-        res.status(201).json({ message: 'Heart rate batch data saved successfully' });
+        res.status(201).json(records);
     } catch (error) {
         res.status(500).json({ error: 'Failed to save heart rate batch data' });
     }

@@ -6,13 +6,13 @@ import './models/index.js';
 import sequelize from './config/database.js';
 import playerRoutes from "./routes/playerRoutes.js";
 import matchRoutes from "./routes/matchRoutes.js";
+import matchPlayerRoutes from "./routes/matchPlayerRoutes.js";
 import scoreHistoryRoutes from "./routes/scoreHistoryRoutes.js";
 import heartRateRoutes from "./routes/heartRateRoutes.js";
 
 const app = express();
 // app.use(cors());
 app.use(cors({
-    // origin: 'http://localhost:5173/table-tennis-scorer',
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type']
@@ -25,6 +25,7 @@ app.use(express.urlencoded({extended: true}));
 // /api included in path to make it obvious this is a backend API call
 app.use('/api/players', playerRoutes);
 app.use('/api/matches', matchRoutes);
+app.use('/api/match-player', matchPlayerRoutes);
 app.use('/api/score-history', scoreHistoryRoutes);
 app.use('/api/heart-rate', heartRateRoutes);
 

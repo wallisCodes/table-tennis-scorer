@@ -1,9 +1,10 @@
 import Player from '../models/Player.js';
 
 export const createPlayer = async (req, res) => {
+    const player = req.body;
     try {
-        const player = await Player.create(req.body);
-        res.status(201).json(player);
+        const newPlayer = await Player.create(player);
+        res.status(201).json(newPlayer);
     } catch (error) {
         res.status(500).json({ error: 'Error creating player' });
     }
@@ -11,7 +12,6 @@ export const createPlayer = async (req, res) => {
 
 export const createPlayers = async (req, res) => {
     const players = req.body; // Expecting an array of player objects
-  
     try {
         // Use bulkCreate to insert multiple players
         const newPlayers = await Player.bulkCreate(players);
