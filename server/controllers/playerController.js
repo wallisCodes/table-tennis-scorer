@@ -1,15 +1,5 @@
 import Player from '../models/Player.js';
 
-export const createPlayer = async (req, res) => {
-    const player = req.body;
-    try {
-        const newPlayer = await Player.create(player);
-        res.status(201).json(newPlayer);
-    } catch (error) {
-        res.status(500).json({ error: 'Error creating player' });
-    }
-};
-
 export const createPlayers = async (req, res) => {
     const players = req.body; // Expecting an array of player objects
     try {

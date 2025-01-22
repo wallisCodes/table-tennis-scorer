@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { addHeartRate, getHeartRateByPlayer } from '../controllers/heartRateController.js';
+import { createHeartRateBatch, getHeartRateByPlayer } from '../controllers/heartRateController.js';
 const router = Router();
 
-router.post('/:matchId/:playerId', addHeartRate);
+router.post('/:matchId/:playerId', createHeartRateBatch);
 router.get('/:matchId/:playerId', getHeartRateByPlayer);
 
 export default router;

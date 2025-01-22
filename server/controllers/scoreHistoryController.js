@@ -1,14 +1,13 @@
 import ScoreHistory from '../models/ScoreHistory.js';
 
-export const addScoreEvent = async (req, res) => {
-    const { matchId, playerId } = req.params;
+export const createScoringBatch = async (req, res) => {
+    const { matchId } = req.params;
     const scoreEvents = req.body; // Expecting an array of score events
   
     try {
         const records = scoreEvents.map((event) => ({
             ...event,
-            matchId,
-            playerId
+            matchId
         }));
     
         // Use bulkCreate to insert multiple records at once
@@ -19,6 +18,7 @@ export const addScoreEvent = async (req, res) => {
     }
 };
 
+// Retrieve score history for a particular match
 export const getScoreHistory = async (req, res) => {
     const { matchId } = req.params;
     

@@ -1,6 +1,6 @@
 import HeartRate from '../models/HeartRate.js';
 
-export const addHeartRate = async (req, res) => {
+export const createHeartRateBatch = async (req, res) => {
     const { matchId, playerId } = req.params;
     const heartRates = req.body; // Expect an array of { time, value }
   

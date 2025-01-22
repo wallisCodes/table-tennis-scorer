@@ -1,7 +1,7 @@
 import MatchPlayer from '../models/MatchPlayer.js';
   
 // Controller to bulk create (in practice will only be two) match-player records
-export const addMatchPlayer = async (req, res) => {
+export const createMatchPlayer = async (req, res) => {
     const matchPlayers = req.body; // Expecting an array of match-player objects
     try {
         const newMatchPlayers = await MatchPlayer.bulkCreate(matchPlayers);

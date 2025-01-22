@@ -4,7 +4,6 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
     // ==================== TESTING FETCH REQUESTS ====================
     const [nonGetRequestCount, setNonGetRequestCount] = useState(0);
     const [allPlayers, setAllPlayers] = useState([]);
-    const [newPlayer, setNewPlayer] = useState({ name: "", age: "", colour: "" });
     const [playerIdToDelete, setPlayerIdToDelete] = useState("");
     const matchId = 1;
     const playerId = 1;
@@ -38,32 +37,9 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
         }
     }
 
-
-    async function createPlayer(){
-        try {
-            const response = await fetch("http://localhost:3000/api/players", {
-                method: "POST",
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(newPlayer)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to create player: ${response.status}`);
-            }
-            const player = await response.json();
-            console.log("Success! Player added to database", player);
-            
-            setNonGetRequestCount(count => count + 1);
-            setNewPlayer({ name: "", age: "", colour: "" }); // clear input
-
-        } catch (error) {
-            console.error('Error:', error.message);
-        }
-    }
-
     async function createPlayers(){
         try {
-            const response = await fetch("http://localhost:3000/api/players/batch", {
+            const response = await fetch("http://localhost:3000/api/players", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(mockPlayersData)
@@ -362,32 +338,6 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
             <h1 className="title-text">Backend Testing</h1>
 
             <div className="block-row-container">
-                {/* Saving a player to the database */}
-                <div className="dashboard-test-block">
-                    <h3 className="block-title">POST/ADD player</h3>
-                    <div className="player-inputs">
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            value={newPlayer.name}
-                            onChange={(e) => setNewPlayer({ ...newPlayer, name: e.target.value })}
-                        />
-                        <input
-                            type="number"
-                            placeholder="Age"
-                            value={newPlayer.age}
-                            onChange={(e) => setNewPlayer({ ...newPlayer, age: e.target.value })}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Colour"
-                            value={newPlayer.colour}
-                            onChange={(e) => setNewPlayer({ ...newPlayer, colour: e.target.value })}
-                        />
-                    </div>
-                    <button onClick={createPlayer} className="block-button">Add Player</button>
-                </div>
-
                 {/* Create two players */}
                 <div className="dashboard-test-block">
                     <h3 className="block-title">POST/ADD two players</h3>

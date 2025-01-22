@@ -13,14 +13,6 @@ ScoreHistory.init(
             },
             field: 'match_id'
         },
-        playerId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: 'players',
-                key: 'id'
-            },
-            field: 'player_id'
-        },
         time: DataTypes.STRING,
         winner: DataTypes.STRING
     },

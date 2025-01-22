@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { addScoreEvent, getScoreHistory } from '../controllers/scoreHistoryController.js';
+import { createScoringBatch, getScoreHistory } from '../controllers/scoreHistoryController.js';
 const router = Router();
 
-router.post('/:matchId/:playerId', addScoreEvent);
+router.post('/:matchId', createScoringBatch);
 router.get('/:matchId', getScoreHistory);
 
 export default router;
