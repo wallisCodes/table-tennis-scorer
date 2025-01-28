@@ -19,6 +19,7 @@ export async function createPlayers(playerData){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -36,6 +37,7 @@ export async function getAllPlayers(){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -90,12 +92,12 @@ export async function createMatch(matchData){
         console.log('Match created:', newMatch);
 
         // Retrieve match id to be used in future api calls
-        const matchId = newMatch.id;
-        console.log("Match id:", matchId);
-        return matchId;
+        console.log("Match id:", newMatch.id);
+        return newMatch.id;
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -113,6 +115,7 @@ export async function getAllMatches(){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -134,13 +137,29 @@ export async function updateMatch(matchId, updateData){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
 
 
 // ========================== MATCH PLAYER TESTING ========================== //
-export async function createMatchPlayer(matchPlayers){
+export async function createMatchPlayers(playerIds, matchId){
+    // Creating match-player records from player ids and match id
+    const matchPlayers = [
+        {
+            matchId,
+            playerId: playerIds[0],
+            finalScore: null
+        },
+        {
+            matchId,
+            playerId: playerIds[1],
+            finalScore: null
+        }
+    ];
+    console.log("matchPlayers:", matchPlayers);
+
     try {
         const response = await fetch("http://localhost:3000/api/match-player", {
             method: 'POST',
@@ -173,6 +192,7 @@ export async function getPlayersByMatch(matchId){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -190,6 +210,7 @@ export async function getMatchesByPlayer(playerId){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -210,6 +231,7 @@ export async function updateMatchPlayer(matchPlayerId, playerScore){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -232,6 +254,7 @@ export async function createScoreHistory(matchId, scoreHistoryData){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -249,6 +272,7 @@ export async function getScoreHistory(matchId){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }
 
@@ -288,5 +312,6 @@ export async function getHeartRate(matchId, playerId){
 
     } catch (error) {
         console.error('Error:', error.message);
+        return null;
     }
 }

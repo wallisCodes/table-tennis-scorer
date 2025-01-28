@@ -22,35 +22,35 @@ export default function App(){
     // const [players, setPlayers] = useState([]);
     const [players, setPlayers] = useState([ // for testing purposes
         {
-            id: uuidv4(),
+            // id: uuidv4(),
             name: "Wallis",
             age: 28,
             colour: "#ff00ff",
-            // serving: false, // maybe implemented later
-            points: 0,
+            points: 0
         },
         {
-            id: uuidv4(),
+            // id: uuidv4(),
             name: "Lau",
             age: 56,
             colour: "#00ff00",
-            // serving: false, // maybe implemented later
-            points: 0,
+            points: 0
         }
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     const [display, setDisplay] = useState("input");
+    // NEW: creating refs to store session ids for players and match records
+    const playerIdsRef = useRef(null);
+    const matchIdRef = useRef(null);
 
 
     function addPlayer(name, age, colour){
         setPlayers([
             ...players,
             {
-                id: uuidv4(),
+                // id: uuidv4(),
                 name: name,
                 age: age,
                 colour: colour,
-                serving: false,
                 points: 0
             }
         ]);
@@ -635,6 +635,7 @@ export default function App(){
                         setMatchDetails={setMatchDetails}
                         toScores={toScores}
                         players={players}
+                        playerIdsRef={playerIdsRef}
                     />
                     <PlayerForm
                         players={players}
@@ -645,6 +646,7 @@ export default function App(){
             
             {display === "scores" &&
                 <GameTracking
+                    matchDetails={matchDetails}
                     setMatchDetails={setMatchDetails} 
                     matchStatus={matchStatus}
                     // setMatchStatus={setMatchStatus}
@@ -681,8 +683,9 @@ export default function App(){
                     handlePauseTwo={handlePauseTwo}
                     handleResumeTwo={handleResumeTwo}
                     batteryLevelTwo={batteryLevelTwo}
-                    matchDetails={matchDetails}
                     mockData={mockData}
+                    playerIdsRef={playerIdsRef}
+                    matchIdRef={matchIdRef}
                 />
             }
 

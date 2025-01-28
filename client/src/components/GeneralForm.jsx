@@ -1,14 +1,15 @@
-// import { useState } from 'react'
+import { createPlayers } from "../api";
 
-export default function GeneralForm({matchDetails, setMatchDetails, toScores, players}){
+export default function GeneralForm({matchDetails, setMatchDetails, toScores, players, playerIdsRef}){
     // Simple form validation logic
     const correctPlayers = players.length === 2;
 
-    function handleSubmit(event){
+    async function handleSubmit(event){
         event.preventDefault();
         if (!correctPlayers){
             alert("Make sure you have two players added below.");
         } else {
+            playerIdsRef.current = await createPlayers(players);
             toScores();
         }
     }

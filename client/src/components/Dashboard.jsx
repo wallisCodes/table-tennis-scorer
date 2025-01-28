@@ -52,6 +52,10 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
             setNonGetRequestCount(count => count + 1);
             console.log("Success! Player batch added to database", batch);
 
+            // Retrieve player ids to be used in future api calls
+            const playerIds = batch.map(player => player.id);
+            console.log("Player ids:", playerIds);
+
         } catch (error) {
             console.error('Error:', error.message);
         }
@@ -154,6 +158,11 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
             const newMatch = await response.json();
             console.log('Match created:', newMatch);
 
+            const matchId = newMatch.id;
+            console.log("Match id:", matchId);
+            console.log("Testing console log works inside ceateMatch() function.");
+            return matchId;
+
         } catch (error) {
             console.error('Error:', error.message);
         }
@@ -204,7 +213,7 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
 
 
     // ========================== MATCH PLAYER TESTING ========================== //
-    async function createMatchPlayer() {
+    async function createMatchPlayers() {
         const mockMatchPlayerData = [
             {
                 matchId: 1,
@@ -265,6 +274,7 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
         }
     }
 
+
     async function updateMatchPlayer (){
         const matchPlayerId = 1;
         const mockFinalScore = 20;
@@ -289,7 +299,7 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
     // ========================== SCORE HISTORY TESTING ========================== //  
     async function createScoreHistory() {
         try {
-            const response = await fetch(`http://localhost:3000/api/score-history/${matchId}/${playerId}`, {
+            const response = await fetch(`http://localhost:3000/api/score-history/${matchId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(scoreHistory)
@@ -304,7 +314,22 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
             console.error('Error:', error.message);
         }
     }
-
+    
+    
+    async function getScoreHistory(){
+        try {
+            const response = await fetch(`http://localhost:3000/api/score-history/${matchId}`);
+    
+            if (!response.ok) {
+                throw new Error(`Failed to retrieve score history records for specific match: ${response.status}`);
+            }
+            const scoreData = await response.json();
+            console.log('Score history retrieved successfully', scoreData);
+    
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
 
 
     // ========================== HEART RATE TESTING ========================== //    
@@ -394,7 +419,7 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
                 {/* Create match player */}
                 <div className="dashboard-test-block">
                     <h3 className="block-title">POST/ADD match_player</h3>
-                    <button onClick={createMatchPlayer} className="block-button">Add MatchPlayer</button>
+                    <button onClick={createMatchPlayers} className="block-button">Add MatchPlayer</button>
                 </div>
 
                 {/* Retrieving match-player records for a specific match */}
@@ -421,6 +446,12 @@ export default function Dashboard({toResults, scoreHistory, heartRateOne}){
                 <div className="dashboard-test-block">
                     <h3 className="block-title">POST/ADD score batch</h3>
                     <button onClick={createScoreHistory} className="block-button">Add Score Batch</button>
+                </div>
+
+                {/* Retrieving scoreHistory data */}
+                <div className="dashboard-test-block">
+                    <h3 className="block-title">GET score history</h3>
+                    <button onClick={getScoreHistory} className="block-button">Get Score Batch</button>
                 </div>
             </div>
 

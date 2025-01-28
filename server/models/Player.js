@@ -5,9 +5,18 @@ class Player extends Model {}
 
 Player.init(
     {
-        name: DataTypes.STRING,
-        age: DataTypes.INTEGER,
-        colour: DataTypes.STRING // HEX colour
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        age: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        colour: {
+            type: DataTypes.STRING, // HEX colour
+            allowNull: false
+        }
     },
     {
         sequelize,

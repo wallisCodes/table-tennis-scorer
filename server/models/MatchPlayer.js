@@ -27,7 +27,6 @@ MatchPlayer.init(
         },
         finalScore: {
             type: DataTypes.INTEGER,
-            allowNull: true,
             field: 'final_score'
         }
     },

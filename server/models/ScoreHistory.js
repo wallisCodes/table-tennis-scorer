@@ -7,14 +7,21 @@ ScoreHistory.init(
     {
         matchId: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
                 model: 'matches',
                 key: 'id'
             },
             field: 'match_id'
         },
-        time: DataTypes.STRING,
-        winner: DataTypes.STRING
+        time: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        winner: {
+            type: DataTypes.STRING,
+            allowNull: false
+        }
     },
     {
         sequelize,

@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "./Modal";
+import { createMatch, createMatchPlayers } from "../api";
+// import _ from 'lodash';
 
 export default function GameTracking({
-    setMatchDetails, matchStatus, players, setPlayers, getCurrentTime, getCurrentDate, toInput, toResults, heartRateOne, heartRateOneOnly, scoreHistory,
+    matchDetails, setMatchDetails, matchStatus, players, setPlayers, getCurrentTime, toInput, toResults, heartRateOne, heartRateOneOnly, scoreHistory,
     setScoreHistory, deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
-    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, matchDetails, mockData
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, mockData, playerIdsRef, matchIdRef
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -266,25 +268,47 @@ export default function GameTracking({
     const lastFivePoints = scoreHistory.slice(-5);
     const recentPointsP1 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.winner === "P1" ? "point-won" : "point-lost"}`} key={index}></div>);
     const recentPointsP2 = lastFivePoints.map((point, index) => <div className={`point-circle ${point.winner === "P2" ? "point-won" : "point-lost"}`} key={index}></div>);
+    
 
-
-    function startMatch(){
+    async function startMatch(){
         matchStatus.current = "active";
         setScoreCooldown(true);
         // Record start of match in matchDetails
         const currentTime = getCurrentTime();
-        const currentDate = new Date().getTime();
-        // Testing
-        console.log(`currentDateText: ${getCurrentDateText()}`);
-        setMatchDetails({
-            ...matchDetails,
-            date: currentDate,
-            startTime: currentTime
+        // Dividing by 1000 crucial here! Allows integer size constraint set out by Postgres to be obeyed
+        // Storing currentDate in milliseconds would require changing data type on the backend to BIG INT
+        const currentDate = Math.floor(new Date().getTime() / 1000);
+
+        setMatchDetails(prevDetails => {
+            const newMatchDetailsState = {
+                sport: prevDetails.sport,
+                date: currentDate,
+                startTime: currentTime
+            };
+            // console.log("newMatchDetailsState (aka matchDetails):", newMatchDetailsState);
+
+            startMatchFetchRequests(newMatchDetailsState);
+            return newMatchDetailsState;
         });
+
         setTimeout(() => setScoreCooldown(false), shortCooldown);
     }
 
 
+    // Keeping track of whether startMatchFetchRequests has been executed, so it doesn't accidentally execute
+    // twice and create too many match and matchPlayer records
+    const hasExecutedRef = useRef(false);
+
+    // Function to create match record, retrieve matchId and use it alongside playerIds to create matchPlayer records
+    async function startMatchFetchRequests(matchDetails){
+        if (hasExecutedRef.current) return; // Prevent duplicate execution
+        hasExecutedRef.current = true; // Mark as executed
+
+        matchIdRef.current = await createMatch(matchDetails);
+        createMatchPlayers(playerIdsRef.current, matchIdRef.current);
+    }
+    
+    
     function finishMatch(){
         matchStatus.current = "complete";
         // Record end of match in matchDetails

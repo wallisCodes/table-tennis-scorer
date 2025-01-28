@@ -5,7 +5,10 @@ class Match extends Model {}
 
 Match.init(
     {
-        sport: DataTypes.STRING,
+        sport: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         date: {
             type: DataTypes.INTEGER, // Unix timestamp format
             allowNull: false
@@ -17,17 +20,14 @@ Match.init(
         },
         endTime: {
             type: DataTypes.TIME, // hh:mm:ss format
-            allowNull: true,
             field: 'end_time'
         },
         matchDuration: {
             type: DataTypes.INTEGER, // Unix timestamp duration
-            allowNull: true,
             field: 'match_duration'
         },
         winnerId: {
             type: DataTypes.INTEGER,
-            allowNull: true,
             references: {
                 model: 'players',
                 key: 'id'
