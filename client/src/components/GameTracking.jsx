@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Modal from "./Modal";
-import { createMatch, createMatchPlayers } from "../api";
+import { createHeartRate, createMatch, createMatchPlayers, createScoreHistory, updateMatch, updateMatchPlayer } from "../api";
 // import _ from 'lodash';
 
 export default function GameTracking({
@@ -8,7 +8,7 @@ export default function GameTracking({
     setScoreHistory, deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
-    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, mockData, playerIdsRef, matchIdRef
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, mockData, playerIdsRef, matchIdRef, matchPlayerIdsRef
 }){
     function maxHeartRate(age){
         return 220 - age;
@@ -295,31 +295,90 @@ export default function GameTracking({
     }
 
 
-    // Keeping track of whether startMatchFetchRequests has been executed, so it doesn't accidentally execute
-    // twice and create too many match and matchPlayer records
-    const hasExecutedRef = useRef(false);
+    // Keeping track of whether startMatchFetchRequests/finishMatchFetchRequests have been executed,
+    // so they don't accidentally execute twice and create/update too many records in the database
+    const hasExecutedStartRef = useRef(false);
+    const hasExecutedFinishRef = useRef(false);
 
     // Function to create match record, retrieve matchId and use it alongside playerIds to create matchPlayer records
     async function startMatchFetchRequests(matchDetails){
-        if (hasExecutedRef.current) return; // Prevent duplicate execution
-        hasExecutedRef.current = true; // Mark as executed
+        if (hasExecutedStartRef.current) return; // Prevent duplicate execution
+        hasExecutedStartRef.current = true; // Mark as executed
 
+        // Saving match record and returning match id for future use
         matchIdRef.current = await createMatch(matchDetails);
-        createMatchPlayers(playerIdsRef.current, matchIdRef.current);
+        // Saving match player records (one for each player) and returning matchPlayer ids for future use
+        matchPlayerIdsRef.current = await createMatchPlayers(playerIdsRef.current, matchIdRef.current);
     }
     
     
+    // GOAL:
+    // Post scoreHistory batch data
+    // TEMPORARY - Post heartRate batch data (will be every 10s or 15s)
     function finishMatch(){
         matchStatus.current = "complete";
         // Record end of match in matchDetails
         const currentTime = getCurrentTime();
         const matchDuration = getMatchDuration(matchDetails.startTime, currentTime);
-        setMatchDetails({
-            ...matchDetails,
-            endTime: currentTime,
-            duration: matchDuration
+        // setMatchDetails({
+        //     ...matchDetails,
+        //     endTime: currentTime,
+        //     duration: matchDuration
+        // });
+
+        setMatchDetails(prevDetails => {
+            const updatedMatchDetailsState = {
+                ...prevDetails,
+                endTime: currentTime,
+                duration: matchDuration
+            };
+            console.log("matchDetails duration:", updatedMatchDetailsState.duration);
+
+            finishMatchFetchRequests(updatedMatchDetailsState);
+            return updatedMatchDetailsState;
         });
+
         toResults();
+    }
+
+
+    // GOAL:
+    // Update match record with endTime, matchDuration, winnerId
+    // Update matchPlayer records with final scores for each player
+    // Post scoreHistory batch data
+    // TEMPORARY - Post heartRate batch data (will be every 10s or 15s)
+
+    // Function to update match/match player records, and save scoring/heart rate datasets 
+    async function finishMatchFetchRequests(matchDetails){
+        if (hasExecutedFinishRef.current) return; // Prevent duplicate execution
+        hasExecutedFinishRef.current = true; // Mark as executed
+
+        // Updating match with endTime, duration and winnerId
+        const updatedMatchData = {
+            endTime: matchDetails.endTime,
+            matchDuration: matchDetails.duration,
+            winnerId: playerIdsRef.current[0] // hard-coded for now, need to work this out
+        }
+        updateMatch(matchIdRef.current, updatedMatchData);
+
+        // Updating first match player record with finalScore
+        const playerOneScore = {
+            finalScore: players[0].points
+        }
+        updateMatchPlayer(matchPlayerIdsRef.current[0], playerOneScore);
+
+        // Updating second match player record with finalScore
+        const playerTwoScore = {
+            finalScore: players[1].points
+        }
+        updateMatchPlayer(matchPlayerIdsRef.current[1], playerTwoScore);
+
+        // Saving score history batch data
+        createScoreHistory(matchIdRef.current, scoreHistory);
+        // Saving heart rate batch data for player one
+        createHeartRate(matchIdRef.current, playerIdsRef.current[0], heartRateOne);
+        // Saving heart rate batch data for player two
+        createHeartRate(matchIdRef.current, playerIdsRef.current[1], heartRateTwo);
     }
 
 

@@ -26,14 +26,14 @@ export default function App(){
             name: "Wallis",
             age: 28,
             colour: "#ff00ff",
-            points: 0
+            points: 18 // testing purposes
         },
         {
             // id: uuidv4(),
             name: "Lau",
             age: 56,
             colour: "#00ff00",
-            points: 0
+            points: 18 // testing purposes
         }
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
@@ -41,6 +41,7 @@ export default function App(){
     // NEW: creating refs to store session ids for players and match records
     const playerIdsRef = useRef(null);
     const matchIdRef = useRef(null);
+    const matchPlayerIdsRef = useRef(null);
 
 
     function addPlayer(name, age, colour){
@@ -686,6 +687,7 @@ export default function App(){
                     mockData={mockData}
                     playerIdsRef={playerIdsRef}
                     matchIdRef={matchIdRef}
+                    matchPlayerIdsRef={matchPlayerIdsRef}
                 />
             }
 

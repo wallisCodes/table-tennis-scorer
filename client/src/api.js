@@ -168,10 +168,15 @@ export async function createMatchPlayers(playerIds, matchId){
         });
     
         if (!response.ok) {
-            throw new Error(`Failed to create match player record: ${response.status}`);
+            throw new Error(`Failed to create match player records: ${response.status}`);
         }
         const matchPlayerData = await response.json();
-        console.log('Match player record created successfully', matchPlayerData);
+        console.log('Match player records created successfully', matchPlayerData);
+
+        // Retrieve matchPlayer id to be used in future api calls
+        const matchPlayerIds = matchPlayerData.map(matchPlayer => matchPlayer.id);
+        console.log("Match player ids:", matchPlayerIds);
+        return matchPlayerIds;
 
     } catch (error) {
         console.error('Error:', error.message);
@@ -219,11 +224,11 @@ export async function updateMatchPlayer(matchPlayerId, playerScore){
         const response = await fetch(`http://localhost:3000/api/match-player/${matchPlayerId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ finalScore: playerScore })
+            body: JSON.stringify(playerScore)
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to retrieve match player records for specific player: ${response.status}`);
+            throw new Error(`Failed to update match player records for specific player: ${response.status}`);
         }
         const matchPlayerData = await response.json();
         console.log('Match player record updated successfully', matchPlayerData);
