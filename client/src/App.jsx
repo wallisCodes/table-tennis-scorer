@@ -22,14 +22,12 @@ export default function App(){
     // const [players, setPlayers] = useState([]);
     const [players, setPlayers] = useState([ // for testing purposes
         {
-            // id: uuidv4(),
             name: "Wallis",
             age: 28,
             colour: "#ff00ff",
             points: 18 // testing purposes
         },
         {
-            // id: uuidv4(),
             name: "Lau",
             age: 56,
             colour: "#00ff00",
@@ -38,7 +36,7 @@ export default function App(){
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     const [display, setDisplay] = useState("input");
-    // NEW: creating refs to store session ids for players and match records
+    // Creating refs to store session ids for players, match and match player records
     const playerIdsRef = useRef(null);
     const matchIdRef = useRef(null);
     const matchPlayerIdsRef = useRef(null);

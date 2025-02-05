@@ -312,20 +312,12 @@ export default function GameTracking({
     }
     
     
-    // GOAL:
-    // Post scoreHistory batch data
-    // TEMPORARY - Post heartRate batch data (will be every 10s or 15s)
     function finishMatch(){
         matchStatus.current = "complete";
-        // Record end of match in matchDetails
         const currentTime = getCurrentTime();
         const matchDuration = getMatchDuration(matchDetails.startTime, currentTime);
-        // setMatchDetails({
-        //     ...matchDetails,
-        //     endTime: currentTime,
-        //     duration: matchDuration
-        // });
-
+        
+        // Record end of match in matchDetails
         setMatchDetails(prevDetails => {
             const updatedMatchDetailsState = {
                 ...prevDetails,
@@ -338,26 +330,25 @@ export default function GameTracking({
             return updatedMatchDetailsState;
         });
 
+        // Automatically navigate to Results "page"
         toResults();
     }
 
-
-    // GOAL:
-    // Update match record with endTime, matchDuration, winnerId
-    // Update matchPlayer records with final scores for each player
-    // Post scoreHistory batch data
-    // TEMPORARY - Post heartRate batch data (will be every 10s or 15s)
 
     // Function to update match/match player records, and save scoring/heart rate datasets 
     async function finishMatchFetchRequests(matchDetails){
         if (hasExecutedFinishRef.current) return; // Prevent duplicate execution
         hasExecutedFinishRef.current = true; // Mark as executed
 
+        // Calculate winnerId from both players points
+        const chosenIndex = players[0].points > players[1].points ? 0 : 1;
+        const winnerId = playerIdsRef.current[chosenIndex];
+
         // Updating match with endTime, duration and winnerId
         const updatedMatchData = {
             endTime: matchDetails.endTime,
             matchDuration: matchDetails.duration,
-            winnerId: playerIdsRef.current[0] // hard-coded for now, need to work this out
+            winnerId // short-hand for winnerId: winnerId
         }
         updateMatch(matchIdRef.current, updatedMatchData);
 
