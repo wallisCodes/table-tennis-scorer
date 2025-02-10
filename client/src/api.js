@@ -29,11 +29,29 @@ export async function getAllPlayers(){
         const response = await fetch("http://localhost:3000/api/players");
 
         if (!response.ok) {
-            throw new Error(`Failed to read players: ${response.status}`);
+            throw new Error(`Failed to retrieve players: ${response.status}`);
         }
         const players = await response.json();
         console.log("Players loaded successfully.");
         return players;
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+}
+
+
+export async function getPlayerById(playerId){
+    try {
+        const response = await fetch(`http://localhost:3000/api/players/${playerId}`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to retrieve specific player: ${response.status}`);
+        }
+        const player = await response.json();
+        console.log("Individual player loaded successfully.");
+        return player;
 
     } catch (error) {
         console.error('Error:', error.message);
@@ -158,7 +176,7 @@ export async function createMatchPlayers(playerIds, matchId){
             finalScore: null
         }
     ];
-    console.log("matchPlayers:", matchPlayers);
+    // console.log("matchPlayers:", matchPlayers);
 
     try {
         const response = await fetch("http://localhost:3000/api/match-player", {
