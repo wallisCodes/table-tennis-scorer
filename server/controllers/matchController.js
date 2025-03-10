@@ -2,15 +2,36 @@ import Match from '../models/Match.js';
 
 export const createMatch = async (req, res) => {
     const { sport, date, startTime } = req.body;
+    // Check if the user is authenticated (token exists)
+    const userId = req.user ? req.user.userId : null;
     try {
         const match = await Match.create({
             sport,
             date,
-            startTime
+            startTime,
+            userId // null if user hasn't logged in
         });
         res.status(201).json(match);
     } catch (error) {
         res.status(500).json({ error: 'Error creating match' });
+    }
+};
+
+export const claimMatch = async (req, res) => {
+    try {
+        const matchId = req.body.matchId;
+        const match = await Match.findByPk(matchId);
+
+        if (!match || match.userId) {
+            return res.status(400).json({ error: 'Match already claimed or not found' });
+        }
+
+        match.userId = req.user.userId;
+        await match.save();
+
+        res.status(200).json(match);
+    } catch (error) {
+        res.status(500).json({ error: 'Error claiming match' });
     }
 };
 

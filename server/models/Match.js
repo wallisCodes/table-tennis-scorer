@@ -26,6 +26,15 @@ Match.init(
             type: DataTypes.INTEGER, // Unix timestamp duration
             field: 'match_duration'
         },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id'
+            },
+            field: 'user_id'
+        },
         winnerId: {
             type: DataTypes.INTEGER,
             references: {

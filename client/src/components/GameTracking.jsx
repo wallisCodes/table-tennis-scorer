@@ -9,7 +9,7 @@ export default function GameTracking({
     setScoreHistory, deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
     handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
-    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, mockData, playerIdsRef, matchIdRef, matchPlayerIdsRef
+    handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, mockData, userIdRef, playerIdsRef, matchIdRef, matchPlayerIdsRef
 }){
     // Dynamically assign player colours to tracking screen based on previous user input
     const p1TeamStyles = {
@@ -183,6 +183,7 @@ export default function GameTracking({
 
         // Saving match record and returning match id for future use
         matchIdRef.current = await createMatch(matchDetails);
+        console.log("matchIdRef:", matchIdRef.current);
         // Saving match player records (one for each player) and returning matchPlayer ids for future use
         matchPlayerIdsRef.current = await createMatchPlayers(playerIdsRef.current, matchIdRef.current);
     }

@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import { createMatch, getAllMatches, getMatchById, updateMatch, deleteMatch } from '../controllers/matchController.js';
+import { createMatch, claimMatch, getAllMatches, getMatchById, updateMatch, deleteMatch } from '../controllers/matchController.js';
+import { authenticateToken } from '../middleware/auth.js';
 const router = Router();
 
 // CRUD operations for matches
 router.post('/', createMatch);
-router.get('/', getAllMatches);
-router.get('/:matchId', getMatchById);
+router.post('/claim', authenticateToken, claimMatch);
+router.get('/', authenticateToken, getAllMatches);
+router.get('/:matchId', authenticateToken, getMatchById);
 router.put('/:matchId', updateMatch);
-router.delete('/:matchId', deleteMatch);
+router.delete('/:matchId', authenticateToken, deleteMatch);
 
 export default router;

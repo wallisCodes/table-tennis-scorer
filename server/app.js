@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 import './models/index.js';
 import sequelize from './config/database.js';
+import userRoutes from './routes/userRoutes.js';
 import playerRoutes from "./routes/playerRoutes.js";
 import matchRoutes from "./routes/matchRoutes.js";
 import matchPlayerRoutes from "./routes/matchPlayerRoutes.js";
@@ -15,7 +16,8 @@ const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type'],
+    credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -23,6 +25,7 @@ app.use(express.urlencoded({extended: true}));
 
 
 // /api included in path to make it obvious this is a backend API call
+app.use('/api/user', userRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/match-player', matchPlayerRoutes);

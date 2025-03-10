@@ -16,6 +16,7 @@ export default function App(){
             startTime: null, // hh:mm:ss format
             endTime: null, // hh:mm:ss format
             duration: null, // Unix timestamp, used for filtering in dashboard
+            userId: null // is this needed?
         }
     );
     const matchStatus = useRef("pending"); // pending, active or complete
@@ -25,18 +26,19 @@ export default function App(){
             name: "Wallis",
             age: 28,
             colour: "#ff00ff",
-            points: 18 // testing purposes
+            points: 19 // testing purposes
         },
         {
             name: "Lau",
             age: 56,
             colour: "#00ff00",
-            points: 18 // testing purposes
+            points: 19 // testing purposes
         }
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     const [display, setDisplay] = useState("input");
-    // Creating refs to store session ids for players, match and match player records
+    // Creating refs to store session ids for user, players, match and match player records
+    const userIdRef = useRef(null);
     const playerIdsRef = useRef(null);
     const matchIdRef = useRef(null);
     const matchPlayerIdsRef = useRef(null);
@@ -683,6 +685,7 @@ export default function App(){
                     handleResumeTwo={handleResumeTwo}
                     batteryLevelTwo={batteryLevelTwo}
                     mockData={mockData}
+                    userIdRef={userIdRef}
                     playerIdsRef={playerIdsRef}
                     matchIdRef={matchIdRef}
                     matchPlayerIdsRef={matchPlayerIdsRef}
