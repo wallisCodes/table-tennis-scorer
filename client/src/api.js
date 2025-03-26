@@ -11,7 +11,10 @@ export async function registerUser(email, password) {
         if (!response.ok) {
             throw new Error(`Failed to register user: ${response.status}`);
         }
-        const newUser = response.json();
+        console.log("User registered successfully!");
+
+        const newUser = await response.json();
+        console.log("newUser:", newUser);
         return newUser.id;
 
     } catch (error) {
@@ -33,8 +36,53 @@ export async function loginUser(email, password) {
         if (!response.ok) {
             throw new Error(`Failed to login user: ${response.status}`);
         }
-        const existingUser = response.json();
-        return existingUser.id;
+        console.log("User logged in successfully!");
+
+        const existingUser = await response.json();
+        console.log("existingUser:", existingUser);
+        return existingUser;
+
+    } catch (error) {
+        console.error("Error:", error.message);
+        return null;
+    }
+}
+
+
+export async function logoutUser() {
+    try {
+        const response = await fetch("http://localhost:3000/api/user/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to logout");
+        }
+
+        console.log("User logged out successfully!");
+        return true;
+
+    } catch (error) {
+        console.error("Error logging out:", error.message);
+        return false;
+    }
+}
+
+
+// Function to auto-authenticate users when refreshing page
+export async function verifyToken(){
+    try {
+        const response = await fetch("http://localhost:3000/api/user/verifyToken", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to verify token: ${response.status}`);
+        }
+        const user = await response.json();
+        return user;
 
     } catch (error) {
         console.error("Error:", error.message);
@@ -143,7 +191,7 @@ export async function deleteAllPlayers(){
 // ========================== MATCH FETCH REQUESTS ========================== //
 export async function createMatch(matchData){ 
     try {
-        const response = await fetch("http://localhost:3000/api/matches", {
+        const response = await fetch("http://localhost:3000/api/match", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(matchData),
@@ -169,9 +217,35 @@ export async function createMatch(matchData){
 }
 
 
+export async function claimMatch(matchId, userId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/match/${matchId}/claim`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }),
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to claim match: ${response.status}`);
+        }
+        const claimedMatch = await response.json();
+        console.log("Claimed match successfully:", claimedMatch);
+        return claimedMatch;
+
+    } catch (error) {
+        console.error("Error claiming match:", error);
+        return null;
+    }
+}
+
+
 export async function getAllMatches(){
     try {
-        const response = await fetch("http://localhost:3000/api/matches");
+        const response = await fetch("http://localhost:3000/api/match", {
+            method: "GET",
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve matches: ${response.status}`);
@@ -189,7 +263,7 @@ export async function getAllMatches(){
 
 export async function updateMatch(matchId, updateData){  
     try {
-        const response = await fetch(`http://localhost:3000/api/matches/${matchId}`, {
+        const response = await fetch(`http://localhost:3000/api/match/${matchId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updateData)
@@ -225,7 +299,6 @@ export async function createMatchPlayers(playerIds, matchId){
             finalScore: null
         }
     ];
-    // console.log("matchPlayers:", matchPlayers);
 
     try {
         const response = await fetch("http://localhost:3000/api/match-player", {

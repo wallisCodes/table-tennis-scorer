@@ -155,17 +155,18 @@ export default function GameTracking({
         // Storing currentDate in milliseconds would require changing data type on the backend to BIG INT
         const currentDate = Math.floor(new Date().getTime() / 1000);
 
-        setMatchDetails(prevDetails => {
-            const newMatchDetailsState = {
-                sport: prevDetails.sport,
-                date: currentDate,
-                startTime: currentTime
-            };
-            // console.log("newMatchDetailsState (aka matchDetails):", newMatchDetailsState);
+        // Create matchDetails manually BEFORE setting state
+        const newMatchDetailsState = {
+            sport: matchDetails.sport, // Keep previous sport
+            date: currentDate,
+            startTime: currentTime,
+            userId: userIdRef.current
+        };
 
-            startMatchFetchRequests(newMatchDetailsState);
-            return newMatchDetailsState;
-        });
+        // Pass directly into the fetch function instead of waiting for state update
+        await startMatchFetchRequests(newMatchDetailsState);
+        // THEN update the state (not used in fetch)
+        setMatchDetails(newMatchDetailsState);
 
         setTimeout(() => setScoreCooldown(false), shortCooldown);
     }
@@ -194,19 +195,19 @@ export default function GameTracking({
         const currentTime = getCurrentTime();
         const matchDuration = getMatchDuration(matchDetails.startTime, currentTime);
         
-        // Record end of match in matchDetails
-        setMatchDetails(prevDetails => {
-            const updatedMatchDetailsState = {
-                ...prevDetails,
-                endTime: currentTime,
-                duration: matchDuration
-            };
-            console.log("matchDetails duration:", updatedMatchDetailsState.duration);
+        // Create updated match details BEFORE setting state
+        const updatedMatchDetailsState = {
+            ...matchDetails,
+            endTime: currentTime,
+            duration: matchDuration
+        };
 
-            finishMatchFetchRequests(updatedMatchDetailsState);
-            return updatedMatchDetailsState;
-        });
-
+        // console.log("updatedMatchDetailsState (aka matchDetails):", updatedMatchDetailsState);
+        
+        // Pass directly into fetch function instead of waiting for state update
+        finishMatchFetchRequests(updatedMatchDetailsState);
+        // THEN update the state (this doesn't affect the fetch function)
+        setMatchDetails(updatedMatchDetailsState);
         // Automatically navigate to Results "page"
         toResults();
     }
@@ -218,29 +219,21 @@ export default function GameTracking({
         hasExecutedFinishRef.current = true; // Mark as executed
 
         // Calculate winnerId from both players points
-        const chosenIndex = players[0].points > players[1].points ? 0 : 1;
-        const winnerId = playerIdsRef.current[chosenIndex];
+        const winnerIndex = players[0].points > players[1].points ? 0 : 1;
+        const winnerId = playerIdsRef.current[winnerIndex];
 
         // Updating match with endTime, duration and winnerId
         const updatedMatchData = {
             endTime: matchDetails.endTime,
             matchDuration: matchDetails.duration,
-            winnerId // short-hand for winnerId: winnerId
+            winnerId
         }
         updateMatch(matchIdRef.current, updatedMatchData);
 
         // Updating first match player record with finalScore
-        const playerOneScore = {
-            finalScore: players[0].points
-        }
-        updateMatchPlayer(matchPlayerIdsRef.current[0], playerOneScore);
-
+        updateMatchPlayer(matchPlayerIdsRef.current[0], { finalScore: players[0].points });
         // Updating second match player record with finalScore
-        const playerTwoScore = {
-            finalScore: players[1].points
-        }
-        updateMatchPlayer(matchPlayerIdsRef.current[1], playerTwoScore);
-
+        updateMatchPlayer(matchPlayerIdsRef.current[1], { finalScore: players[1].points });
         // Saving score history batch data
         createScoreHistory(matchIdRef.current, scoreHistory);
         // Saving heart rate batch data for player one
@@ -252,7 +245,7 @@ export default function GameTracking({
 
     return (
         <>
-            <div className="players-container">
+            <div className="score-tracking-container">
                 {/* Back button */}
                 <svg onClick={toInput} className="back-button" width="48" height="48" clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="m10.978 14.999v3.251c0 .412-.335.75-.752.75-.188 0-.375-.071-.518-.206-1.775-1.685-4.945-4.692-6.396-6.069-.2-.189-.312-.452-.312-.725 0-.274.112-.536.312-.725 1.451-1.377 4.621-4.385 6.396-6.068.143-.136.33-.207.518-.207.417 0 .752.337.752.75v3.251h9.02c.531 0 1.002.47 1.002 1v3.998c0 .53-.471 1-1.002 1z" fillRule="nonzero"/>

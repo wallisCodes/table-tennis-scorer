@@ -40,6 +40,8 @@ export default function MatchList(){
                     };
                 }));
 
+                console.log("matchesData:", matchesData);
+                console.log("matchesWithDetails:", matchesWithDetails);
                 setMatches(matchesWithDetails);
                 setLoading(false);
             } catch (error) {

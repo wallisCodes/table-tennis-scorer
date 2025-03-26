@@ -1,6 +1,6 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -15,17 +15,17 @@ export const registerUser = async (req, res) => {
         const newUser = await User.create({ email, password: hashedPassword });
 
         // Generate JWT token
-        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
         // Set HTTP-only cookie
-        res.cookie('token', token, {
+        res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Implement NODE_ENV env variable
-            sameSite: 'Strict', // Prevent CSRF attacks
+            secure: process.env.NODE_ENV === "production", // Implement NODE_ENV env variable
+            sameSite: "Strict", // Prevent CSRF attacks
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(201).json(newUser);
 
     } catch (error) {
         console.error("Error registering user:", error);
@@ -39,28 +39,66 @@ export const loginUser = async (req, res) => {
         const { email, password } = req.body;
 
         // Find user by email
-        const user = await User.findOne({ where: { email } });
-        if (!user) return res.status(401).json({ error: "Invalid email or password" });
-
-        // Compare passwords
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
+        const existingUser = await User.findOne({ where: { email } });
+        if (!existingUser || !(await bcrypt.compare(password, existingUser.password))) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+        console.log("Generated Token for User:", token);
 
-        // Set HTTP-only cookie
-        res.cookie('token', token, {
+        // Set JWT as HTTP-only cookie
+        res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // HTTPS in production
-            sameSite: 'Strict', // Prevent CSRF attacks
+            secure: process.env.NODE_ENV === "production", // HTTPS in production
+            sameSite: "Strict", // Prevent CSRF attacks
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        res.json({ user: { id: user.id, username: user.username, email: user.email } });
+        res.status(200).json(existingUser);
+        // res.status(200).json({ id: existingUser.id, email: existingUser.email });
 
     } catch (error) {
         console.error("Error logging in:", error);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
+export const logoutUser = (req, res) => {
+    console.log("Logging out user...");
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict"
+    });
+    res.status(200).json({ message: "Logged out successfully!" });
+};
+
+
+export const verifyToken = async (req, res) => {
+    try {
+        // Get token from HTTP-only cookie
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorised (no token provided)" });
+        }
+
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Retrieve user ID from token & return user data
+        const user = await User.findByPk(decoded.userId, { attributes: ["id", "email"] });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+        
+    } catch (error) {
+        console.error("Error verifying token:", error);
+        return res.status(403).json({ message: "Invalid or expired token" });
     }
 };

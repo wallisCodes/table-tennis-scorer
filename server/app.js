@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import express from "express";
+import cookieParser from "cookie-parser";
 import './models/index.js';
 import sequelize from './config/database.js';
 import userRoutes from './routes/userRoutes.js';
@@ -12,14 +13,14 @@ import scoreHistoryRoutes from "./routes/scoreHistoryRoutes.js";
 import heartRateRoutes from "./routes/heartRateRoutes.js";
 
 const app = express();
-// app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],
     credentials: true
 }));
-app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 // app.options('*', cors()); // Handles preflight requests
 
@@ -27,7 +28,7 @@ app.use(express.urlencoded({extended: true}));
 // /api included in path to make it obvious this is a backend API call
 app.use('/api/user', userRoutes);
 app.use('/api/players', playerRoutes);
-app.use('/api/matches', matchRoutes);
+app.use('/api/match', matchRoutes);
 app.use('/api/match-player', matchPlayerRoutes);
 app.use('/api/score-history', scoreHistoryRoutes);
 app.use('/api/heart-rate', heartRateRoutes);

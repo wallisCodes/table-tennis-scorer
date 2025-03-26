@@ -1,4 +1,4 @@
-import HeartRate from '../models/HeartRate.js';
+import HeartRate from "../models/HeartRate.js";
 
 export const createHeartRateBatch = async (req, res) => {
     const { matchId, playerId } = req.params;
@@ -14,7 +14,8 @@ export const createHeartRateBatch = async (req, res) => {
         await HeartRate.bulkCreate(records);
         res.status(201).json(records);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to save heart rate batch data' });
+        console.error("Failed to save heart rate batch data", error);
+        res.status(500).json({ error: "Failed to save heart rate batch data" });
     }
 };
 
@@ -27,6 +28,7 @@ export const getHeartRateByPlayer = async (req, res) => {
         });
         res.status(200).json(heartRates);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching heart rate data' });
+        console.error("Error fetching heart rate data", error);
+        res.status(500).json({ error: "Error fetching heart rate data" });
     }
 };

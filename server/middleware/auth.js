@@ -1,21 +1,17 @@
 import jwt from 'jsonwebtoken';
 
 export const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token; // Reading token from HTTP-only cookie
-
-    // If no token, skip over authentication
-    if (!token) {
-        req.user = null;
-        return next();
+    // Make sure req.cookies exists before accessing `token`
+    if (!req.cookies || !req.cookies.token) {
+        return res.status(401).json({ message: "Unauthorised (no token provided)" });
     }
+    const token = req.cookies.token;
 
-    // If token exists, verify it
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            req.user = null;
-            return next();
-        }
-        req.user = user;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
         next();
-    });
+    } catch (error) {
+        return res.status(403).json({ message: "Invalid or expired token" });
+    }
 };

@@ -10,11 +10,36 @@
     box-sizing: border-box;
 }
 
-/* =============== INPUT SCREEN =============== */
+input {
+    padding: 5px 10px;
+}
 
+/* =============== NAVIGATION =============== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 5vh;
+    /* background-color: darkslategray; */
+    border-bottom: 2px solid white;
+    padding: 10px;
+    /* margin-bottom: 1rem; */
+}
 
+.nav-title {
+    font-size: 2rem;
+}
 
-/* =============== GAME TRACKING =============== */
+.nav-auth-button {
+    font-size: 1.5rem;
+    padding: 3px 10px;
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 .back-button, .next-button {
     position: absolute;
     top: 0;
@@ -27,14 +52,68 @@
     fill: white;
 }
 
+.back-button {
+    left: 0;
+}
+
 .next-button {
     right: 0;
 }
 
-.players-container {
+
+/* =============== INPUT SCREEN =============== */
+.input-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 95vh;
+}
+
+.general-form {
+    margin-top: 48px;
+}
+
+
+/* =============== AUTHENTICATION SCREEN =============== */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: fit-content;
+    height: 70vh;
+    margin: 0 auto;
+}
+
+.auth-heading {
+    font-size: 3rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-toggle {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.auth-button {
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 1rem;
+}
+
+
+/* =============== GAME TRACKING =============== */
+.score-tracking-container {
     display: flex;
     position: relative;
-    min-height: 100vh;
+    min-height: 95vh;
 }
 
 .modal-container {
@@ -46,7 +125,6 @@
     position: absolute;
     left: 0;
     right: 0;
-    
     margin: auto;
     height: 300px;
     width: 500px;
@@ -88,7 +166,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    height: 55vh;
+    height: 50vh;
     width: 100%;
 }
 
@@ -358,13 +436,13 @@
 
 
 /* =============== RESULTS =============== */
-.results-page {
-    position: relative;
+.results-container {
     display: flex;
+    position: relative;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    /* height: 100vh; */
+    min-height: 95vh;
 }
 
 .title-text {
@@ -383,9 +461,10 @@
 .dashboard-container {
     display: flex;
     flex-direction: column;
+    position: relative;
     gap: 1rem;
-    min-height: 80vh;
-    border: 2px solid white;
+    min-height: 95vh;
+    /* border: 2px solid white; */
     width: 100%;
     margin-bottom: 1rem;
 }

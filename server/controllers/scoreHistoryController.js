@@ -1,4 +1,4 @@
-import ScoreHistory from '../models/ScoreHistory.js';
+import ScoreHistory from "../models/ScoreHistory.js";
 
 export const createScoringBatch = async (req, res) => {
     const { matchId } = req.params;
@@ -14,7 +14,8 @@ export const createScoringBatch = async (req, res) => {
         await ScoreHistory.bulkCreate(records);
         res.status(201).json(records);
     } catch (error) {
-        res.status(500).json({ error: 'Error adding score event batch' });
+        console.error("Error adding score event batch", error);
+        res.status(500).json({ error: "Error adding score event batch" });
     }
 };
 
@@ -26,6 +27,7 @@ export const getScoreHistory = async (req, res) => {
         const scoreHistory = await ScoreHistory.findAll({ where: { matchId } });
         res.status(200).json(scoreHistory);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching score history' });
+        console.error("Error fetching score history", error);
+        res.status(500).json({ error: "Error fetching score history" });
     }
 };

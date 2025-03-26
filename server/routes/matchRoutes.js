@@ -5,10 +5,10 @@ const router = Router();
 
 // CRUD operations for matches
 router.post('/', createMatch);
-router.post('/claim', authenticateToken, claimMatch);
 router.get('/', authenticateToken, getAllMatches);
 router.get('/:matchId', authenticateToken, getMatchById);
 router.put('/:matchId', updateMatch);
+router.put("/:matchId/claim", authenticateToken, claimMatch);
 router.delete('/:matchId', authenticateToken, deleteMatch);
 
 export default router;

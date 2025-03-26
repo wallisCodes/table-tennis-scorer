@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
+import Navbar from './components/Navbar';
 import GeneralForm from './components/GeneralForm';
+import AuthForm from './components/AuthForm';
 import PlayerForm from './components/PlayerForm';
 import GameTracking from './components/GameTracking';
 import Dashboard from './components/Dashboard';
 import Results from './components/Results';
-import { v4 as uuidv4 } from "uuid"
-
-uuidv4();
+import { verifyToken } from './api';
+// TODO: uninstall uuid
 
 export default function App(){
+    const [user, setUser] = useState(null);
     const [matchDetails, setMatchDetails] = useState(
         {
             sport: "table-tennis",
@@ -16,7 +18,7 @@ export default function App(){
             startTime: null, // hh:mm:ss format
             endTime: null, // hh:mm:ss format
             duration: null, // Unix timestamp, used for filtering in dashboard
-            userId: null // is this needed?
+            userId: null
         }
     );
     const matchStatus = useRef("pending"); // pending, active or complete
@@ -48,7 +50,6 @@ export default function App(){
         setPlayers([
             ...players,
             {
-                // id: uuidv4(),
                 name: name,
                 age: age,
                 colour: colour,
@@ -57,6 +58,19 @@ export default function App(){
         ]);
     }
 
+    // Verify user on page refresh
+    useEffect(() => {
+        const verifyUser = async () => {
+            const userData = await verifyToken(); // Checking token on refresh
+            if (userData) {
+                setUser(userData);
+            } else {
+                setUser(null); // Ensures userId is reset if no token
+            }
+        };
+        verifyUser();
+    }, []);
+    
 
     // Get current time in hh:mm:ss format
     function getCurrentTime(){
@@ -142,8 +156,13 @@ export default function App(){
     }
 
 
+    // These will be replaced eventually with React Router
     function toInput(){
         setDisplay("input");
+    }
+
+    function toAuth(){
+        setDisplay("auth");
     }
 
     function toScores(){
@@ -629,20 +648,44 @@ export default function App(){
 
     return (
         <>
+            <Navbar 
+                user={user}
+                setUser={setUser}
+                matchStatus={matchStatus}
+                toAuth={toAuth}
+                toInput={toInput}
+                toScores={toScores}
+                toResults={toResults}
+            />
             {display === "input" &&
-                <>
+                <div className="input-container">
                     <GeneralForm 
+                        players={players}
+                        playerIdsRef={playerIdsRef}
+                        matchStatus={matchStatus}
                         matchDetails={matchDetails}
                         setMatchDetails={setMatchDetails}
                         toScores={toScores}
-                        players={players}
-                        playerIdsRef={playerIdsRef}
                     />
                     <PlayerForm
                         players={players}
                         addPlayer={addPlayer}
                     />
-                </>
+                </div>
+            }
+
+            {display === "auth" &&
+                <AuthForm
+                    userIdRef={userIdRef}
+                    setUser={setUser}
+                    matchIdRef={matchIdRef}
+                    matchDetails={matchDetails}
+                    setMatchDetails={setMatchDetails}
+                    matchStatus={matchStatus}
+                    toInput={toInput}
+                    toScores={toScores}
+                    toResults={toResults} 
+                />
             }
             
             {display === "scores" &&
@@ -695,23 +738,23 @@ export default function App(){
 
             {display === "results" &&
                 <Results 
-                    toScores={toScores}
-                    toDashboard={toDashboard}
+                    user={user}
+                    players={players}
                     matchDetails={matchDetails}
                     matchStatus={matchStatus}
-                    players={players}
                     heartRateOne={heartRateOne}
                     heartRateTwo={heartRateTwo}
                     smoothHeartRateData={smoothHeartRateData}
                     scoreHistory={scoreHistory}
+                    toAuth={toAuth}
+                    toScores={toScores}
+                    toDashboard={toDashboard}
                 />
             }
 
             {display === "dashboard" &&
                 <Dashboard
                     toResults={toResults}
-                    scoreHistory={scoreHistory} 
-                    heartRateOne={heartRateOne}
                 />
             }
         </>

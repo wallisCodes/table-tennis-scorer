@@ -1,55 +1,97 @@
-import Match from '../models/Match.js';
+import jwt from "jsonwebtoken";
+import Match from "../models/Match.js";
 
 export const createMatch = async (req, res) => {
     const { sport, date, startTime } = req.body;
-    // Check if the user is authenticated (token exists)
-    const userId = req.user ? req.user.userId : null;
+    let userId = null; // Default to null for anonymous users
+
+    // console.log("Incoming Request:", req.method, req.path);
+    // console.log("Request Headers:", req.headers);
+    // console.log("Request Cookies:", req.cookies);
+
+    // Check if the request contains a token
+    if (req.cookies?.token) {
+        try {
+            const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+            userId = decoded.userId; // Assign userId if authenticated
+            console.log("Token Valid. User ID:", userId);
+        } catch (error) {
+            console.warn("Invalid token, proceeding as anonymous user:", error.message);
+        }
+    } else {
+        console.log("No token found, creating match as anonymous user.");
+    }
+    console.log("Attempting to create match with userId:", userId);
+    
     try {
         const match = await Match.create({
             sport,
             date,
             startTime,
-            userId // null if user hasn't logged in
+            userId // Saves userId if logged in, otherwise stays null
         });
+
+        console.log("Match Created:", match);
         res.status(201).json(match);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating match' });
+        console.error("Error creating match:", error);
+        res.status(500).json({ error: "Error creating match" });
     }
 };
 
 export const claimMatch = async (req, res) => {
     try {
-        const matchId = req.body.matchId;
+        const { matchId } = req.params;
+        const { userId } = req.body;
+
+        console.log(`Attempting to claim match ${matchId} for user ${userId}`);
         const match = await Match.findByPk(matchId);
 
-        if (!match || match.userId) {
-            return res.status(400).json({ error: 'Match already claimed or not found' });
+        if (!match) {
+            return res.status(404).json({ error: "Match not found" });
         }
 
-        match.userId = req.user.userId;
+        if (match.userId) {
+            return res.status(400).json({ error: "Match already belongs to a user" });
+        }
+
+        match.userId = userId;
         await match.save();
 
+        console.log("Match successfully claimed:", match);
         res.status(200).json(match);
     } catch (error) {
-        res.status(500).json({ error: 'Error claiming match' });
+        console.error("Error claiming match:", error);
+        res.status(500).json({ error: "Error claiming match" });
     }
 };
 
 export const getAllMatches = async (req, res) => {
     try {
-        const matches = await Match.findAll();
+        // Check if user is authenticated
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorised (no token provided)" });
+        }
+
+        const userId = req.user.userId; // Extract user ID from JWT
+        const matches = await Match.findAll({ where: { userId } }); // Fetch only this user's matches
         res.status(200).json(matches);
+
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching matches' });
+        console.error("Error fetching matches:", error);
+        res.status(500).json({ message: "Error fetching matches" });
     }
 };
+
 
 export const getMatchById = async (req, res) => {
     try {
         const match = await Match.findByPk(req.params.matchId);
         res.status(200).json(match);
+
     } catch (error) {
-        res.status(404).json({ error: 'Match not found' });
+        console.error("Match not found:", error);
+        res.status(404).json({ error: "Match not found" });
     }
 };
 
@@ -60,7 +102,7 @@ export const updateMatch = async (req, res) => {
         const match = await Match.findByPk(matchId);
         
         if (!match) {
-            return res.status(404).json({ error: 'Match not found' });
+            return res.status(404).json({ error: "Match not found" });
         }
     
         // Update only the provided fields
@@ -72,7 +114,8 @@ export const updateMatch = async (req, res) => {
         res.status(200).json(match);
 
     } catch (error) {
-        res.status(400).json({ error: 'Error updating match' });
+        console.error("Error updating match:", error);
+        res.status(400).json({ error: "Error updating match" });
     }
 };
   
@@ -83,9 +126,10 @@ export const deleteMatch = async (req, res) => {
             await match.destroy();
             res.status(204).send();
         } else {
-            res.status(404).json({ error: 'Match not found' });
+            res.status(404).json({ error: "Match not found" });
         }
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting match' });
+        console.error("Error deleting match:", error);
+        res.status(500).json({ error: "Error deleting match" });
     }
 };
