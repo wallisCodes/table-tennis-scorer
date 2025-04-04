@@ -29,7 +29,7 @@ export default function GameTracking({
     const [receiversChoice, setReceiversChoice] = useState(0);
     const [scoreCooldown, setScoreCooldown] = useState(false);
     const shortCooldown = 1000;
-    const longCooldown = 1000; // TODO: change back to 3000
+    const longCooldown = 2000; // TODO: change back to 2000
 
     function updatePlayerPoints(playerIndex, increment = true){
         // Only update scores if they haven't been updated within [cooldownDuration] ms

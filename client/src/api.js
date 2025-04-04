@@ -1,7 +1,11 @@
+const API_BASE_URL = process.env.NODE_ENV === "production" 
+    ? "http://18.130.43.206:3000"  // EC2 IP address
+    : "http://localhost:3000";   // localhost for local dev
+    
 // ========================== USER FETCH REQUESTS ========================== //
 export async function registerUser(email, password) {
     try {
-        const response = await fetch("http://localhost:3000/api/user/register", {
+        const response = await fetch(`${API_BASE_URL}/api/user/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -26,7 +30,7 @@ export async function registerUser(email, password) {
 
 export async function loginUser(email, password) {
     try {
-        const response = await fetch("http://localhost:3000/api/user/login", {
+        const response = await fetch(`${API_BASE_URL}/api/user/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -51,7 +55,7 @@ export async function loginUser(email, password) {
 
 export async function logoutUser() {
     try {
-        const response = await fetch("http://localhost:3000/api/user/logout", {
+        const response = await fetch(`${API_BASE_URL}/api/user/logout`, {
             method: "POST",
             credentials: "include"
         });
@@ -73,7 +77,7 @@ export async function logoutUser() {
 // Function to auto-authenticate users when refreshing page
 export async function verifyToken(){
     try {
-        const response = await fetch("http://localhost:3000/api/user/verifyToken", {
+        const response = await fetch(`${API_BASE_URL}/api/user/verifyToken`, {
             method: "GET",
             credentials: "include"
         });
@@ -94,7 +98,7 @@ export async function verifyToken(){
 // ========================== PLAYER FETCH REQUESTS ========================== //
 export async function createPlayers(playerData){
     try {
-        const response = await fetch("http://localhost:3000/api/players", {
+        const response = await fetch(`${API_BASE_URL}/api/players`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(playerData)
@@ -120,7 +124,7 @@ export async function createPlayers(playerData){
 
 export async function getAllPlayers(){
     try {
-        const response = await fetch("http://localhost:3000/api/players");
+        const response = await fetch(`${API_BASE_URL}/api/players`);
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve players: ${response.status}`);
@@ -138,7 +142,7 @@ export async function getAllPlayers(){
 
 export async function getPlayerById(playerId){
     try {
-        const response = await fetch(`http://localhost:3000/api/players/${playerId}`);
+        const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`);
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve specific player: ${response.status}`);
@@ -156,7 +160,7 @@ export async function getPlayerById(playerId){
 
 export async function deleteSinglePlayer(playerId){
     try {
-        const response = await fetch(`http://localhost:3000/api/players/${playerId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
             method: "DELETE"
         });
         
@@ -173,7 +177,7 @@ export async function deleteSinglePlayer(playerId){
 
 export async function deleteAllPlayers(){
     try {
-        const response = await fetch("http://localhost:3000/api/players", {
+        const response = await fetch(`${API_BASE_URL}/api/players`, {
             method: "DELETE"
         });
 
@@ -191,7 +195,7 @@ export async function deleteAllPlayers(){
 // ========================== MATCH FETCH REQUESTS ========================== //
 export async function createMatch(matchData){ 
     try {
-        const response = await fetch("http://localhost:3000/api/match", {
+        const response = await fetch(`${API_BASE_URL}/api/match`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(matchData),
@@ -219,7 +223,7 @@ export async function createMatch(matchData){
 
 export async function claimMatch(matchId, userId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/match/${matchId}/claim`, {
+        const response = await fetch(`${API_BASE_URL}/api/match/${matchId}/claim`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId }),
@@ -242,7 +246,7 @@ export async function claimMatch(matchId, userId) {
 
 export async function getAllMatches(){
     try {
-        const response = await fetch("http://localhost:3000/api/match", {
+        const response = await fetch(`${API_BASE_URL}/api/match`, {
             method: "GET",
             credentials: "include"
         });
@@ -263,7 +267,7 @@ export async function getAllMatches(){
 
 export async function updateMatch(matchId, updateData){  
     try {
-        const response = await fetch(`http://localhost:3000/api/match/${matchId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/match/${matchId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updateData)
@@ -301,7 +305,7 @@ export async function createMatchPlayers(playerIds, matchId){
     ];
 
     try {
-        const response = await fetch("http://localhost:3000/api/match-player", {
+        const response = await fetch(`${API_BASE_URL}/api/match-player`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(matchPlayers),
@@ -326,7 +330,7 @@ export async function createMatchPlayers(playerIds, matchId){
 
 export async function getPlayersByMatch(matchId){
     try {
-        const response = await fetch(`http://localhost:3000/api/match-player/${matchId}`);
+        const response = await fetch(`${API_BASE_URL}/api/match-player/${matchId}`);
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve match player records for specific match: ${response.status}`);
@@ -344,7 +348,7 @@ export async function getPlayersByMatch(matchId){
 
 export async function getMatchesByPlayer(playerId){
     try {
-        const response = await fetch(`http://localhost:3000/api/match-player/player/${playerId}`);
+        const response = await fetch(`${API_BASE_URL}/api/match-player/player/${playerId}`);
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve match player records for specific player: ${response.status}`);
@@ -361,7 +365,7 @@ export async function getMatchesByPlayer(playerId){
 
 export async function updateMatchPlayer(matchPlayerId, playerScore){
     try {
-        const response = await fetch(`http://localhost:3000/api/match-player/${matchPlayerId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/match-player/${matchPlayerId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(playerScore)
@@ -384,7 +388,7 @@ export async function updateMatchPlayer(matchPlayerId, playerScore){
 // ========================== SCORE HISTORY FETCH REQUESTS ========================== //  
 export async function createScoreHistory(matchId, scoreHistoryData){
     try {
-        const response = await fetch(`http://localhost:3000/api/score-history/${matchId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/score-history/${matchId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(scoreHistoryData)
@@ -406,7 +410,7 @@ export async function createScoreHistory(matchId, scoreHistoryData){
 
 export async function getScoreHistory(matchId){
     try {
-        const response = await fetch(`http://localhost:3000/api/score-history/${matchId}`);
+        const response = await fetch(`${API_BASE_URL}/api/score-history/${matchId}`);
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve score history records for specific match: ${response.status}`);
@@ -425,7 +429,7 @@ export async function getScoreHistory(matchId){
 // ========================== HEART RATE FETCH REQUESTS ========================== //    
 export async function createHeartRate(matchId, playerId, heartRateData){
     try {
-        const response = await fetch(`http://localhost:3000/api/heart-rate/${matchId}/${playerId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/heart-rate/${matchId}/${playerId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(heartRateData)
@@ -446,7 +450,7 @@ export async function createHeartRate(matchId, playerId, heartRateData){
 
 export async function getHeartRate(matchId, playerId){
     try {
-        const response = await fetch(`http://localhost:3000/api/heart-rate/${matchId}/${playerId}`);
+        const response = await fetch(`${API_BASE_URL}/api/heart-rate/${matchId}/${playerId}`);
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve heart rate records for specific player: ${response.status}`);

@@ -15,15 +15,20 @@ import heartRateRoutes from "./routes/heartRateRoutes.js";
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-    origin: 'http://localhost:5173',
+
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production' 
+        ? 'https://dfucpyx6pefum.cloudfront.net' // frontend URL making API calls
+        : 'http://localhost:5173', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],
     credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.urlencoded({extended: true}));
 // app.options('*', cors()); // Handles preflight requests
-
+console.log("NODE_ENV:", process.env.NODE_ENV);
 
 // /api included in path to make it obvious this is a backend API call
 app.use('/api/user', userRoutes);
@@ -33,13 +38,15 @@ app.use('/api/match-player', matchPlayerRoutes);
 app.use('/api/score-history', scoreHistoryRoutes);
 app.use('/api/heart-rate', heartRateRoutes);
 
+// Quickly check API's work
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'OK' });
+});
 
 // Sync database and start server
 const PORT = process.env.PORT || 3000;
-// change sync options for production { alter: true }
-// sequelize.sync().then(() => {
-sequelize.sync({ force: true }).then(() => {
-// sequelize.sync({ alter: true }).then(() => {
+// sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ alter: true }).then(() => {
     console.log("Database synchronized");
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }).catch(error => {

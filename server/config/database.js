@@ -9,13 +9,13 @@ isProduction && console.log(`Current time inside databse.js: ${new Date()}`);
 const sequelize = isProduction
     ? new Sequelize(process.env.DATABASE_URL, {
         dialect: 'postgres',
-        logging: false, 
         dialectOptions: {
             ssl: {
                 require: true,
                 rejectUnauthorized: false // Required for AWS RDS
             }
-        }
+        },
+        logging: false 
     })
     : new Sequelize(
         process.env.DB_NAME,
