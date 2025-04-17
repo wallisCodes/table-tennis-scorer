@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production' 
-        ? 'https://dfucpyx6pefum.cloudfront.net' // frontend URL making API calls
+        ? 'https://t-racket.com' // frontend URL making API calls
         : 'http://localhost:5173', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],

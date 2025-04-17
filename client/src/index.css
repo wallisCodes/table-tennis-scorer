@@ -10,9 +10,6 @@
     box-sizing: border-box;
 }
 
-input {
-    padding: 5px 10px;
-}
 
 /* =============== NAVIGATION =============== */
 .navbar {
@@ -65,12 +62,159 @@ input {
 .input-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
     position: relative;
     min-height: 95vh;
+    /* margin-top: 1rem; */
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    gap: 1rem;
 }
 
 .general-form {
     margin-top: 48px;
+}
+
+.sport-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+  
+.sport-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+}
+  
+.sport-item.selected {
+    border-color: #007bff;
+}
+
+.player-selection {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem auto;
+}
+
+.player-inputs {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.label-input-group {
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.text-input, .number-input {
+    padding: 2px 4px;
+}
+
+.text-input {
+    width: 150px;
+}
+
+.number-input {
+    width: 100px;
+}
+
+.colour-input {
+    width: 100px;
+    height: 24px;
+    border: 1px solid white;
+}
+
+.add-player-button {
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: 2px solid white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-player-button:disabled {
+    color: #ccc;
+    border-color: #ccc;
+    background-color: transparent;
+    cursor: default;
+}
+
+.player-list-info {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.player-list {
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+    list-style-type: none;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.player-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    padding: 1rem;
+    border: 1px solid aquamarine;
+}
+
+.player-text-colour {
+    display: flex;
+    gap: 1rem;
+}
+
+.colour-box {
+    width: 20px;
+    aspect-ratio: 1;
+}
+
+.player-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.player-action-button {
+    padding: 3px 6px;
+}
+
+.match-start-button {
+    font-size: 1.5rem;
+    color: white;
+    padding: 1rem;
+    background-color: #007bff;
+    border: 2px solid white;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
 

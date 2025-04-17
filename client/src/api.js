@@ -1,5 +1,5 @@
 const API_BASE_URL = process.env.NODE_ENV === "production" 
-    ? "http://18.130.43.206:3000"  // EC2 IP address
+    ? "https://api.t-racket.com"  // Custom domain url
     : "http://localhost:3000";   // localhost for local dev
     
 // ========================== USER FETCH REQUESTS ========================== //

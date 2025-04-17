@@ -33,8 +33,8 @@ export default function GeneralForm({players, playerIdsRef, matchDetails, setMat
                         >
                             <option value="">Choose Sport</option>
                             <option value="table-tennis">Table Tennis</option>
-                            <option value="squash">Squash</option>
                             <option value="badminton">Badminton</option>
+                            <option value="squash">Squash</option>
                             {/* <option value="tennis">Tennis</option> */}
                         </select>
                     </div>                    
