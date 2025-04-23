@@ -26,18 +26,18 @@ export default function App(){
     const matchStatus = useRef("pending"); // pending, active or complete
     // const [players, setPlayers] = useState([]);
     const [players, setPlayers] = useState([ // for testing purposes
-        // {
-        //     name: "Wallis",
-        //     age: 28,
-        //     colour: "#ff00ff",
-        //     points: 19 // testing purposes
-        // },
-        // {
-        //     name: "Lau",
-        //     age: 56,
-        //     colour: "#00ff00",
-        //     points: 19 // testing purposes
-        // }
+        {
+            name: "Wallis",
+            age: 28,
+            colour: "#ff00ff",
+            points: 19 // testing purposes
+        },
+        {
+            name: "Lau",
+            age: 56,
+            colour: "#00ff00",
+            points: 19 // testing purposes
+        }
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     const [display, setDisplay] = useState("input");

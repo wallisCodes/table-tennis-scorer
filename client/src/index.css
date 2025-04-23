@@ -16,7 +16,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 5vh;
+    height: 6vh;
     /* background-color: darkslategray; */
     border-bottom: 2px solid white;
     padding: 10px;
@@ -28,8 +28,8 @@
 }
 
 .nav-auth-button {
-    font-size: 1.5rem;
-    padding: 3px 10px;
+    font-size: 1.4rem;
+    padding: 2px 10px;
     background-color: transparent;
     color: white;
     border: 1px solid white;
@@ -59,30 +59,25 @@
 
 
 /* =============== INPUT SCREEN =============== */
-.input-container {
+.match-creation-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
-    min-height: 95vh;
-    /* margin-top: 1rem; */
+    min-height: 94vh;
 }
 
-.input-group {
+.sport-selection-group {
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
     align-items: center;
-    gap: 1rem;
-}
-
-.general-form {
-    margin-top: 48px;
+    gap: 2rem;
+    margin: 2rem auto;
 }
 
 .sport-options {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     flex-wrap: wrap;
 }
   
@@ -102,7 +97,7 @@
     border-color: #007bff;
 }
 
-.player-selection {
+.player-selection-group {
     display: flex;
     gap: 1rem;
     margin: 2rem auto;
@@ -173,33 +168,37 @@
 
 .player-list {
     display: flex;
-    gap: 2rem;
     flex-direction: column;
+    justify-content: space-between;
     list-style-type: none;
-    border: 2px solid #ccc;
-    border-radius: 8px;
 }
 
 .player-group {
     display: flex;
-    gap: 0.5rem;
+    /* gap: 0.5rem; */
     flex-direction: column;
-    padding: 1rem;
-    border: 1px solid aquamarine;
+    justify-content: space-between;
+    height: 46%;
+    padding: 0.5rem 1rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
 }
 
 .player-text-colour {
     display: flex;
-    gap: 1rem;
+    justify-content: space-between;
+    gap: 1.5rem;
 }
 
 .colour-box {
     width: 20px;
     aspect-ratio: 1;
+    border: 1px solid #ccc;
 }
 
 .player-actions {
     display: flex;
+    justify-content: space-between;
     gap: 1rem;
 }
 
@@ -257,7 +256,7 @@
 .score-tracking-container {
     display: flex;
     position: relative;
-    min-height: 95vh;
+    min-height: 94vh;
 }
 
 .modal-container {
@@ -454,7 +453,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 45vh;
+    height: 44vh;
     width: 100%;
     border-top: 6px solid black;
 }
@@ -586,7 +585,7 @@
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    min-height: 95vh;
+    min-height: 94vh;
 }
 
 .title-text {
@@ -607,7 +606,7 @@
     flex-direction: column;
     position: relative;
     gap: 1rem;
-    min-height: 95vh;
+    min-height: 94vh;
     /* border: 2px solid white; */
     width: 100%;
     margin-bottom: 1rem;
