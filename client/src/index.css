@@ -10,6 +10,11 @@
     box-sizing: border-box;
 }
 
+a {
+    color: unset;
+    text-decoration: none;
+}
+
 
 /* =============== NAVIGATION =============== */
 .navbar {
@@ -25,6 +30,17 @@
 
 .nav-title {
     font-size: 2rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style-type: none;
+}
+
+.nav-link {
+    padding: 2px 10px;
+    border: 1px solid white;
 }
 
 .nav-auth-button {
@@ -55,6 +71,20 @@
 
 .next-button {
     right: 0;
+}
+
+
+/* =============== INPUT SCREEN =============== */
+.home-title {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.home-links {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin: 2rem 0;
 }
 
 
@@ -551,8 +581,6 @@
 .bluetooth-initial-buttons {
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
-    /* align-items: center; */
 }
 
 .bluetooth-connect-btn, .use-mock-data-btn {

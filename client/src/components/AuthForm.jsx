@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerUser, loginUser, logoutUser, claimMatch } from "../api";
 
-export default function AuthForm({ userIdRef, setUser, matchIdRef, matchDetails, setMatchDetails, matchStatus, toInput, toScores, toResults }){
+export default function AuthForm({ userIdRef, setUser, matchIdRef, matchDetails, setMatchDetails, matchStatus }){
+    let navigate = useNavigate();
+    
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginMode, setLoginMode] = useState(true); // Used to toggle between login/register forms
@@ -35,11 +38,11 @@ export default function AuthForm({ userIdRef, setUser, matchIdRef, matchDetails,
 
             // Navigate to correct page after logging in, depending on matchStatus
             if (matchStatus.current === "pending"){
-                toInput();
+                navigate("/input");
             } else if (matchStatus.current === "active"){
-                toScores();
+                navigate("/scores");
             } else {
-                toResults();
+                navigate("/results");
             }
         
         // Logic when registering

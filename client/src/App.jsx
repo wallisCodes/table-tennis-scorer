@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import GeneralForm from './components/GeneralForm';
+import Home from './components/Home';
 import AuthForm from './components/AuthForm';
-import PlayerForm from './components/PlayerForm';
-import GameTracking from './components/GameTracking';
-import Dashboard from './components/Dashboard';
-import Results from './components/Results';
-import { verifyToken } from './api';
 import MatchCreation from './components/MatchCreation';
-import MatchForm from './components/MatchForm';
-// TODO: uninstall uuid
+import Scores from './components/Scores';
+import Results from './components/Results';
+import Dashboard from './components/Dashboard';
+import { verifyToken } from './api';
+
 
 export default function App(){
     const [user, setUser] = useState(null);
@@ -40,25 +39,12 @@ export default function App(){
         }
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
-    const [display, setDisplay] = useState("input");
     // Creating refs to store session ids for user, players, match and match player records
     const userIdRef = useRef(null);
     const playerIdsRef = useRef(null);
     const matchIdRef = useRef(null);
     const matchPlayerIdsRef = useRef(null);
 
-
-    function addPlayer(name, age, colour){
-        setPlayers([
-            ...players,
-            {
-                name: name,
-                age: age,
-                colour: colour,
-                points: 0
-            }
-        ]);
-    }
 
     // Verify user on page refresh
     useEffect(() => {
@@ -155,28 +141,6 @@ export default function App(){
     
             return () => clearInterval(int);
         }, []);
-    }
-
-
-    // These will be replaced eventually with React Router
-    function toInput(){
-        setDisplay("input");
-    }
-
-    function toAuth(){
-        setDisplay("auth");
-    }
-
-    function toScores(){
-        setDisplay("scores");
-    }
-
-    function toResults(){
-        setDisplay("results");
-    }
-
-    function toDashboard(){
-        setDisplay("dashboard");
     }
 
 
@@ -654,123 +618,112 @@ export default function App(){
                 user={user}
                 setUser={setUser}
                 matchStatus={matchStatus}
-                toAuth={toAuth}
-                toInput={toInput}
-                toScores={toScores}
-                toResults={toResults}
             />
-            {display === "input" &&
-                <div className="input-container">
-                    {/* <GeneralForm 
-                        players={players}
-                        playerIdsRef={playerIdsRef}
-                        // matchStatus={matchStatus}
-                        matchDetails={matchDetails}
-                        setMatchDetails={setMatchDetails}
-                        toScores={toScores}
-                    />
-                    <PlayerForm
-                        players={players}
-                        addPlayer={addPlayer}
-                    /> */}
-                    <MatchCreation 
-                        players={players}
-                        setPlayers={setPlayers}
-                        playerIdsRef={playerIdsRef}
-                        // matchStatus={matchStatus}
-                        matchDetails={matchDetails}
-                        setMatchDetails={setMatchDetails}
-                        toScores={toScores}
-                    />
-                    {/* <MatchForm 
-                        toScores={toScores}
-                    /> */}
-                </div>
-            }
 
-            {display === "auth" &&
-                <AuthForm
-                    userIdRef={userIdRef}
-                    setUser={setUser}
-                    matchIdRef={matchIdRef}
-                    matchDetails={matchDetails}
-                    setMatchDetails={setMatchDetails}
-                    matchStatus={matchStatus}
-                    toInput={toInput}
-                    toScores={toScores}
-                    toResults={toResults} 
+            <Routes>
+                <Route 
+                    path="/" 
+                    element={
+                        <Home />
+                    }
                 />
-            }
-            
-            {display === "scores" &&
-                <GameTracking
-                    matchDetails={matchDetails}
-                    setMatchDetails={setMatchDetails} 
-                    matchStatus={matchStatus}
-                    // setMatchStatus={setMatchStatus}
-                    players={players}
-                    setPlayers={setPlayers}
-                    getCurrentTime={getCurrentTime}
-                    toInput={toInput}
-                    toResults={toResults}
-                    heartRateOne={heartRateOne}
-                    heartRateOneOnly={heartRateOneOnly}
-                    scoreHistory={scoreHistory}
-                    setScoreHistory={setScoreHistory}
-                    deviceInitialisedOne={deviceInitialisedOne}
-                    deviceStatusOne={deviceStatusOne}
-                    pausedOne={pausedOne}
-                    reconnectOverrideOne={reconnectOverrideOne}
-                    disconnectedManuallyRefOne={disconnectedManuallyRefOne}
-                    handleManualDisconnectOne={handleManualDisconnectOne}
-                    handleManualReconnectOne={handleManualReconnectOne}
-                    connectToHeartRateSensorOne={connectToHeartRateSensorOne}
-                    handlePauseOne={handlePauseOne}
-                    handleResumeOne={handleResumeOne}
-                    batteryLevelOne={batteryLevelOne}
-                    heartRateTwo={heartRateTwo}
-                    heartRateTwoOnly={heartRateTwoOnly}
-                    deviceInitialisedTwo={deviceInitialisedTwo}
-                    deviceStatusTwo={deviceStatusTwo}
-                    pausedTwo={pausedTwo}
-                    reconnectOverrideTwo={reconnectOverrideTwo}
-                    disconnectedManuallyRefTwo={disconnectedManuallyRefTwo}
-                    handleManualDisconnectTwo={handleManualDisconnectTwo}
-                    handleManualReconnectTwo={handleManualReconnectTwo}
-                    connectToHeartRateSensorTwo={connectToHeartRateSensorTwo}
-                    handlePauseTwo={handlePauseTwo}
-                    handleResumeTwo={handleResumeTwo}
-                    batteryLevelTwo={batteryLevelTwo}
-                    mockData={mockData}
-                    userIdRef={userIdRef}
-                    playerIdsRef={playerIdsRef}
-                    matchIdRef={matchIdRef}
-                    matchPlayerIdsRef={matchPlayerIdsRef}
-                />
-            }
 
-
-            {display === "results" &&
-                <Results 
-                    user={user}
-                    players={players}
-                    matchDetails={matchDetails}
-                    matchStatus={matchStatus}
-                    heartRateOne={heartRateOne}
-                    heartRateTwo={heartRateTwo}
-                    smoothHeartRateData={smoothHeartRateData}
-                    scoreHistory={scoreHistory}
-                    toAuth={toAuth}
-                    toScores={toScores}
-                    toDashboard={toDashboard}
+                <Route 
+                    path="/auth"
+                    element={
+                        <AuthForm
+                            userIdRef={userIdRef}
+                            setUser={setUser}
+                            matchIdRef={matchIdRef}
+                            matchDetails={matchDetails}
+                            setMatchDetails={setMatchDetails}
+                            matchStatus={matchStatus}
+                        />
+                    }
                 />
-            }
 
-            {display === "dashboard" &&
-                <Dashboard
-                    toResults={toResults}
+                <Route 
+                    path="/create"
+                    element={
+                        <MatchCreation 
+                            players={players}
+                            setPlayers={setPlayers}
+                            playerIdsRef={playerIdsRef}
+                            matchDetails={matchDetails}
+                            setMatchDetails={setMatchDetails}
+                        />
+                    }
                 />
-            }
+
+                <Route 
+                    path="/scores"
+                    element={
+                        <Scores
+                            matchDetails={matchDetails}
+                            setMatchDetails={setMatchDetails} 
+                            matchStatus={matchStatus}
+                            players={players}
+                            setPlayers={setPlayers}
+                            getCurrentTime={getCurrentTime}
+                            heartRateOne={heartRateOne}
+                            heartRateOneOnly={heartRateOneOnly}
+                            scoreHistory={scoreHistory}
+                            setScoreHistory={setScoreHistory}
+                            deviceInitialisedOne={deviceInitialisedOne}
+                            deviceStatusOne={deviceStatusOne}
+                            pausedOne={pausedOne}
+                            reconnectOverrideOne={reconnectOverrideOne}
+                            disconnectedManuallyRefOne={disconnectedManuallyRefOne}
+                            handleManualDisconnectOne={handleManualDisconnectOne}
+                            handleManualReconnectOne={handleManualReconnectOne}
+                            connectToHeartRateSensorOne={connectToHeartRateSensorOne}
+                            handlePauseOne={handlePauseOne}
+                            handleResumeOne={handleResumeOne}
+                            batteryLevelOne={batteryLevelOne}
+                            heartRateTwo={heartRateTwo}
+                            heartRateTwoOnly={heartRateTwoOnly}
+                            deviceInitialisedTwo={deviceInitialisedTwo}
+                            deviceStatusTwo={deviceStatusTwo}
+                            pausedTwo={pausedTwo}
+                            reconnectOverrideTwo={reconnectOverrideTwo}
+                            disconnectedManuallyRefTwo={disconnectedManuallyRefTwo}
+                            handleManualDisconnectTwo={handleManualDisconnectTwo}
+                            handleManualReconnectTwo={handleManualReconnectTwo}
+                            connectToHeartRateSensorTwo={connectToHeartRateSensorTwo}
+                            handlePauseTwo={handlePauseTwo}
+                            handleResumeTwo={handleResumeTwo}
+                            batteryLevelTwo={batteryLevelTwo}
+                            mockData={mockData}
+                            userIdRef={userIdRef}
+                            playerIdsRef={playerIdsRef}
+                            matchIdRef={matchIdRef}
+                            matchPlayerIdsRef={matchPlayerIdsRef}
+                        />
+                    }
+                />
+
+                <Route 
+                    path="/results"
+                    element={
+                        <Results 
+                            players={players}
+                            matchDetails={matchDetails}
+                            matchStatus={matchStatus}
+                            heartRateOne={heartRateOne}
+                            heartRateTwo={heartRateTwo}
+                            smoothHeartRateData={smoothHeartRateData}
+                            scoreHistory={scoreHistory}
+                        />
+                    }
+                />
+
+                <Route 
+                    path="/dashboard"
+                    element={
+                        <Dashboard />
+                    }
+                />
+            </Routes>
         </>
     )
 }
