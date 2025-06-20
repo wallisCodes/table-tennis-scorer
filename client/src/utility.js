@@ -1,3 +1,4 @@
+import Papa from "papaparse";
 // DEDICATED FILE FOR UTILITY FUNCTIONS TO HELP DECLUTTER COMPONENTS
 
 export function calcHRPercent(heartRate, age){
@@ -124,4 +125,11 @@ export function getMatchDurationText(duration){
     }
 
     return matchDurationText;
+}
+
+// Convert JSON data into CSV format (scoring)
+export function generateScoreHistoryCSV(json){
+    const csvData = Papa.unparse(json);
+    console.log("csvData:", csvData);
+    return csvData;
 }

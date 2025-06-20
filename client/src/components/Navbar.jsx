@@ -33,7 +33,10 @@ export default function Navbar({user, setUser, matchStatus}){
                     <li className="nav-link"><Link to="/scores">Scores</Link></li>
                     <li className="nav-link"><Link to="/results">Results</Link></li>
                     {/* TODO: Navigate to auth/dashboard depending on user status */}
-                    <li className="nav-link"><Link to="/dashboard">Dashboard</Link></li>
+                    {user ?
+                        <li className="nav-link"><Link to="/dashboard">Dashboard</Link></li> :
+                        <li className="nav-link"><Link to="/auth">Dashboard</Link></li>
+                    }
                 </ul>
             </nav>
 

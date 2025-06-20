@@ -14,7 +14,7 @@ export default function App(){
     const [user, setUser] = useState(null);
     const [matchDetails, setMatchDetails] = useState(
         {
-            sport: null, // testing null starting value
+            sport: "squash", // testing null starting value
             date: null, // Unix timestamp, used for filtering in dashboard
             startTime: null, // hh:mm:ss format
             endTime: null, // hh:mm:ss format
@@ -29,13 +29,13 @@ export default function App(){
             name: "Wallis",
             age: 28,
             colour: "#ff00ff",
-            points: 19 // testing purposes
+            points: 10 // testing purposes
         },
         {
             name: "Lau",
             age: 56,
             colour: "#00ff00",
-            points: 19 // testing purposes
+            points: 9 // testing purposes
         }
     ]);
     const [scoreHistory, setScoreHistory] = useState([]);
@@ -106,8 +106,8 @@ export default function App(){
 
 
     // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(false);
-    // const [mockData, setMockData] = useState(true);
+    // const [mockData, setMockData] = useState(false);
+    const [mockData, setMockData] = useState(true);
 
     if (mockData === true){
         useEffect(() => {
@@ -137,7 +137,7 @@ export default function App(){
 
             const int = setInterval(() => { //generates HR data between X and Y (excluding X and Y) bpm every Z ms for both players
                 generateRandomHRValues(109, 181);
-            }, 30000);
+            }, 1000);
     
             return () => clearInterval(int);
         }, []);

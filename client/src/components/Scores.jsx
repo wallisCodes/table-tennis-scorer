@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
+import CSVModal from "./CSVModal";
 import { createHeartRate, createMatch, createMatchPlayers, createScoreHistory, updateMatch, updateMatchPlayer } from "../api";
 import { calcHRPercent, chooseBackgroundColor, chooseStatusColor, getMatchDuration } from "../utility";
-// import _ from 'lodash';
 
 export default function GameTracking({
     matchDetails, setMatchDetails, matchStatus, players, setPlayers, getCurrentTime, heartRateOne, heartRateOneOnly, scoreHistory,
@@ -33,6 +33,7 @@ export default function GameTracking({
     const [scoreCooldown, setScoreCooldown] = useState(false);
     const shortCooldown = 1000;
     const longCooldown = 1000; // TODO: change back to 2000
+    const [showCSVModal, setShowCSVModal] = useState(false);
 
     function updatePlayerPoints(playerIndex, increment = true){
         // Only update scores if they haven't been updated within [cooldownDuration] ms
@@ -102,21 +103,31 @@ export default function GameTracking({
             } 
         }
         else if (matchDetails.sport === "squash"){
-            // Squash scoring: first to 15, except if it's 14-14 a modal pops up asking the receiver if they want to play 1 or 3 more points
+            // Squash scoring: first to 11 points wins, must be by two clear points (e.g. 12-10, 15-13)
             if (players.length === 2) {
                 const [player1, player2] = players;
     
-                if (player1.points === 14 && player2.points === 14) {
-                    promptReceiver();
-                }
-                else if (player1.points === 15 + receiversChoice) {
+                if (player1.points >= 11 && player1.points - player2.points >= 2) {
                     setWinner(player1.name);
                     setShowWinner(true);
-                } 
-                else if (player2.points === 15 + receiversChoice) {
+                } else if (player2.points >= 11 && player2.points - player1.points >= 2) {
                     setWinner(player2.name);
                     setShowWinner(true);
                 }
+
+            // Alternative/old scoring logic...
+            // Squash scoring: first to 15, except if it's 14-14 a modal pops up asking the receiver if they want to play 1 or 3 more points
+            // if (player1.points === 14 && player2.points === 14) {
+            //     promptReceiver();
+            // }
+            // else if (player1.points === 15 + receiversChoice) {
+            //     setWinner(player1.name);
+            //     setShowWinner(true);
+            // } 
+            // else if (player2.points === 15 + receiversChoice) {
+            //     setWinner(player2.name);
+            //     setShowWinner(true);
+            // }
             }
         }
         else {
@@ -204,15 +215,18 @@ export default function GameTracking({
             endTime: currentTime,
             duration: matchDuration
         };
-
-        // console.log("updatedMatchDetailsState (aka matchDetails):", updatedMatchDetailsState);
         
         // Pass directly into fetch function instead of waiting for state update
         finishMatchFetchRequests(updatedMatchDetailsState);
         // THEN update the state (this doesn't affect the fetch function)
         setMatchDetails(updatedMatchDetailsState);
+
+        // const csvScoreHistory = generateCombinedCSV(scoreHistory);
+        // Prompt user to save locally?
+
+
         // Automatically navigate to Results "page"
-        navigate("/results");
+        // navigate("/results");
     }
 
 
@@ -294,7 +308,18 @@ export default function GameTracking({
                                         <div className="recent-points">{recentPointsP1}</div>
                                     </div>
                                 )) : (
-                                    <h1 className="">Match complete!</h1>
+                                    <div>
+                                        {!showCSVModal && <button onClick={() => setShowCSVModal(true)} className="modal-button">Export Data</button>}
+                                        <CSVModal 
+                                            isOpen={showCSVModal}
+                                            onClose={() => setShowCSVModal(false)}
+                                            players={players}
+                                            matchDetails={matchDetails}
+                                            scoreHistory={scoreHistory}
+                                            heartRateOne={heartRateOne}
+                                            heartRateTwo={heartRateTwo}
+                                        />
+                                    </div>
                                 )
                             )
                         }
@@ -382,7 +407,8 @@ export default function GameTracking({
                             <div className="player-team-two" style={p2TeamStyles}></div>
                         </div>
 
-                        {matchStatus.current === "active" ? (
+                        {/* Only display score/winner confirmation during active match */}
+                        {matchStatus.current === "active" && (
                             showWinner ? (
                                 <div className="winner-box">
                                     <h1 className="winner-name">{winner} wins!</h1>
@@ -400,8 +426,7 @@ export default function GameTracking({
                                     </div>
                                     <div className="recent-points">{recentPointsP2}</div>
                                 </div>
-                            )) : ( 
-                            matchStatus.current === "complete" && <h1 className="">Match complete!</h1>
+                            )
                         )}
                     </div>
                     
