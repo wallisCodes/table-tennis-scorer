@@ -333,7 +333,6 @@ a {
 .export-checkbox {
     display: flex;
     gap: 2rem;
-    /* justify-content: space-between; */
     align-items: center;
     width: 200px;
 }
@@ -496,6 +495,8 @@ a {
     background-color: red;
 }
 
+.post-match-buttons {}
+
 .heart-rate-box {
     display: flex;
     justify-content: center;
@@ -595,9 +596,10 @@ a {
     fill: white;
 }
 
-.bluetooth-initial-buttons {
+.vertical-buttons {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
 }
 
 .bluetooth-connect-btn, .use-mock-data-btn {

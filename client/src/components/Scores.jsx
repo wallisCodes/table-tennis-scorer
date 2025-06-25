@@ -6,9 +6,9 @@ import { createHeartRate, createMatch, createMatchPlayers, createScoreHistory, u
 import { calcHRPercent, chooseBackgroundColor, chooseStatusColor, getMatchDuration } from "../utility";
 
 export default function GameTracking({
-    matchDetails, setMatchDetails, matchStatus, players, setPlayers, getCurrentTime, heartRateOne, heartRateOneOnly, scoreHistory,
+    matchDetails, setMatchDetails, matchStatus, players, setPlayers, getCurrentTime, heartRateOne, setHeartRateOne, heartRateOneOnly, scoreHistory,
     setScoreHistory, deviceInitialisedOne, deviceStatusOne, pausedOne, reconnectOverrideOne, disconnectedManuallyRefOne, handleManualDisconnectOne,
-    handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, heartRateTwoOnly,
+    handleManualReconnectOne, connectToHeartRateSensorOne, handlePauseOne, handleResumeOne, batteryLevelOne, heartRateTwo, setHeartRateTwo, heartRateTwoOnly,
     deviceInitialisedTwo, deviceStatusTwo, pausedTwo, reconnectOverrideTwo, disconnectedManuallyRefTwo, handleManualDisconnectTwo,
     handleManualReconnectTwo, connectToHeartRateSensorTwo, handlePauseTwo, handleResumeTwo, batteryLevelTwo, mockData, userIdRef, playerIdsRef, matchIdRef, matchPlayerIdsRef
 }){
@@ -221,10 +221,6 @@ export default function GameTracking({
         // THEN update the state (this doesn't affect the fetch function)
         setMatchDetails(updatedMatchDetailsState);
 
-        // const csvScoreHistory = generateCombinedCSV(scoreHistory);
-        // Prompt user to save locally?
-
-
         // Automatically navigate to Results "page"
         // navigate("/results");
     }
@@ -257,6 +253,68 @@ export default function GameTracking({
         createHeartRate(matchIdRef.current, playerIdsRef.current[0], heartRateOne);
         // Saving heart rate batch data for player two
         createHeartRate(matchIdRef.current, playerIdsRef.current[1], heartRateTwo);
+    }
+
+    // Function to create a new match with the same player & match details
+    function restartMatch(){
+        // Reset HR and score data
+        setPlayers([
+            {
+                ...players[0],
+                points: 0
+            },
+            {
+                ...players[1],
+                points: 0
+            }
+        ])
+        setMatchDetails({
+            ...matchDetails,
+            startTime: getCurrentTime(),
+            endTime: null,
+            duration: null
+        }); // sport, date and userId should remain
+        setHeartRateOne([]);
+        setHeartRateTwo([]);
+        setScoreHistory([]);
+        // console.log("Reset HR and score data");
+
+        // Reset matchStatus ref
+        matchStatus.current = "pending";
+
+        // Reset winner
+        setShowWinner(false);
+        setWinner(null);
+
+        // Navigate to /scores route
+        navigate("/scores");
+    }
+
+    // Function to create a new match from scratch
+    function createNewMatch(){
+        // Reset players, matchDetails, HR and score data
+        setPlayers([]);
+        setMatchDetails({
+            ...matchDetails,
+            sport: null,
+            date: null,
+            startTime: null,
+            endTime: null,
+            duration: null
+        }); // userId should remain
+        setHeartRateOne([]);
+        setHeartRateTwo([]);
+        setScoreHistory([]);
+
+        // Reset matchStatus ref
+        matchStatus.current = "pending";
+
+        // Reset winner
+        setShowWinner(false);
+        setWinner(null);
+
+        // Navigate to /create route
+        navigate("/create");
     }
 
 
@@ -309,7 +367,11 @@ export default function GameTracking({
                                     </div>
                                 )) : (
                                     <div>
-                                        {!showCSVModal && <button onClick={() => setShowCSVModal(true)} className="modal-button">Export Data</button>}
+                                        {!showCSVModal && 
+                                        <div className="vertical-buttons">
+                                            <button onClick={() => setShowCSVModal(true)} className="modal-button">Export Data</button>
+                                            <button onClick={() => restartMatch()} className="modal-button">Rematch</button>
+                                        </div>}
                                         <CSVModal 
                                             isOpen={showCSVModal}
                                             onClose={() => setShowCSVModal(false)}
@@ -408,7 +470,7 @@ export default function GameTracking({
                         </div>
 
                         {/* Only display score/winner confirmation during active match */}
-                        {matchStatus.current === "active" && (
+                        {matchStatus.current === "active" ? (
                             showWinner ? (
                                 <div className="winner-box">
                                     <h1 className="winner-name">{winner} wins!</h1>
@@ -427,6 +489,12 @@ export default function GameTracking({
                                     <div className="recent-points">{recentPointsP2}</div>
                                 </div>
                             )
+                        ) : (
+                            matchStatus.current === "complete" &&
+                            (<div className="vertical-buttons">
+                                <button onClick={() => navigate("/results")} className="modal-button">View Graph</button>
+                                <button onClick={() => createNewMatch()} className="modal-button">New Match</button>
+                            </div>)
                         )}
                     </div>
                     
