@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getMatchDurationText } from "../utility";
+import { getCurrentDateText, getMatchDurationText } from "../utility";
 import Papa from "papaparse";
 
 export default function CSVModal({ isOpen, onClose, players, matchDetails, scoreHistory, heartRateOne, heartRateTwo }){
@@ -57,74 +57,57 @@ export default function CSVModal({ isOpen, onClose, players, matchDetails, score
 
 
     // Generate combined CSV data
-    function generateCombinedCSV(heartRateOne, heartRateTwo, scoreHistory){
-        // Array to store combined JSON data to be parsed
-        const allData = [];
-    
-        // Add heart rate data if selected and available
-        if ((exportOptions.heartRateOptionOne && heartRateOne ) || (exportOptions.heartRateOptionTwo && heartRateTwo)) {
-            // Process heart rate data for both players
-            if (heartRateOne) {
-                heartRateOne.forEach(entry => {
-                    allData.push({
-                        timestamp: `${matchDetails.date}T${entry.time}`,
-                        time: entry.time,
-                        value: entry.value,
-                        details: `Heart rate: ${entry.value} bpm`
-                    });
-                });
-            }
+    function generateCombinedCSV(hrOne, hrTwo, scores) {
+        const output = []; // Array to store combined JSON data to be parsed
+        const timeToRow = {};
 
-            if (heartRateTwo) {
-                heartRateTwo.forEach(entry => {
-                    allData.push({
-                        timestamp: `${matchDetails.date}T${entry.time}`,
-                        time: entry.time,
-                        value: entry.value,
-                        details: `Heart rate: ${entry.value} bpm`
-                    });
-                });
-            }
-        }
-
-        // Add score history data if selected
-        if (exportOptions.scoreHistoryOption && scoreHistory) {
-            scoreHistory.forEach(entry => {
-                allData.push({
-                    timestamp: `${matchDetails.date}T${entry.time}`,
-                    // timestamp: `T${entry.time}`,
-                    time: entry.time,
-                    value: entry.winner,
-                    details: `${entry.winner} won the point`
-                });
+        // Add Player 1 HR data if selected and available
+        if (exportOptions.heartRateOptionOne && hrOne) {
+            hrOne.forEach(entry => {
+                if (!timeToRow[entry.time]) {
+                    timeToRow[entry.time] = {};
+                }
+                timeToRow[entry.time].hrOne = entry.value;
             });
         }
 
-        // Sort all data by timestamp
-        allData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        // Add Player 2 HR data if selected and available
+        if (exportOptions.heartRateOptionTwo && hrTwo) {
+            hrTwo.forEach(entry => {
+                if (!timeToRow[entry.time]) {
+                    timeToRow[entry.time] = {};
+                }
+                timeToRow[entry.time].hrTwo = entry.value;
+            });
+        }
 
-        // Add match metadata as header rows
-        const metadataRows = [
-            {
-                timestamp: getMatchDurationText(matchDetails.date),
-                time: matchDetails.sport,
-                value: `Players: ${players.map(p => p.name).join(' vs ')}`,
-                details: matchDetails.duration ? `${Math.round(matchDetails.duration / 60000)} min` : 'N/A'
-            },
-            {
-                timestamp: '',
-                time: '',
-                value: '',
-                details: ''
-            } // Empty row separator
-        ];
+        // Add score history data if selected and available
+        if (exportOptions.scoreHistoryOption && scores) {
+            scores.forEach(entry => {
+                if (!timeToRow[entry.time]) {
+                    timeToRow[entry.time] = {};
+                }
+                timeToRow[entry.time].pointWinner = entry.winner;
+            });
+        }
 
-        const finalData = [...metadataRows, ...allData];
-        
-        return Papa.unparse(finalData, {
-            columns: ['timestamp', 'time', 'value', 'details']
+        // Convert merged timeToRow map into rows
+        const sortedTimes = Object.keys(timeToRow).sort();
+        sortedTimes.forEach(time => {
+            const row = timeToRow[time];
+            output.push({
+                Time: time,
+                "HR One (bpm)": row.hrOne ?? '',
+                "HR Two (bpm)": row.hrTwo ?? '',
+                "Point winner": row.pointWinner ?? ''
+            });
         });
-    };
+
+        return Papa.unparse(output, {
+            columns: ["Time", "HR One (bpm)", "HR Two (bpm)", "Point winner"]
+        });
+    }
+
 
 
     // Handle CSV save with file picker attempt
@@ -135,15 +118,16 @@ export default function CSVModal({ isOpen, onClose, players, matchDetails, score
         }
 
         const csvContent = generateCombinedCSV(heartRateOne, heartRateTwo, scoreHistory);
-        const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `tracket_match_${matchDetails.sport}_${timestamp}.csv`; // tweak this
+        // const timestamp = new Date().toISOString().split('T')[0];
+        const timeSuffix = matchDetails.startTime.slice(0, 2) >= 12 ? "pm" : "am";
+        const formattedStartTime = `${matchDetails.startTime.slice(0, 5)}${timeSuffix}`; // go from 16:07:13 to 16_07pm
+        const filename = `${players[0].name} vs. ${players[1].name} (${matchDetails.sport}), ${getCurrentDateText(matchDetails.date)}, ${formattedStartTime} (${getMatchDurationText(matchDetails.duration)}).csv`; // tweak this
 
         // Try modern File System Access API first
         const fileSystemResult = await saveWithFileSystemAPI(csvContent, filename);
         
         if (fileSystemResult === true) {
             // Successfully saved with file picker
-            alert('CSV file saved successfully!');
             onClose();
         } else if (fileSystemResult === null) {
             // User cancelled - do nothing
@@ -152,7 +136,6 @@ export default function CSVModal({ isOpen, onClose, players, matchDetails, score
             // Fallback to traditional download
             console.log('File System Access API not supported, using traditional download');
             downloadCSV(csvContent, filename);
-            alert('CSV file downloaded to your Downloads folder');
             onClose();
         }
     };

@@ -1,4 +1,3 @@
-import React from "react";
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export default function CombinedGraph({ matchDetails, matchStatus, players, heartRateOne, heartRateTwo, smoothHeartRateData, scoreHistory }){

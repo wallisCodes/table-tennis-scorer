@@ -67,7 +67,8 @@ export function getMatchDuration(start, finish){
 // Get current date in text format to be displayed inside Dashboard
 export function getCurrentDateText(date){
 // export function getCurrentDateText(){
-    const weekdayArray = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    // const weekdayArray = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const weekdayArray = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const dayArray = [
         "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
         "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th", "20th",

@@ -23,21 +23,21 @@ export default function App(){
         }
     );
     const matchStatus = useRef("pending"); // pending, active or complete
-    const [players, setPlayers] = useState([]);
-    // const [players, setPlayers] = useState([ // for testing purposes
-    //     {
-    //         name: "Wallis",
-    //         age: 28,
-    //         colour: "#ff00ff",
-    //         points: 10 // testing purposes
-    //     },
-    //     {
-    //         name: "Lau",
-    //         age: 56,
-    //         colour: "#00ff00",
-    //         points: 9 // testing purposes
-    //     }
-    // ]);
+    // const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([ // for testing purposes
+        {
+            name: "Wallis",
+            age: 28,
+            colour: "#ff00ff",
+            points: 10 // testing purposes
+        },
+        {
+            name: "Lau",
+            age: 56,
+            colour: "#00ff00",
+            points: 9 // testing purposes
+        }
+    ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     // Creating refs to store session ids for user, players, match and match player records
     const userIdRef = useRef(null);
@@ -106,8 +106,8 @@ export default function App(){
 
 
     // Used to generate mock HR data for testing purposes
-    const [mockData, setMockData] = useState(false);
-    // const [mockData, setMockData] = useState(true);
+    // const [mockData, setMockData] = useState(false);
+    const [mockData, setMockData] = useState(true);
 
     if (mockData === true){
         useEffect(() => {
