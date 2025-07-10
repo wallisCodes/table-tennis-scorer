@@ -148,7 +148,7 @@ export async function getPlayerById(playerId){
             throw new Error(`Failed to retrieve specific player: ${response.status}`);
         }
         const player = await response.json();
-        console.log("Individual player loaded successfully.");
+        // console.log("Individual player loaded successfully.");
         return player;
 
     } catch (error) {
@@ -167,7 +167,7 @@ export async function deleteSinglePlayer(playerId){
         if (!response.ok) {
             throw new Error(`Failed to delete player: ${response.status}`);
         }
-        console.log(`Player with ID ${playerIdToDelete} deleted successfully.`);
+        console.log(`Player with ID ${playerId} deleted successfully.`);
 
     } catch (error) {
         console.error("Error:", error.message);
@@ -287,6 +287,40 @@ export async function updateMatch(matchId, updateData){
 }
 
 
+///////////////////////////////////////////////////////////////
+// export async function deleteSinglePlayer(playerId){
+//     try {
+//         const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
+//             method: "DELETE"
+//         });
+        
+//         if (!response.ok) {
+//             throw new Error(`Failed to delete player: ${response.status}`);
+//         }
+//         console.log(`Player with ID ${playerId} deleted successfully.`);
+
+//     } catch (error) {
+//         console.error("Error:", error.message);
+//     }
+// } 
+///////////////////////////////////////////////////////////////
+
+export async function deleteMatch(matchId){
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/match/${matchId}`, {
+            method: "DELETE"
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to delete match: ${response.status}`);
+        }
+        console.log(`Match with ID ${matchId} deleted successfully.`);
+
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
+}
+
 
 // ========================== MATCH-PLAYER FETCH REQUESTS ========================== //
 export async function createMatchPlayers(playerIds, matchId){
@@ -336,7 +370,7 @@ export async function getPlayersByMatch(matchId){
             throw new Error(`Failed to retrieve match player records for specific match: ${response.status}`);
         }
         const playerData = await response.json();
-        console.log("Specific match players retrieved successfully", playerData);
+        // console.log("Specific match players retrieved successfully", playerData);
         return playerData;
 
     } catch (error) {
@@ -354,7 +388,7 @@ export async function getMatchesByPlayer(playerId){
             throw new Error(`Failed to retrieve match player records for specific player: ${response.status}`);
         }
         const matchData = await response.json();
-        console.log("Specific player matches retrieved successfully", matchData);
+        // console.log("Specific player matches retrieved successfully", matchData);
         return matchData;
 
     } catch (error) {
@@ -381,6 +415,23 @@ export async function updateMatchPlayer(matchPlayerId, playerScore){
     } catch (error) {
         console.error("Error:", error.message);
         return null;
+    }
+}
+
+
+export async function deleteMatchPlayer(matchPlayerId){
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/match-player/${matchPlayerId}`, {
+            method: "DELETE"
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to delete match-player: ${response.status}`);
+        }
+        console.log(`Match-player with ID ${matchPlayerId} deleted successfully.`);
+
+    } catch (error) {
+        console.error("Error:", error.message);
     }
 }
 
@@ -426,6 +477,11 @@ export async function getScoreHistory(matchId){
 }
 
 
+export async function deleteScoreHistory(){
+    // TODO: add backend controller "deleteScoringBatch" and matching route
+}
+
+
 // ========================== HEART RATE FETCH REQUESTS ========================== //    
 export async function createHeartRate(matchId, playerId, heartRateData){
     try {
@@ -456,7 +512,7 @@ export async function getHeartRate(matchId, playerId){
             throw new Error(`Failed to retrieve heart rate records for specific player: ${response.status}`);
         }
         const heartRateData = await response.json();
-        console.log("Heart rate data retrieved successfully", heartRateData);
+        // console.log("Heart rate data retrieved successfully", heartRateData);
         return heartRateData;
 
     } catch (error) {

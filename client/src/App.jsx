@@ -106,8 +106,8 @@ export default function App(){
 
 
     // Used to generate mock HR data for testing purposes
-    // const [mockData, setMockData] = useState(false);
-    const [mockData, setMockData] = useState(true);
+    const [mockData, setMockData] = useState(false);
+    // const [mockData, setMockData] = useState(true);
 
     if (mockData === true){
         useEffect(() => {

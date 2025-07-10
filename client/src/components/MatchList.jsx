@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAllMatches, getPlayersByMatch, getPlayerById, getHeartRate } from "../api";
 import MatchCard from "./MatchCard";
 
@@ -40,8 +40,8 @@ export default function MatchList(){
                     };
                 }));
 
-                console.log("matchesData:", matchesData);
-                console.log("matchesWithDetails:", matchesWithDetails);
+                // console.log("matchesData:", matchesData);
+                // console.log("matchesWithDetails:", matchesWithDetails);
                 setMatches(matchesWithDetails);
                 setLoading(false);
             } catch (error) {
