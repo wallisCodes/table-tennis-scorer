@@ -16,6 +16,15 @@ Player.init(
         colour: {
             type: DataTypes.STRING, // HEX colour
             allowNull: false
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id'
+            },
+            field: 'user_id'
         }
     },
     {

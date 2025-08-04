@@ -32,3 +32,20 @@ export const getHeartRateByPlayer = async (req, res) => {
         res.status(500).json({ error: "Error fetching heart rate data" });
     }
 };
+
+export const deleteHeartRateByPlayer = async (req, res) => {
+    const { matchId, playerId } = req.params;
+
+    try {
+        const heartRate = await HeartRate.findAll({ where: { matchId, playerId } });
+        if (heartRate) {
+            await heartRate.destroy();
+            res.status(204).send();
+        } else {
+            res.status(404).json({ error: "Heart rate not found" });
+        }
+    } catch (error) {
+        console.error("Error deleting heart rate:", error);
+        res.status(500).json({ error: "Error deleting heart rate" });
+    }
+}

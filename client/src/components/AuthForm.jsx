@@ -38,7 +38,7 @@ export default function AuthForm({ userIdRef, setUser, matchIdRef, matchDetails,
 
             // Navigate to correct page after logging in, depending on matchStatus
             if (matchStatus.current === "pending"){
-                navigate("/input");
+                navigate("/create");
             } else if (matchStatus.current === "active"){
                 navigate("/scores");
             } else {

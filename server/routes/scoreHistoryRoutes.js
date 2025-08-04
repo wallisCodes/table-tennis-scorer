@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import { createScoringBatch, getScoreHistory } from '../controllers/scoreHistoryController.js';
+import { createScoreHistory, getScoreHistory, deleteScoreHistory } from '../controllers/scoreHistoryController.js';
+import { authenticateToken } from '../middleware/auth.js';
+
 const router = Router();
 
-router.post('/:matchId', createScoringBatch);
-router.get('/:matchId', getScoreHistory);
+router.post('/:matchId', createScoreHistory);
+router.get('/:matchId', authenticateToken, getScoreHistory);
+router.delete('/:matchId', authenticateToken, deleteScoreHistory);
 
 export default router;

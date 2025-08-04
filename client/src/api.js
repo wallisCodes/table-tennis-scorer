@@ -18,7 +18,7 @@ export async function registerUser(email, password) {
         console.log("User registered successfully!");
 
         const newUser = await response.json();
-        console.log("newUser:", newUser);
+        // console.log("newUser:", newUser);
         return newUser.id;
 
     } catch (error) {
@@ -142,7 +142,10 @@ export async function getAllPlayers(){
 
 export async function getPlayerById(playerId){
     try {
-        const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`);
+        const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
+            method: "GET",
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve specific player: ${response.status}`);
@@ -161,7 +164,8 @@ export async function getPlayerById(playerId){
 export async function deleteSinglePlayer(playerId){
     try {
         const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            credentials: "include"
         });
         
         if (!response.ok) {
@@ -178,7 +182,8 @@ export async function deleteSinglePlayer(playerId){
 export async function deleteAllPlayers(){
     try {
         const response = await fetch(`${API_BASE_URL}/api/players`, {
-            method: "DELETE"
+            method: "DELETE",
+            credentials: "include"
         });
 
         if (!response.ok) {
@@ -287,28 +292,11 @@ export async function updateMatch(matchId, updateData){
 }
 
 
-///////////////////////////////////////////////////////////////
-// export async function deleteSinglePlayer(playerId){
-//     try {
-//         const response = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
-//             method: "DELETE"
-//         });
-        
-//         if (!response.ok) {
-//             throw new Error(`Failed to delete player: ${response.status}`);
-//         }
-//         console.log(`Player with ID ${playerId} deleted successfully.`);
-
-//     } catch (error) {
-//         console.error("Error:", error.message);
-//     }
-// } 
-///////////////////////////////////////////////////////////////
-
 export async function deleteMatch(matchId){
     try {
         const response = await fetch(`${API_BASE_URL}/api/match/${matchId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            credentials: "include"
         });
         
         if (!response.ok) {
@@ -364,7 +352,10 @@ export async function createMatchPlayers(playerIds, matchId){
 
 export async function getPlayersByMatch(matchId){
     try {
-        const response = await fetch(`${API_BASE_URL}/api/match-player/${matchId}`);
+        const response = await fetch(`${API_BASE_URL}/api/match-player/${matchId}`, {
+            method: "GET",
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve match player records for specific match: ${response.status}`);
@@ -382,7 +373,10 @@ export async function getPlayersByMatch(matchId){
 
 export async function getMatchesByPlayer(playerId){
     try {
-        const response = await fetch(`${API_BASE_URL}/api/match-player/player/${playerId}`);
+        const response = await fetch(`${API_BASE_URL}/api/match-player/player/${playerId}`, {
+            method: "GET",
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve match player records for specific player: ${response.status}`);
@@ -422,7 +416,8 @@ export async function updateMatchPlayer(matchPlayerId, playerScore){
 export async function deleteMatchPlayer(matchPlayerId){
     try {
         const response = await fetch(`${API_BASE_URL}/api/match-player/${matchPlayerId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            credentials: "include"
         });
         
         if (!response.ok) {
@@ -461,7 +456,10 @@ export async function createScoreHistory(matchId, scoreHistoryData){
 
 export async function getScoreHistory(matchId){
     try {
-        const response = await fetch(`${API_BASE_URL}/api/score-history/${matchId}`);
+        const response = await fetch(`${API_BASE_URL}/api/score-history/${matchId}`, {
+            method: "GET",
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve score history records for specific match: ${response.status}`);
@@ -477,8 +475,21 @@ export async function getScoreHistory(matchId){
 }
 
 
-export async function deleteScoreHistory(){
-    // TODO: add backend controller "deleteScoringBatch" and matching route
+export async function deleteScoreHistory(matchId){
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/score-history/${matchId}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete score history records for specific match: ${response.status}`);
+        }
+        console.log(`Score history for match ID ${matchId} deleted successfully`);
+
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
 }
 
 
@@ -506,7 +517,10 @@ export async function createHeartRate(matchId, playerId, heartRateData){
 
 export async function getHeartRate(matchId, playerId){
     try {
-        const response = await fetch(`${API_BASE_URL}/api/heart-rate/${matchId}/${playerId}`);
+        const response = await fetch(`${API_BASE_URL}/api/heart-rate/${matchId}/${playerId}`, {
+            method: "GET",
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to retrieve heart rate records for specific player: ${response.status}`);
@@ -518,5 +532,22 @@ export async function getHeartRate(matchId, playerId){
     } catch (error) {
         console.error("Error:", error.message);
         return null;
+    }
+}
+
+export async function deleteHeartRateByPlayer(matchId, playerId){
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/heart-rate/${matchId}/${playerId}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete heart rate record for specific match and player: ${response.status}`);
+        }
+        console.log(`Heart rate data for match ID ${matchId}, player ID ${playerId} deleted successfully`);
+
+    } catch (error) {
+        console.error("Error:", error.message);
     }
 }

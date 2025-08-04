@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { createMatch, claimMatch, getAllMatches, getMatchById, updateMatch, deleteMatch } from '../controllers/matchController.js';
 import { authenticateToken } from '../middleware/auth.js';
+
 const router = Router();
 
 // CRUD operations for matches

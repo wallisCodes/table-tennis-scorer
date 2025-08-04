@@ -9,7 +9,7 @@ export default function MatchList(){
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                const matchesData = await getAllMatches();
+                const matchesData = await getAllMatches(); // Array of all matches tied to logged-in user
                 const matchesWithDetails = await Promise.all(matchesData.map(async (match) => {
                     // Fetch players for the match
                     const matchPlayers = await getPlayersByMatch(match.id);
@@ -59,7 +59,11 @@ export default function MatchList(){
     return (
         <div className="match-list">
             {matches.map(match => (
-                <MatchCard key={match.id} match={match} />
+                <MatchCard 
+                    key={match.id}
+                    match={match}
+                    setMatches={setMatches}
+                />
             ))}
         </div>
     );

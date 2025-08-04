@@ -12,7 +12,6 @@ export const createMatchPlayers = async (req, res) => {
     }
 };
   
-// Controller to get all match-player records for a specific match
 export const getMatchPlayerByMatch = async (req, res) => {
     const { matchId } = req.params;
     try {
@@ -24,7 +23,6 @@ export const getMatchPlayerByMatch = async (req, res) => {
     }
 };
 
-// Controller to get all match-player records for a specific player
 export const getMatchPlayerByPlayer = async (req, res) => {
     const { playerId } = req.params;
     try {
@@ -40,7 +38,6 @@ export const getMatchPlayerByPlayer = async (req, res) => {
     }
 }
   
-// Controller to update a specific match-player record
 export const updateMatchPlayer = async (req, res) => {
     const { id } = req.params;
     const { finalScore } = req.body; // Only finalScore is to be updated
@@ -60,7 +57,6 @@ export const updateMatchPlayer = async (req, res) => {
     }
 };
   
-// Controller to delete a specific match-player record
 export const deleteMatchPlayer = async (req, res) => {
     const { id } = req.params;
     try {

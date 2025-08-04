@@ -1,6 +1,6 @@
 import ScoreHistory from "../models/ScoreHistory.js";
 
-export const createScoringBatch = async (req, res) => {
+export const createScoreHistory = async (req, res) => {
     const { matchId } = req.params;
     const scoreEvents = req.body; // Expecting an array of score events
   
@@ -14,12 +14,11 @@ export const createScoringBatch = async (req, res) => {
         await ScoreHistory.bulkCreate(records);
         res.status(201).json(records);
     } catch (error) {
-        console.error("Error adding score event batch", error);
-        res.status(500).json({ error: "Error adding score event batch" });
+        console.error("Error adding score history", error);
+        res.status(500).json({ error: "Error adding score history" });
     }
 };
 
-// Retrieve score history for a particular match
 export const getScoreHistory = async (req, res) => {
     const { matchId } = req.params;
     
@@ -31,3 +30,19 @@ export const getScoreHistory = async (req, res) => {
         res.status(500).json({ error: "Error fetching score history" });
     }
 };
+
+export const deleteScoreHistory = async (req, res) => {
+    const { matchId } = req.params;
+
+    try {
+        const deletedCount = await ScoreHistory.destroy({ where: { matchId } });
+        if (deletedCount > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ error: "Score history not found for this match" });
+        }
+    } catch (error) {
+        console.error("Error deleting score history:", error);
+        res.status(500).json({ error: "Error deleting score history" });
+    }
+}

@@ -46,7 +46,7 @@ export const loginUser = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-        console.log("Generated Token for User:", token);
+        // console.log("Generated Token for User:", token);
 
         // Set JWT as HTTP-only cookie
         res.cookie("token", token, {
