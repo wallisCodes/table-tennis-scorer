@@ -195,16 +195,6 @@ export default function CSVModal({ isOpen, onClose, players, matchDetails, score
                 </div>
             </div>
 
-            {/* Info Box */}
-            {/* <div className="">
-                <p className="">
-                    <strong>Note:</strong> All selected data will be combined into one CSV file. 
-                    {('showSaveFilePicker' in window) 
-                    ? ' You can choose where to save it.' 
-                    : ' It will be saved to your Downloads folder.'}
-                </p>
-            </div> */}
-
             {/* Modal Buttons */}
             <div className="modal-buttons">
                 <button

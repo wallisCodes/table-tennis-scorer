@@ -321,11 +321,29 @@ a {
     border: 1px solid white;
 }
 
+.export-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.2); /* dim effect */
+  z-index: 999; /* behind modal but above everything else */
+}
+
 .export-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* center horizontally + vertically */
+    z-index: 1000; /* above overlay */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+
     display: flex;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
+    background-color: #192734;
     padding: 1rem;
     border: 2px solid white;
 }
@@ -335,6 +353,15 @@ a {
     gap: 2rem;
     align-items: center;
     width: 200px;
+}
+
+.export-btn {
+    font-size: 1.2rem;
+    padding: 2px 10px;
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    cursor: pointer;
 }
 
 .player-one, .player-two {
@@ -494,8 +521,6 @@ a {
 .point-lost {
     background-color: red;
 }
-
-.post-match-buttons {}
 
 .heart-rate-box {
     display: flex;
