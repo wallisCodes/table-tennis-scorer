@@ -14,7 +14,7 @@ export default function App(){
     const [user, setUser] = useState(null);
     const [matchDetails, setMatchDetails] = useState(
         {
-            sport: "squash", // testing null starting value
+            sport: "table-tennis", // testing null starting value
             date: null, // Unix timestamp, used for filtering in dashboard
             startTime: null, // hh:mm:ss format
             endTime: null, // hh:mm:ss format

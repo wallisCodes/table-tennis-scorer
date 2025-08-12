@@ -6,14 +6,8 @@ import { deleteMatch, getScoreHistory, getHeartRate } from "../api";
 export default function MatchCard({ match, setMatches }){
     // Defining state
     const [showCSVModal, setShowCSVModal] = useState(false);
-    // const [csvData, setCsvData] = useState({
-    //     players: [],
-    //     matchDetails: {},
-    //     scoreHistory: [],
-    //     heartRateOne: [],
-    //     heartRateTwo: []
-    // });
     const [csvData, setCsvData] = useState(null); // Cache per card
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 
     async function handleExportClick() {
@@ -55,8 +49,7 @@ export default function MatchCard({ match, setMatches }){
                 </button>
 
                 <svg onClick={async () => {
-                    await deleteMatch(match.id);
-                    setMatches(prev => prev.filter(m => m.id !== match.id)); // Optimistic delete
+                    setShowDeleteModal(true);
                 }}
                     className="dashboard-icon"
                     clipRule="evenodd"
@@ -69,13 +62,34 @@ export default function MatchCard({ match, setMatches }){
 
             {(showCSVModal && csvData) && (
                 <>
-                    <div className="export-modal-overlay" onClick={() => setShowCSVModal(false)} />
+                    <div onClick={() => setShowCSVModal(false)} className="export-modal-overlay"/>
                     <CSVModal
                         isOpen={showCSVModal}
                         onClose={() => setShowCSVModal(false)}
                         {...csvData}
                     />
                 </>
+            )}
+
+            {showDeleteModal && (
+                <div onClick={() => setShowDeleteModal(false)} className="export-modal-overlay">
+                    <div className="export-modal-container">
+                        <h2>Are you sure you want to delete this match?</h2>
+                        <div className="modal-buttons">
+                            <button onClick={() => setShowDeleteModal(false)} className="modal-button">Cancel</button>
+                            <button 
+                                onClick={async () => {
+                                    await deleteMatch(match.id);
+                                    setMatches(prev => prev.filter(m => m.id !== match.id)); // Optimistic delete
+                                    setShowDeleteModal(false);
+                                }}
+                                className="modal-button"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
             
 
