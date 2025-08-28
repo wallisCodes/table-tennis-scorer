@@ -14,7 +14,7 @@ export default function App(){
     const [user, setUser] = useState(null);
     const [matchDetails, setMatchDetails] = useState(
         {
-            sport: "table-tennis", // testing null starting value
+            sport: null, // testing null starting value
             date: null, // Unix timestamp, used for filtering in dashboard
             startTime: null, // hh:mm:ss format
             endTime: null, // hh:mm:ss format
@@ -23,21 +23,21 @@ export default function App(){
         }
     );
     const matchStatus = useRef("pending"); // pending, active or complete
-    // const [players, setPlayers] = useState([]);
-    const [players, setPlayers] = useState([ // for testing purposes
-        {
-            name: "Wallis",
-            age: 28,
-            colour: "#ff00ff",
-            points: 10 // testing purposes
-        },
-        {
-            name: "Lau",
-            age: 56,
-            colour: "#00ff00",
-            points: 9 // testing purposes
-        }
-    ]);
+    const [players, setPlayers] = useState([]);
+    // const [players, setPlayers] = useState([ // for testing purposes
+    //     {
+    //         name: "Wallis",
+    //         age: 28,
+    //         colour: "#ff00ff",
+    //         points: 10 // testing purposes
+    //     },
+    //     {
+    //         name: "Lau",
+    //         age: 56,
+    //         colour: "#00ff00",
+    //         points: 9 // testing purposes
+    //     }
+    // ]);
     const [scoreHistory, setScoreHistory] = useState([]);
     // Creating refs to store session ids for user, players, match and match player records
     const userIdRef = useRef(null);

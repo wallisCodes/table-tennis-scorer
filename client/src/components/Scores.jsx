@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import CSVModal from "./CSVModal";
@@ -28,12 +28,16 @@ export default function GameTracking({
     // SCORING STATE & LOGIC
     const [winner, setWinner] = useState(null);
     const [showWinner, setShowWinner] = useState(false);
-    const [modal, setModal] = useState(false); // Modal for receiver to choose extra points played if tied 14-14
-    const [receiversChoice, setReceiversChoice] = useState(0);
+    const [showFinishBtn, setShowFinishBtn] = useState(true);
     const [scoreCooldown, setScoreCooldown] = useState(false);
     const shortCooldown = 1000;
     const longCooldown = 1000; // TODO: change back to 2000
     const [showCSVModal, setShowCSVModal] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const timerRef = useRef(null);
+    const startTimeRef = useRef(null);
+    const threshold = 1500;
+
 
     function updatePlayerPoints(playerIndex, increment = true){
         // Only update scores if they haven't been updated within [cooldownDuration] ms
@@ -79,76 +83,54 @@ export default function GameTracking({
     };
 
 
-    function promptReceiver(){
-        setTimeout(() => {
-            setModal(true);
-        }, "200");       
-    }
+    function startPress(){
+        startTimeRef.current = Date.now();
 
+        function step(){
+            const elapsed = Date.now() - startTimeRef.current;
+            const percentage = Math.min((elapsed / threshold) * 100, 100);
+            setProgress(percentage);
 
-    // Decide which scoring algorithm to execute depending on user sport choice
-    useEffect(() => {
-        if (matchDetails.sport === "table-tennis" || matchDetails.sport === "badminton"){
-            // Table tennis & badminton scoring: first to 21 points wins, must be by two clear points (e.g. 22-20, 25-23)
-            if (players.length === 2) {
-                const [player1, player2] = players;
-    
-                if (player1.points >= 21 && player1.points - player2.points >= 2) {
-                    setWinner(player1.name);
-                    setShowWinner(true);
-                } else if (player2.points >= 21 && player2.points - player1.points >= 2) {
-                    setWinner(player2.name);
-                    setShowWinner(true);
-                }
-            } 
-        }
-        else if (matchDetails.sport === "squash"){
-            // Squash scoring: first to 11 points wins, must be by two clear points (e.g. 12-10, 15-13)
-            if (players.length === 2) {
-                const [player1, player2] = players;
-    
-                if (player1.points >= 11 && player1.points - player2.points >= 2) {
-                    setWinner(player1.name);
-                    setShowWinner(true);
-                } else if (player2.points >= 11 && player2.points - player1.points >= 2) {
-                    setWinner(player2.name);
-                    setShowWinner(true);
-                }
-
-            // Alternative/old scoring logic...
-            // Squash scoring: first to 15, except if it's 14-14 a modal pops up asking the receiver if they want to play 1 or 3 more points
-            // if (player1.points === 14 && player2.points === 14) {
-            //     promptReceiver();
-            // }
-            // else if (player1.points === 15 + receiversChoice) {
-            //     setWinner(player1.name);
-            //     setShowWinner(true);
-            // } 
-            // else if (player2.points === 15 + receiversChoice) {
-            //     setWinner(player2.name);
-            //     setShowWinner(true);
-            // }
+            if (percentage < 100) {
+                timerRef.current = requestAnimationFrame(step);
+            } else {
+                handleFinishMatch();
+                setProgress(0);
             }
-        }
-        else {
-            console.log("Couldn't find matching scoring algorithm. Please check sport choice.");
-        }
-    }, [players]); // Run this effect whenever 'players' state changes
+        };
+
+        timerRef.current = requestAnimationFrame(step);
+    };
 
 
-    function chooseOneExtraPoint(){
-        setReceiversChoice(0);
-        // console.log("Receiver chose 1 extra point!");
-        setModal(false);
+    function cancelPress(){
+        if (timerRef.current) {
+            cancelAnimationFrame(timerRef.current);
+            timerRef.current = null;
+        }
+        setProgress(0);
+    };
+
+
+    function handleFinishMatch(){
+        setShowFinishBtn(false); // Hide finish match button after clicking it
+
+        if (players.length === 2) {
+            const [player1, player2] = players;
+
+            if (player1.points > player2.points) {
+                setWinner(player1.name);
+                setShowWinner(true);
+            } else if (player2.points > player1.points) {
+                setWinner(player2.name);
+                setShowWinner(true);
+            } else return;
+        }
     }
 
-    function chooseThreeExtraPoints(){
-        setReceiversChoice(2);
-        // console.log("Receiver chose 3 extra points!");
-        setModal(false);
-    }
 
     function handleGoBack(){
+        setShowFinishBtn(true);
         setShowWinner(false);
         setWinner(null); // Reset the winner state in order to make changes to score again
     };
@@ -220,9 +202,6 @@ export default function GameTracking({
         finishMatchFetchRequests(updatedMatchDetailsState);
         // THEN update the state (this doesn't affect the fetch function)
         setMatchDetails(updatedMatchDetailsState);
-
-        // Automatically navigate to Results "page"
-        // navigate("/results");
     }
 
 
@@ -277,17 +256,15 @@ export default function GameTracking({
         setHeartRateOne([]);
         setHeartRateTwo([]);
         setScoreHistory([]);
-        // console.log("Reset HR and score data");
 
-        // Reset matchStatus ref
-        matchStatus.current = "pending";
+        matchStatus.current = "pending"; // Reset matchStatus ref
 
         // Reset winner
+        setShowFinishBtn(true);
         setShowWinner(false);
         setWinner(null);
 
-        // Navigate to /scores route
-        navigate("/scores");
+        navigate("/scores"); // Navigate to /scores route
     }
 
     // Function to create a new match from scratch
@@ -306,36 +283,20 @@ export default function GameTracking({
         setHeartRateTwo([]);
         setScoreHistory([]);
 
-        // Reset matchStatus ref
-        matchStatus.current = "pending";
+        matchStatus.current = "pending"; // Reset matchStatus ref
 
         // Reset winner
+        setShowFinishBtn(true);
         setShowWinner(false);
         setWinner(null);
-
-        // Navigate to /create route
-        navigate("/create");
+        
+        navigate("/create"); // Navigate to /create route
     }
 
 
     return (
         <>
-            <div className="score-tracking-container">
-                {/* Modal that pops up when score is tied at 14-14 asking receiver how many more points should be played */}
-                {modal && 
-                <Modal
-                    openModal={modal}
-                    closeModal={() => setModal(false)}
-                    className=""
-                >
-                    <h1 className="modal-header">Extra points (receiver's choice)</h1>
-                    <div className="modal-buttons">
-                        <button onClick={chooseOneExtraPoint} className="modal-button">1</button>
-                        <button onClick={chooseThreeExtraPoints} className="modal-button">3</button>
-                    </div>                
-                </Modal>}
-                
-
+            <div className="score-tracking-container"> 
                 {/* First player/team display */}
                 <div className="player-one">
                     {/* Player name, colour and score */}
@@ -459,7 +420,26 @@ export default function GameTracking({
                     </div>
                 </div>
 
-                
+                {/* Finish Match button (user decides regardless of scores - unless equal) */}
+                {(showFinishBtn && matchStatus.current === "active") && 
+                    <div className="finish-game-container">
+                        <div className="finish-game-wrapper">
+                            <button 
+                                onMouseDown={startPress}
+                                onMouseUp={cancelPress}
+                                onMouseLeave={cancelPress}
+                                disabled={players[0].points - players[1].points == 0}
+                                className="finish-game-btn">
+                                    Finish Match
+                            </button>
+                            <div 
+                                className="finish-game-progress"
+                                style={{ width: `calc(${progress}% - 6px * ${progress / 100})` }}>
+                            </div>
+                        </div>
+                    </div>
+                }
+
                 {/* Second player/team display */}
                 <div className="player-two">
                     {/* Player name, colour and score */}
